@@ -30,6 +30,7 @@ use App\Http\Controllers\ShippmentE;
 use App\Http\Controllers\SIKController;
 use App\Http\Controllers\SupplyController;
 use App\Http\Controllers\TraillerController;
+use App\Http\Controllers\PackingController;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,16 @@ Route::get('/', [LoginController::class, 'index'])->name('login');
 Route::post('/login', [LoginController::class, 'proses'])->name('login-proses');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
+Route::prefix('Laporan-packing')->group(function () {
+    Route::get('/',[PackingController::class,'index'])->name('pac');
+    Route::get('/add',[PackingController::class,'add'])->name('pac.add');
+    Route::post('/store',[PackingController::class,'store'])->name('pac.store');
+    Route::delete('/delete/{id}',[PackingController::class,'destroy'])->name('pac.delete');
+    Route::get('/edit/{id}',[PackingController::class,'edit'])->name('pac.edit');
+    Route::put('/update/{id}',[PackingController::class,'update'])->name('pac.update');
+    Route::get('/print/{id}',[PackingController::class,'print'])->name('pac.print');
+    Route::get('/export',[PackingController::class,'export'])->name('pac.export');
+});
 Route::prefix('Surat-Izin-Keluar')->group(function () {
     Route::get('/',[SIKController::class,'index'])->name('sik');
     Route::get('/add',[SIKController::class,'add'])->name('sik.add');
@@ -92,10 +103,10 @@ Route::get('/download-report/{id}', [CraneController::class, 'downloadReport'])-
 
 
 Route::middleware([AutoLogout::class])->group(function () {
-    
+
     Route::get('/welcome', [LoginController::class, 'welcome'])->name('welcome');
 
-    //Profile 
+    //Profile
     Route::prefix('profile')->group(function () {
         Route::get('/{id}',[ProfileController::class,'index'])->name('profile');
         Route::put('/update/{id}',[ProfileController::class,'update'])->name('update-profile');
@@ -148,11 +159,11 @@ Route::middleware([AutoLogout::class])->group(function () {
                     Route::put('/update/{id}', [DataMasterController::class, 'updatedi'])->name('update');
                     Route::delete('/delete/{id}', [DataMasterController::class, 'destroydi'])->name('delete');
                 });
-                
+
             });
             Route::prefix('Open-Packing')->group(function () {
                 Route::get('/Open-Packing',[DataMasterController::class,'openPacking'])->name('data-master.Open-Packing');
-                
+
             });
         });
 
@@ -301,7 +312,7 @@ Route::middleware([AutoLogout::class])->group(function () {
             });
 
 
-            
+
         });
     });
 
@@ -309,7 +320,7 @@ Route::middleware([AutoLogout::class])->group(function () {
     Route::group(['prefix' => 'Mapping', 'middleware' => ['Mapping'], 'as' => 'Mapping.'], function () {
         //admin
         Route::group(['prefix' => 'admin', 'middleware' => ['admin'], 'as' => 'admin.'], function () {
-           
+
             Route::prefix('shipment')->group(function () {
                 Route::get('/', [DashboardController::class, 'index'])->name('shipment');
                 Route::get('/shipment/{id}', [DashboardController::class, 'show'])->name('show-shipment');
@@ -318,7 +329,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::post('shipmentcreated', [DashboardController::class, 'store'])->name('store-shipment');
             });
 
-            
+
             Route::prefix('mapping')->group(function () {
                 Route::get('/mapping/{id}', [MappingController::class, 'index'])->name('maping-shipment');
                 Route::get('/mapping-truk/{id}', [MappingTrukController::class, 'index'])->name('maping-shipment-truk');
@@ -344,12 +355,12 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::post('/upload-excel', [InputDataExcel::class, 'store'])->name('upload-excel');
                 Route::post('/upload-koil-excel', [InputDataExcel::class, 'storekoil'])->name('upload-koil-excel');
             });
-            
+
         });
 
         //pegawai
         Route::group(['prefix' => 'pegawai', 'middleware' => ['pegawai'], 'as' => 'pegawai.'], function () {
-            
+
             Route::prefix('shipment')->group(function () {
                 Route::get('/', [DashboardController::class, 'index'])->name('shipment');
                 Route::get('/shipment/{id}', [DashboardController::class, 'show'])->name('show-shipment');
@@ -382,7 +393,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::post('/upload-koil-excel', [InputDataExcel::class, 'storekoil'])->name('upload-koil-excel');
             });
         });
-            
+
     });
 
     // Form-Check
@@ -392,7 +403,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::group(['prefix' => 'admin', 'middleware' => ['admin'], 'as' => 'admin.'], function () {
             //dashboard admin
             Route::get('/',[DashboardControlller::class, 'fcindex'])->name('dashboard');
-            
+
             //crane
             Route::prefix('crane')->group(function () {
                 Route::get('/', [CraneController::class, 'index'])->name('crane');
@@ -428,7 +439,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/export', [TraillerController::class, 'export'])->name('trailler.export');
 
             });
-            
+
             //Eup
             Route::prefix('eup')->group(function () {
                 Route::get('/', [EUPController::class, 'index'])->name('eup');
@@ -436,8 +447,8 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::post('/create', [EUPController::class, 'create'])->name('eup.create');
                 Route::get('/print/{id}', [EUPController::class, 'print'])->name('eup.print');
                 Route::get('/export', [EUPController::class, 'export'])->name('eup.export');
-                Route::get('/show/{id}', [EUPController::class, 'show'])->name('eup.show');    
-                Route::delete('/destroy/{id}', [EUPController::class, 'destroy'])->name('eup.destroy');  
+                Route::get('/show/{id}', [EUPController::class, 'show'])->name('eup.show');
+                Route::delete('/destroy/{id}', [EUPController::class, 'destroy'])->name('eup.destroy');
             });
 
             //material
@@ -447,30 +458,30 @@ Route::middleware([AutoLogout::class])->group(function () {
                     Route::get('/add', [MaterialController::class, 'add_crc'])->name('crc.add');
                     Route::get('/export', [MaterialController::class, 'crc_export'])->name('crc.export');
                     Route::post('/create', [MaterialController::class, 'create_crc'])->name('crc.create');
-                    Route::get('/print/{id}', [MaterialController::class, 'print_crc'])->name('crc.print');    
-                    Route::get('/show/{id}', [MaterialController::class, 'show_crc'])->name('crc.show');    
-                    Route::delete('/destroy/{id}', [MaterialController::class, 'destroy_crc'])->name('crc.destroy');  
-                    
+                    Route::get('/print/{id}', [MaterialController::class, 'print_crc'])->name('crc.print');
+                    Route::get('/show/{id}', [MaterialController::class, 'show_crc'])->name('crc.show');
+                    Route::delete('/destroy/{id}', [MaterialController::class, 'destroy_crc'])->name('crc.destroy');
+
                 });
                 Route::prefix('ingot')->group(function () {
                     Route::get('/', [MaterialController::class, 'index_ingot'])->name('ingot');
                     Route::get('/add', [MaterialController::class, 'add_ingot'])->name('ingot.add');
                     Route::get('/export', [MaterialController::class, 'ingot_export'])->name('ingot.export');
                     Route::post('/create', [MaterialController::class, 'create_ingot'])->name('ingot.create');
-                    Route::get('/print/{id}', [MaterialController::class, 'print_ingot'])->name('ingot.print');   
-                    Route::get('/show/{id}', [MaterialController::class, 'show_ingot'])->name('ingot.show');    
-                    Route::delete('/destroy/{id}', [MaterialController::class, 'destroy_ingot'])->name('ingot.destroy');  
-                    
-                    
+                    Route::get('/print/{id}', [MaterialController::class, 'print_ingot'])->name('ingot.print');
+                    Route::get('/show/{id}', [MaterialController::class, 'show_ingot'])->name('ingot.show');
+                    Route::delete('/destroy/{id}', [MaterialController::class, 'destroy_ingot'])->name('ingot.destroy');
+
+
                 });
                 Route::prefix('resin')->group(function () {
                     Route::get('/', [MaterialController::class, 'index_resin'])->name('resin');
                     Route::get('/add', [MaterialController::class, 'add_resin'])->name('resin.add');
                     Route::get('/export', [MaterialController::class, 'resin_export'])->name('resin.export');
                     Route::post('/create', [MaterialController::class, 'create_resin'])->name('resin.create');
-                    Route::get('/print/{id}', [MaterialController::class, 'print_resin'])->name('resin.print');  
-                    Route::get('/show/{id}', [MaterialController::class, 'show_resin'])->name('resin.show');    
-                    Route::delete('/destroy/{id}', [MaterialController::class, 'destroy_resin'])->name('resin.destroy');  
+                    Route::get('/print/{id}', [MaterialController::class, 'print_resin'])->name('resin.print');
+                    Route::get('/show/{id}', [MaterialController::class, 'show_resin'])->name('resin.show');
+                    Route::delete('/destroy/{id}', [MaterialController::class, 'destroy_resin'])->name('resin.destroy');
                 });
             });
 
@@ -480,7 +491,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::group(['prefix' => 'pegawai', 'middleware' => ['pegawai'], 'as' => 'pegawai.'], function () {
 
             Route::get('/',[DashboardControlller::class, 'fc_pegawai'])->name('dashboard');
-            
+
             //crane
             Route::prefix('crane')->group(function () {
                 Route::get('/', [CraneController::class, 'index'])->name('crane');
@@ -517,23 +528,23 @@ Route::middleware([AutoLogout::class])->group(function () {
                     Route::get('/', [MaterialController::class, 'index_crc'])->name('crc');
                     Route::get('/add', [MaterialController::class, 'add_crc'])->name('crc.add');
                     Route::post('/create', [MaterialController::class, 'create_crc'])->name('crc.create');
-                    Route::get('/print/{id}', [MaterialController::class, 'print_crc'])->name('crc.print');    
-                    Route::get('/show/{id}', [MaterialController::class, 'show_crc'])->name('crc.show');    
+                    Route::get('/print/{id}', [MaterialController::class, 'print_crc'])->name('crc.print');
+                    Route::get('/show/{id}', [MaterialController::class, 'show_crc'])->name('crc.show');
                 });
                 Route::prefix('ingot')->group(function () {
                     Route::get('/', [MaterialController::class, 'index_ingot'])->name('ingot');
                     Route::get('/add', [MaterialController::class, 'add_ingot'])->name('ingot.add');
                     Route::post('/create', [MaterialController::class, 'create_ingot'])->name('ingot.create');
-                    Route::get('/print/{id}', [MaterialController::class, 'print_ingot'])->name('ingot.print');    
-                
+                    Route::get('/print/{id}', [MaterialController::class, 'print_ingot'])->name('ingot.print');
+
                 });
                 Route::prefix('resin')->group(function () {
                     Route::get('/', [MaterialController::class, 'index_resin'])->name('resin');
                     Route::get('/add', [MaterialController::class, 'add_resin'])->name('resin.add');
                     Route::post('/create', [MaterialController::class, 'create_resin'])->name('resin.create');
-                    Route::get('/print/{id}', [MaterialController::class, 'print_resin'])->name('resin.print');    
-                
-                }); 
+                    Route::get('/print/{id}', [MaterialController::class, 'print_resin'])->name('resin.print');
+
+                });
             });
             //Eup
             Route::prefix('eup')->group(function () {
@@ -541,7 +552,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/add', [EUPController::class, 'add'])->name('eup.add');
                 Route::post('/create', [EUPController::class, 'create'])->name('eup.create');
                 Route::get('/print/{id}', [EUPController::class, 'print'])->name('eup.print');
-                Route::get('/show/{id}', [EUPController::class, 'show'])->name('eup.show');     
+                Route::get('/show/{id}', [EUPController::class, 'show'])->name('eup.show');
             });
         });
     });
@@ -549,7 +560,7 @@ Route::middleware([AutoLogout::class])->group(function () {
     // Open-Packing
     Route::group(['prefix' => 'Open-Packing', 'middleware' => ['Open-Packing'], 'as' => 'Open-Packing.'], function () {
 
-        
+
         Route::group(['prefix' => 'admin', 'middleware' => ['admin'], 'as' => 'admin.'], function () {
             Route::get('/',[DashboardControlller::class, 'op_admin'])->name('dashboard');
             Route::get('/backup',[OpenPackController::class, 'backup'])->name('backup');
@@ -586,7 +597,7 @@ Route::middleware([AutoLogout::class])->group(function () {
     // Supply
     Route::group(['prefix' => 'Supply', 'middleware' => ['Supply'], 'as' => 'Supply.'], function () {
 
-        
+
         Route::group(['prefix' => 'admin', 'middleware' => ['admin'], 'as' => 'admin.'], function () {
             Route::get('/',[DashboardControlller::class, 'sp_admin'])->name('dashboard');
             Route::prefix('supply')->group(function () {
@@ -618,7 +629,7 @@ Route::middleware([AutoLogout::class])->group(function () {
     // Packing-List
     Route::group(['prefix' => 'Packing-List', 'middleware' => ['Packing-List'], 'as' => 'Packing-List.'], function () {
 
-        
+
         Route::group(['prefix' => 'admin', 'middleware' => ['admin'], 'as' => 'admin.'], function () {
             Route::get('/',[DashboardControlller::class, 'pl_admin'])->name('dashboard');
             Route::prefix('list')->group(function () {
@@ -657,9 +668,9 @@ Route::middleware([AutoLogout::class])->group(function () {
                     Route::delete('/delete/{id}',[PListController::class, 'db_delete_gm'])->name('gm.delete');
                     Route::delete('/clear',[PListController::class, 'db_clear_gm'])->name('gm.clear');
                 });
-            
+
             });
-                
+
             Route::prefix('hasil')->group(function () {
                 Route::get('/',[PListController::class, 'hasil_group'])->name('hasil');
                 Route::get('/show/{ket}',[PListController::class, 'hasil'])->name('hasil.shows');
@@ -668,7 +679,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/download/{ket}',[PListController::class, 'exportexcel'])->name('hasil.export');
                 Route::get('/download',[PListController::class, 'exportexcels'])->name('hasil.exports');
             });
-                
+
         });
 
     });
@@ -699,7 +710,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}', [KendaraanController::class, 'update'])->name('kendaraan.update');
                 Route::delete('/delete/{id}', [KendaraanController::class, 'delete'])->name('kendaraan.delete');
             });
-            
+
         });
 
     });
@@ -708,7 +719,7 @@ Route::middleware([AutoLogout::class])->group(function () {
     Route::group(['prefix' => 'Scan-Layout', 'middleware' => ['Scan-Layout'], 'as' => 'Scan-Layout.'], function () {
         Route::group(['prefix' => 'admin', 'middleware' => ['admin'], 'as' => 'admin.'], function () {
             Route::get('/',[DashboardControlller::class, 'a_scan'])->name('dashboard');
-            
+
             Route::prefix('scan')->group(function () {
                 Route::get('/',[ScanLayoutController::class, 'index'])->name('scan');
                 Route::get('/add',[ScanLayoutController::class, 'add'])->name('scan.add');
@@ -718,11 +729,11 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::delete('/delete/{id}',[ScanLayoutController::class, 'delete'])->name('scan.delete');
 
             });
-            
+
         });
         Route::group(['prefix' => 'pegawai', 'middleware' => ['pegawai'], 'as' => 'pegawai.'], function () {
             Route::get('/',[DashboardControlller::class, 'a_scan'])->name('dashboard');
-            
+
             Route::prefix('scan')->group(function () {
                 Route::get('/',[ScanLayoutController::class, 'index'])->name('scan');
                 Route::get('/add',[ScanLayoutController::class, 'add'])->name('scan.add');
@@ -740,7 +751,7 @@ Route::middleware([AutoLogout::class])->group(function () {
     Route::group(['prefix' => 'Coil-Damage', 'middleware' => ['Coil-Damage'], 'as' => 'Coil-Damage.'], function () {
         Route::group(['prefix' => 'admin', 'middleware' => ['admin'], 'as' => 'admin.'], function () {
             Route::get('/',[DashboardControlller::class, 'coil_damage'])->name('dashboard');
-            
+
             Route::prefix('damage')->group(function () {
                 Route::get('/',[CoilDamageController::class, 'index'])->name('damage');
                 Route::get('/add',[CoilDamageController::class, 'add'])->name('damage.add');
@@ -749,11 +760,11 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[CoilDamageController::class, 'update'])->name('damage.update');
                 Route::delete('/delete/{id}',[CoilDamageController::class, 'delete'])->name('damage.delete');
             });
-            
+
         });
         Route::group(['prefix' => 'pegawai', 'middleware' => ['pegawai'], 'as' => 'pegawai.'], function () {
             Route::get('/',[DashboardControlller::class, 'coil_damage'])->name('dashboard');
-            
+
             Route::prefix('damage')->group(function () {
                 Route::get('/',[CoilDamageController::class, 'index'])->name('damage');
                 Route::get('/add',[CoilDamageController::class, 'add'])->name('damage.add');
@@ -770,7 +781,7 @@ Route::middleware([AutoLogout::class])->group(function () {
     Route::group(['prefix' => 'L-08', 'middleware' => ['L-08'], 'as' => 'L-08.'], function () {
         Route::group(['prefix' => 'admin', 'middleware' => ['admin'], 'as' => 'admin.'], function () {
             Route::get('/',[DashboardControlller::class, 'l_08'])->name('dashboard');
-            
+
             Route::prefix('damage')->group(function () {
                 Route::get('/',[PackingL08Controller::class, 'index'])->name('damage');
                 Route::get('/add',[PackingL08Controller::class, 'add'])->name('damage.add');
@@ -789,11 +800,11 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/search-attributes', [PackingL08Controller::class, 'searchAttributes'])->name('search.attributes');
 
             });
-            
+
         });
         Route::group(['prefix' => 'pegawai', 'middleware' => ['pegawai'], 'as' => 'pegawai.'], function () {
             Route::get('/',[DashboardControlller::class, 'l_08'])->name('dashboard');
-            
+
             Route::prefix('damage')->group(function () {
                 Route::get('/',[PackingL08Controller::class, 'index'])->name('damage');
                 Route::get('/add',[PackingL08Controller::class, 'add'])->name('damage.add');

@@ -110,7 +110,8 @@ $menuItems = [
     "CK"  => ["title" => "Checklist Kendaraan", "icon" => "mdi-car", "route" => Auth::user()->role == 0 ? route('Kendaraan.admin.dashboard') : route('Kendaraan.pegawai.dashboard')],
     "SL"  => ["title" => "Scan Layout", "icon" => "mdi-qrcode", "route" => Auth::user()->role == 0 ? route('Scan-Layout.admin.dashboard') : route('Scan-Layout.pegawai.dashboard')],
     "CD"  => ["title" => "Coil Damage", "icon" => "mdi-package-variant-closed-remove", "route" => Auth::user()->role == 0 ? route('Coil-Damage.admin.dashboard') : route('Coil-Damage.pegawai.dashboard')],
-    "L8"  => ["title" => "Packing L08", "icon" => "mdi-numeric-8-box-multiple", "route" => Auth::user()->role == 0 ? route('L-08.admin.dashboard') : route('L-08.pegawai.dashboard')],
+    // "L8"  => ["title" => "Packing L08", "icon" => "mdi-numeric-8-box-multiple", "route" => Auth::user()->role == 0 ? route('L-08.admin.dashboard') : route('L-08.pegawai.dashboard')],
+    // "PC"  => ["title" => "Form Packing", "icon" => "mdi-numeric-8-box-multiple", "route" => Auth::user()->role == 0 ? route('L-08.admin.dashboard') : route('L-08.pegawai.dashboard')],
 ];
 @endphp
 
@@ -132,6 +133,12 @@ $menuItems = [
         <div>
             <i class="mdi mdi-email"></i>
             <div class="menu-title">Surat Izin Keluar</div>
+        </div>
+    </a>
+    <a href="{{ route('pac') }}" class="menu-item">
+        <div>
+            <i class="mdi mdi-note"></i>
+            <div class="menu-title">Laporan Packing</div>
         </div>
     </a>
     @endif
@@ -188,7 +195,7 @@ $menuItems = [
 <script>window.location = "{{ route('login') }}";</script>
 @endif
 
-      
+
       <!-- Bootstrap JS -->
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
    </body>
