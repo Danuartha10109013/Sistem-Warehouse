@@ -217,201 +217,212 @@ document.addEventListener("DOMContentLoaded", function () {
         </thead>
 
         <tbody>
-            @foreach ($data as $d)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $d->date }}</td>
-                <td>{{ $d->attribute }}</td>
-                <td>Group {{ $d->group }}</td>
-                <td>{{ $d->layout }}</td>
-                <td>{{ $d->no_so }}</td>
-                <td>{{ $d->kondisi }}</td>
-                <td>{{ $d->plastik }}</td>
-                <td>{{ $d->wrapping }}</td>
-                <td>{{ $d->impraboard }}</td>
-                <td>{{ $d->idod }}</td>
-                <td>{{ $d->pallet }}</td>
-                <td>{{ $d->bandazer }}</td>
-                <td>
-                    <!-- Tombol Edit -->
-                    <button class="btn btn-warning btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editModal{{ $d->id }}">
-                        Edit
-                    </button>
+            @if ($data)
+                @foreach ($data as $d)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $d->date }}</td>
+                    <td>{{ $d->attribute }}</td>
+                    <td>Group {{ $d->group }}</td>
+                    <td>{{ $d->layout }}</td>
+                    <td>{{ $d->no_so }}</td>
+                    <td>{{ $d->kondisi }}</td>
+                    <td>{{ $d->plastik }}</td>
+                    <td>{{ $d->wrapping }}</td>
+                    <td>{{ $d->impraboard }}</td>
+                    <td>{{ $d->idod }}</td>
+                    <td>{{ $d->pallet }}</td>
+                    <td>{{ $d->bandazer }}</td>
+                    <td>
+                        <!-- Tombol Edit -->
+                        <button class="btn btn-warning btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal{{ $d->id }}">
+                            Edit
+                        </button>
 
 
 
-                    <!-- Tombol Delete -->
-                    <button class="btn btn-danger btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#deleteModal{{ $d->id }}">
-                        Delete
-                    </button>
+                        <!-- Tombol Delete -->
+                        <button class="btn btn-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ $d->id }}">
+                            Delete
+                        </button>
 
-                </td>
+                    </td>
 
-            </tr>
-            @endforeach
+                </tr>
+                @endforeach
+
+
+
+            @endif
         </tbody>
     </table>
 </div>
 
+@if ($data)
 
-@foreach ($data as $d)
+    @foreach ($data as $d)
 
-<!-- Modal Edit -->
-<div class="modal fade" id="editModal{{ $d->id }}" tabindex="-1">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content rounded-4">
+        <!-- Modal Edit -->
+        <div class="modal fade" id="editModal{{ $d->id }}" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content rounded-4">
 
-      <form method="POST" action="{{ route('pac.update', $d->id) }}">
-        @csrf
-        @method('PUT')
+            <form method="POST" action="{{ route('pac.update', $d->id) }}">
+                @csrf
+                @method('PUT')
 
-        <div class="modal-header bg-primary text-white rounded-top-4">
-          <h5 class="modal-title">Edit Laporan {{ $d->id }}</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                <h5 class="modal-title">Edit Laporan {{ $d->id }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                    <label class="fw-bold mb-1">Date</label>
+                    <input type="datetime-local" name="date" class="form-control rounded-pill"
+                            value="{{ $d->date }}">
+                    </div>
+
+                    <div class="col-md-4">
+                    <label class="fw-bold mb-1">Attribute</label>
+                    <input type="text" name="attribute" class="form-control rounded-pill"
+                            value="{{ $d->attribute }}">
+                    </div>
+
+                    <div class="col-md-4">
+                    <label class="fw-bold mb-1">Group</label>
+                    <select name="group" class="form-select rounded-pill">
+                        <option value="A" {{ $d->group=='A'?'selected':'' }}>Group A</option>
+                        <option value="B" {{ $d->group=='B'?'selected':'' }}>Group B</option>
+                        <option value="Lokal" {{ $d->group=='Lokal'?'selected':'' }}>Group Lokal</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-4">
+                    <label class="fw-bold mb-1">Layout</label>
+                    <input type="text" name="layout" class="form-control rounded-pill" value="{{ $d->layout }}">
+                    </div>
+
+                    <div class="col-md-4">
+                    <label class="fw-bold mb-1">No SO</label>
+                    <input type="text" name="no_so" class="form-control rounded-pill" value="{{ $d->no_so }}">
+                    </div>
+
+                    <div class="col-md-4">
+                    <label class="fw-bold mb-1">Kondisi</label>
+                    <select name="kondisi" class="form-select rounded-pill">
+                        <option value="Baik" {{ $d->kondisi=='Baik'?'selected':'' }}>Baik</option>
+                        <option value="Damage Realese QA" {{ $d->kondisi=='Damage Realese QA'?'selected':'' }}>Damage Realese QA</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-6">
+                    <label class="fw-bold mb-1">PE & VCI</label>
+                    <select name="plastik" class="form-select rounded-pill">
+                        <option value="OK" {{ $d->plastik=='OK'?'selected':'' }}>OK</option>
+                        <option value="Not OK" {{ $d->plastik=='Not OK'?'selected':'' }}>Not OK</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-6">
+                    <label class="fw-bold mb-1">Wrapping</label>
+                    <select name="wrapping" class="form-select rounded-pill">
+                        <option value="Pakai" {{ $d->wrapping=='Pakai'?'selected':'' }}>Pakai</option>
+                        <option value="Tidak Pakai" {{ $d->wrapping=='Tidak Pakai'?'selected':'' }}>Tidak Pakai</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-6">
+                    <label class="fw-bold mb-1">Impraboard</label>
+                    <select name="impraboard" class="form-select rounded-pill">
+                        <option value="Pakai" {{ $d->impraboard=='Pakai'?'selected':'' }}>Pakai</option>
+                        <option value="Tidak Pakai" {{ $d->impraboard=='Tidak Pakai'?'selected':'' }}>Tidak Pakai</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-6">
+                    <label class="fw-bold mb-1">ID & OD</label>
+                    <select name="idod" class="form-select rounded-pill">
+                        <option value="OK" {{ $d->idod=='OK'?'selected':'' }}>OK</option>
+                        <option value="Not OK" {{ $d->idod=='Not OK'?'selected':'' }}>Not OK</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-6">
+                    <label class="fw-bold mb-1">Pallet</label>
+                    <select name="pallet" class="form-select rounded-pill">
+                        <option value="Pakai" {{ $d->pallet=='Pakai'?'selected':'' }}>Pakai</option>
+                        <option value="Tidak Pakai" {{ $d->pallet=='Tidak Pakai'?'selected':'' }}>Tidak Pakai</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-6">
+                    <label class="fw-bold mb-1">Bandazer</label>
+                    <select name="bandazer" class="form-select rounded-pill">
+                        <option value="OK" {{ $d->bandazer=='OK'?'selected':'' }}>OK</option>
+                        <option value="Not OK" {{ $d->bandazer=='Not OK'?'selected':'' }}>Not OK</option>
+                    </select>
+                    </div>
+
+                </div>
+
+                </div>
+
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary rounded-pill px-4">Update</button>
+                </div>
+
+            </form>
+
+            </div>
+        </div>
         </div>
 
-        <div class="modal-body">
+    @endforeach
 
-          <div class="row g-3">
+    @foreach ($data as $d)
 
-            <div class="col-md-4">
-              <label class="fw-bold mb-1">Date</label>
-              <input type="datetime-local" name="date" class="form-control rounded-pill"
-                     value="{{ $d->date }}">
+        <!-- Modal Delete -->
+        <div class="modal fade" id="deleteModal{{ $d->id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+            <form method="POST" action="{{ route('pac.delete', $d->id) }}">
+                @csrf
+                @method('DELETE')
+
+                <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                <p class="fw-bold">Yakin ingin menghapus data ini?</p>
+                <p class="text-muted">No SO: {{ $d->no_so }} | Attribute: {{ $d->attribute }}</p>
+                </div>
+
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+
+            </form>
+
             </div>
-
-            <div class="col-md-4">
-              <label class="fw-bold mb-1">Attribute</label>
-              <input type="text" name="attribute" class="form-control rounded-pill"
-                     value="{{ $d->attribute }}">
-            </div>
-
-            <div class="col-md-4">
-              <label class="fw-bold mb-1">Group</label>
-              <select name="group" class="form-select rounded-pill">
-                <option value="A" {{ $d->group=='A'?'selected':'' }}>Group A</option>
-                <option value="B" {{ $d->group=='B'?'selected':'' }}>Group B</option>
-                <option value="Lokal" {{ $d->group=='Lokal'?'selected':'' }}>Group Lokal</option>
-              </select>
-            </div>
-
-            <div class="col-md-4">
-              <label class="fw-bold mb-1">Layout</label>
-              <input type="text" name="layout" class="form-control rounded-pill" value="{{ $d->layout }}">
-            </div>
-
-            <div class="col-md-4">
-              <label class="fw-bold mb-1">No SO</label>
-              <input type="text" name="no_so" class="form-control rounded-pill" value="{{ $d->no_so }}">
-            </div>
-
-            <div class="col-md-4">
-              <label class="fw-bold mb-1">Kondisi</label>
-              <select name="kondisi" class="form-select rounded-pill">
-                <option value="Baik" {{ $d->kondisi=='Baik'?'selected':'' }}>Baik</option>
-                <option value="Damage Realese QA" {{ $d->kondisi=='Damage Realese QA'?'selected':'' }}>Damage Realese QA</option>
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="fw-bold mb-1">PE & VCI</label>
-              <select name="plastik" class="form-select rounded-pill">
-                <option value="OK" {{ $d->plastik=='OK'?'selected':'' }}>OK</option>
-                <option value="Not OK" {{ $d->plastik=='Not OK'?'selected':'' }}>Not OK</option>
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="fw-bold mb-1">Wrapping</label>
-              <select name="wrapping" class="form-select rounded-pill">
-                <option value="Pakai" {{ $d->wrapping=='Pakai'?'selected':'' }}>Pakai</option>
-                <option value="Tidak Pakai" {{ $d->wrapping=='Tidak Pakai'?'selected':'' }}>Tidak Pakai</option>
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="fw-bold mb-1">Impraboard</label>
-              <select name="impraboard" class="form-select rounded-pill">
-                <option value="Pakai" {{ $d->impraboard=='Pakai'?'selected':'' }}>Pakai</option>
-                <option value="Tidak Pakai" {{ $d->impraboard=='Tidak Pakai'?'selected':'' }}>Tidak Pakai</option>
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="fw-bold mb-1">ID & OD</label>
-              <select name="idod" class="form-select rounded-pill">
-                <option value="OK" {{ $d->idod=='OK'?'selected':'' }}>OK</option>
-                <option value="Not OK" {{ $d->idod=='Not OK'?'selected':'' }}>Not OK</option>
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="fw-bold mb-1">Pallet</label>
-              <select name="pallet" class="form-select rounded-pill">
-                <option value="Pakai" {{ $d->pallet=='Pakai'?'selected':'' }}>Pakai</option>
-                <option value="Tidak Pakai" {{ $d->pallet=='Tidak Pakai'?'selected':'' }}>Tidak Pakai</option>
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="fw-bold mb-1">Bandazer</label>
-              <select name="bandazer" class="form-select rounded-pill">
-                <option value="OK" {{ $d->bandazer=='OK'?'selected':'' }}>OK</option>
-                <option value="Not OK" {{ $d->bandazer=='Not OK'?'selected':'' }}>Not OK</option>
-              </select>
-            </div>
-
-          </div>
-
         </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary rounded-pill px-4">Update</button>
         </div>
+    @endforeach
 
-      </form>
-
-    </div>
-  </div>
-</div>
-
-@endforeach
-
-
-<!-- Modal Delete -->
-<div class="modal fade" id="deleteModal{{ $d->id }}" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <form method="POST" action="{{ route('pac.delete', $d->id) }}">
-        @csrf
-        @method('DELETE')
-
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title">Confirm Delete</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div class="modal-body">
-          <p class="fw-bold">Yakin ingin menghapus data ini?</p>
-          <p class="text-muted">No SO: {{ $d->no_so }} | Attribute: {{ $d->attribute }}</p>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-danger">Delete</button>
-        </div>
-
-      </form>
-
-    </div>
-  </div>
-</div>
+@else
+@endif
 
 
 {{-- </div> --}}
