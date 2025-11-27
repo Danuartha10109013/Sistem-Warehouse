@@ -12,10 +12,8 @@
                 class="nav-item nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}">
                 Home
             </a>
-
             <a href="{{route('pac')}}" class="nav-item nav-link {{ request()->routeIs('pac') ? 'active' : '' }}">Packing</a>
             <a href="{{route('pac.add')}}" class="nav-item nav-link {{ request()->routeIs('pac.add') ? 'active' : '' }}">Tambah Data</a>
-
         </div>
         {{-- <a href="#" class="btn btn-light border border-primary rounded-pill text-primary py-2 px-4 me-4">Log In</a> --}}
     </div>

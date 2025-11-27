@@ -31,6 +31,7 @@ use App\Http\Controllers\SIKController;
 use App\Http\Controllers\SupplyController;
 use App\Http\Controllers\TraillerController;
 use App\Http\Controllers\PackingController;
+use App\Http\Controllers\SACController;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,8 @@ Route::get('/country-data/{negara}', function ($negara) {
 Route::get('/', [LoginController::class, 'index'])->name('login');
 Route::post('/login', [LoginController::class, 'proses'])->name('login-proses');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+
+
 
 Route::prefix('Laporan-packing')->group(function () {
     Route::get('/',[PackingController::class,'index'])->name('pac');
@@ -105,6 +108,18 @@ Route::get('/download-report/{id}', [CraneController::class, 'downloadReport'])-
 Route::middleware([AutoLogout::class])->group(function () {
 
     Route::get('/welcome', [LoginController::class, 'welcome'])->name('welcome');
+
+    Route::prefix('so-sac')->group(function () {
+        Route::get('/',[SACController::class,'index'])->name('so');
+        Route::post('/so/import', [PackingController::class, 'import'])->name('so.import');
+        Route::get('/add',[SACController::class,'add'])->name('so.add');
+        Route::post('/store',[SACController::class,'store'])->name('so.store');
+        Route::delete('/delete/{id}',[SACController::class,'destroy'])->name('so.delete');
+        Route::get('/edit/{id}',[SACController::class,'edit'])->name('so.edit');
+        Route::put('/update/{id}',[SACController::class,'update'])->name('so.update');
+        Route::get('/print/{id}',[SACController::class,'print'])->name('so.print');
+        Route::get('/export',[SACController::class,'export'])->name('so.export');
+    });
 
     //Profile
     Route::prefix('profile')->group(function () {
