@@ -165,7 +165,7 @@
 
 
                 <div class="col-md-4">
-                    <label class="fw-bold mb-1">Layout</label>
+                    <label class="fw-bold mb-1">Layout Kontainer</label>
 
                     <div class="position-relative">
                         <button type="button" id="dropdownBtn"
@@ -346,13 +346,13 @@
 
                 <!-- No SO -->
                 <div class="col-md-4">
-                    <label class="fw-bold mb-1">No SO</label>
+                    <label class="fw-bold mb-1">No Sales Order/Customer</label>
                     <input type="text" name="no_so" class="form-control rounded-pill px-3 py-2" placeholder="Nomor SO" required>
                 </div>
 
                 <!-- Kondisi -->
                 <div class="col-md-4">
-                    <label class="fw-bold mb-1">Kondisi</label>
+                    <label class="fw-bold mb-1">Kondisi Coil</label>
 
                     <select name="kondisi" class="form-select rounded-pill px-3 py-2" required>
                         <option value="" selected disabled>Pilih Kondisi</option>
@@ -418,6 +418,14 @@
                         <option value="" selected disabled>Pilih Kondisi</option>
                         <option value="OK">OK</option>
                         <option value="Not OK">Not OK</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold mb-1">Label</label>
+                     <select name="label" class="form-select rounded-pill px-3 py-2" required>
+                        <option value="" selected disabled>Pilih Kondisi</option>
+                        <option value="Lengkap">Lengkap</option>
+                        <option value="Tidak Lengkap">Tidak Lengkap</option>
                     </select>
                 </div>
 

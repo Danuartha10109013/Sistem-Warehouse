@@ -47,46 +47,167 @@
         </div>
 
         <div class="col-12 col-md-3">
-            <!-- Export -->
-        <button id="exportExcel" class="btn btn-success mb-3">
-           <i class="fa fa-download"></i> Export to Excel
-        </button>
+    <!-- Export -->
+            <div class="dropdown mb-3">
+            <button class="btn btn-success dropdown-toggle" type="button" id="exportMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-download"></i> Export
+            </button>
+
+            <ul class="dropdown-menu" aria-labelledby="exportMenu">
+                <li>
+                    <a class="dropdown-item" href="#" id="exportExcelBtn">
+                        <i class="fa fa-file-excel-o text-success"></i> Export to Excel
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#" id="exportPdfBtn">
+                        <i class="fa fa-file-pdf-o text-danger"></i> Export to PDF
+                    </a>
+                </li>
+            </ul>
         </div>
 
-        <script>
-        document.getElementById("exportExcel").addEventListener("click", function () {
-            let table = document.getElementById("dataTable");
-            let tableHTML = table.outerHTML.replace(/ /g, '%20');
+</div>
 
-            let filename = "Packing_Report_" + new Date().toISOString().slice(0,10) + ".xls";
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
-            let excelContent = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office"
-                    xmlns:x="urn:schemas-microsoft-com:office:excel"
-                    xmlns="http://www.w3.org/TR/REC-html40">
-                <head>
-                    <meta charset="UTF-8">
-                </head>
-                <body>
-                    ${table.outerHTML}
-                </body>
-                </html>
-            `;
 
-            let blob = new Blob([excelContent], {
-                type: "application/vnd.ms-excel"
-            });
+<script>
+document.getElementById("exportExcelBtn").addEventListener("click", function () {
 
-            let url = URL.createObjectURL(blob);
+    let table = document.getElementById("dataTable");
 
-            let a = document.createElement("a");
-            a.href = url;
-            a.download = filename;
-            a.click();
+    // Clone tabel
+    let cloneTable = table.cloneNode(true);
 
-            URL.revokeObjectURL(url);
-        });
-        </script>
+    // Hapus kolom Action (kolom terakhir)
+    let ths = cloneTable.querySelectorAll("thead th");
+    ths[ths.length - 1].remove();
+
+    let trs = cloneTable.querySelectorAll("tbody tr");
+    trs.forEach(tr => {
+        tr.children[tr.children.length - 1].remove();
+    });
+
+    // Tambahkan border & header abu
+    cloneTable.querySelectorAll("th").forEach(th => {
+        th.style.background = "#d9d9d9";
+        th.style.border = "1px solid #000";
+        th.style.padding = "4px";
+    });
+
+    cloneTable.querySelectorAll("td").forEach(td => {
+        td.style.border = "1px solid #000";
+        td.style.padding = "4px";
+    });
+
+    // Header Excel Merge A1–N1
+    let headerExcel = `
+        <table border="1" style="border-collapse:collapse;">
+            <tr>
+                <td colspan="14" style="
+                    text-align:center;
+                    font-weight:bold;
+                    font-size:16px;
+                    border:1px solid #000;
+                    padding:6px;
+                ">
+                    FORM CEK LIST & LAPORAN PACKING
+                </td>
+            </tr>
+            <tr>
+                <td colspan="13" style="border:1px solid #000;"></td>
+                <td style="font-weight:bold; border:1px solid #000;">FM.WH.21.00</td>
+            </tr>
+        </table>
+        <br>
+    `;
+
+    // Nama File
+    let today = new Date().toISOString().slice(0,10);
+    let filename = `FM.21.00 FORM CEK LIST & LAPORAN PACKING - ${today}.xls`;
+
+    // Gabungkan HTML Excel
+    let excelContent = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:x="urn:schemas-microsoft-com:office:excel"
+            xmlns="http://www.w3.org/TR/REC-html40">
+        <head><meta charset="UTF-8"></head>
+        <body>
+            ${headerExcel}
+            ${cloneTable.outerHTML}
+        </body>
+        </html>
+    `;
+
+    let blob = new Blob([excelContent], { type: "application/vnd.ms-excel" });
+    let url = URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+
+    URL.revokeObjectURL(url);
+});
+
+
+// ===============================
+// ===== EXPORT PDF SYSTEM =======
+// ===============================
+
+document.getElementById("exportPdfBtn").addEventListener("click", function () {
+    const { jsPDF } = window.jspdf;
+
+    let doc = new jsPDF('l', 'mm', 'a4');
+
+    let today = new Date().toISOString().slice(0,10);
+    let filename = `FM.21.00 FORM CEK LIST & LAPORAN PACKING - ${today}.pdf`;
+
+    // HEADER PDF
+    doc.setFontSize(14);
+    doc.text("FORM CEK LIST & LAPORAN PACKING", 148, 15, { align: "center" });
+
+    doc.setFontSize(10);
+    doc.text("FM.WH.21.00", 280, 15, { align: "right" });
+
+    // Tabel
+    let table = document.getElementById("dataTable");
+    let headers = [...table.querySelectorAll("thead th")].map(th => th.innerText);
+    headers.pop(); // hapus kolom action
+
+    let body = [];
+    table.querySelectorAll("tbody tr").forEach(tr => {
+        let row = [...tr.querySelectorAll("td")].map(td => td.innerText);
+        row.pop();
+        body.push(row);
+    });
+
+    // ★ BATASI MAKSIMAL 15 DATA
+    body = body.slice(0, 15);
+
+    doc.autoTable({
+        head: [headers],
+        body: body,
+        startY: 25,
+        styles: {
+            fontSize: 8,
+            cellPadding: 2
+        },
+        headStyles: {
+            fillColor: [200, 200, 200],
+            textColor: 0,
+            halign: 'center'
+        },
+        theme: 'grid'
+    });
+
+    doc.save(filename);
+});
+
+</script>
+
 
 
         <style>
@@ -204,14 +325,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 <th class="sortable">Attribute</th>
                 <th class="sortable">Group</th>
                 <th class="sortable">Layout</th>
-                <th class="sortable">No SO</th>
-                <th class="sortable">Kondisi</th>
-                <th class="sortable">PE & VCI</th>
+                <th class="sortable">No Sales Order/Customer</th>
+                <th class="sortable">Kondisi Coil</th>
+                <th class="sortable">Plastik PE & VCI</th>
                 <th class="sortable">Wrapping</th>
                 <th class="sortable">Impraboard</th>
                 <th class="sortable">ID & OD</th>
                 <th class="sortable">Pallet</th>
                 <th class="sortable">Ikatan Bandazer</th>
+                <th class="sortable">Label</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -233,6 +355,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>{{ $d->idod }}</td>
                     <td>{{ $d->pallet }}</td>
                     <td>{{ $d->bandazer }}</td>
+                    <td>{{ $d->label }}</td>
                     <td>
                         <!-- Tombol Edit -->
                         <button class="btn btn-warning btn-sm"
@@ -368,6 +491,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     <select name="bandazer" class="form-select rounded-pill">
                         <option value="OK" {{ $d->bandazer=='OK'?'selected':'' }}>OK</option>
                         <option value="Not OK" {{ $d->bandazer=='Not OK'?'selected':'' }}>Not OK</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-6">
+                    <label class="fw-bold mb-1">label</label>
+                    <select name="label" class="form-select rounded-pill">
+                        <option value="Lengkap" {{ $d->label=='Lengkap'?'selected':'' }}>Lengkap</option>
+                        <option value="Tidak Lengkap" {{ $d->label=='Tidak Lengkap'?'selected':'' }}>Tidak Lengkap</option>
                     </select>
                     </div>
 

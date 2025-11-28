@@ -111,7 +111,8 @@ Route::middleware([AutoLogout::class])->group(function () {
 
     Route::prefix('so-sac')->group(function () {
         Route::get('/',[SACController::class,'index'])->name('so');
-        Route::post('/so/import', [PackingController::class, 'import'])->name('so.import');
+        Route::get('/so/autofill', [SACController::class, 'autofill'])->name('so.autofill');
+        Route::post('/so/import', [SACController::class, 'import'])->name('so.import');
         Route::get('/add',[SACController::class,'add'])->name('so.add');
         Route::post('/store',[SACController::class,'store'])->name('so.store');
         Route::delete('/delete/{id}',[SACController::class,'destroy'])->name('so.delete');

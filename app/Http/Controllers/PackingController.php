@@ -42,6 +42,7 @@ class PackingController extends Controller
             'idod'        => 'required|string|max:255',
             'pallet'      => 'required|string|max:255',
             'bandazer'    => 'required|string|max:255',
+            'label'    => 'required|string|max:255',
         ]);
 
         // --- SAVE DATA ---
@@ -71,6 +72,7 @@ class PackingController extends Controller
         'idod'       => 'required|string',
         'pallet'     => 'required|string',
         'bandazer'   => 'required|string',
+        'label'   => 'required|string',
     ]);
 
     // Ambil data berdasarkan ID
@@ -90,6 +92,7 @@ class PackingController extends Controller
         'idod'       => $request->idod,
         'pallet'     => $request->pallet,
         'bandazer'   => $request->bandazer,
+        'label'   => $request->label,
     ]);
 
     return redirect()->back()->with('success', 'Data berhasil diperbarui!');

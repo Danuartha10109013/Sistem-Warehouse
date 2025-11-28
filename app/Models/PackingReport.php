@@ -18,6 +18,7 @@ class PackingReport extends Model
         'impraboard',
         'idod',
         'pallet',
-        'bandazer'
+        'bandazer',
+        'label'
     ];
 }

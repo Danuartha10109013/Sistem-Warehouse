@@ -57,7 +57,7 @@
                         <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
 
-                    <form action="{{ route('pac.add') }}" method="POST">
+                    <form action="{{ route('so.store') }}" method="POST">
                         @csrf
 
                         <div class="modal-body">
@@ -101,6 +101,15 @@
                                     <input type="text" name="lokasi" class="form-control rounded-pill px-3 py-2"
                                         placeholder="Lokasi" required>
                                 </div>
+                                <div class="col-md-12">
+                                    <label class="fw-bold mb-1">Keterangan</label>
+                                    <textarea name="keterangan"
+                                            class="form-control px-3 py-2 rounded"
+                                            rows="3"
+                                            placeholder="Keterangan"
+                                            ></textarea>
+                                </div>
+
 
                             </div>
                         </div>
@@ -115,52 +124,79 @@
             </div>
         </div>
 
-        <script src="https://unpkg.com/@zxing/library@latest"></script>
+<script src="https://unpkg.com/@zxing/library@latest"></script>
 
-        <script>
-            let stream;
-            let codeReader;
+<script>
+let stream;
+let codeReader;
 
-            function openScanner() {
-                const qrBox = document.getElementById("qrScanner");
-                qrBox.style.display = "block";
+function openScanner() {
+    const qrBox = document.getElementById("qrScanner");
+    qrBox.style.display = "block";
 
-                codeReader = new ZXing.BrowserMultiFormatReader();
+    codeReader = new ZXing.BrowserMultiFormatReader();
 
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                    .then(s => {
-                        stream = s;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(s => {
+            stream = s;
 
-                        const video = document.getElementById("cameraPreview");
-                        video.srcObject = s;
-                        video.play();
+            const video = document.getElementById("cameraPreview");
+            video.srcObject = s;
+            video.play();
 
-                        codeReader.decodeFromVideoDevice(null, "cameraPreview", (result, err) => {
-                            if (result) {
-                                document.getElementById("attributeInput").value = result.text;
-                                closeScanner();
-                            }
-                        });
-                    })
-                    .catch(err => {
-                        alert("Tidak bisa mengakses kamera");
-                        console.error(err);
-                    });
-            }
+            codeReader.decodeFromVideoDevice(null, "cameraPreview", (result, err) => {
+                if (result) {
+                    const input = document.getElementById("attributeInput");
+                    input.value = result.text;
 
-            function closeScanner() {
-                const qrBox = document.getElementById("qrScanner");
-                qrBox.style.display = "none";
+                    // TRIGGER INPUT EVENT
+                    input.dispatchEvent(new Event('input'));
 
-                if (stream) {
-                    stream.getTracks().forEach(t => t.stop());
+                    closeScanner();
                 }
+            });
+        })
+        .catch(err => {
+            alert("Tidak bisa mengakses kamera");
+            console.error(err);
+        });
+}
 
-                if (codeReader) {
-                    codeReader.reset();
-                }
+function closeScanner() {
+    const qrBox = document.getElementById("qrScanner");
+    qrBox.style.display = "none";
+
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+    }
+
+    if (codeReader) {
+        codeReader.reset();
+    }
+}
+</script>
+
+<script>
+const autofillUrl = "{{ route('so.autofill') }}";
+
+document.getElementById('attributeInput').addEventListener('input', function () {
+    let attr = this.value;
+
+    if (attr.length < 3) return;
+
+    fetch(`${autofillUrl}?attribute=${encodeURIComponent(attr)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === true) {
+                document.querySelector('input[name="qty"]').value = data.qty ?? '';
+                document.querySelector('input[name="lokasi"]').value = data.lokasi ?? '';
+                document.querySelector('textarea[name="keterangan"]').value = data.keterangan ?? '';
             }
-        </script>
+        })
+        .catch(err => console.error("Autofill error:", err));
+});
+</script>
+
 
 
 
@@ -317,69 +353,119 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 
-    </div>
+   <!-- BUTTON FILTER -->
+<div class="mb-3">
+    <button id="btnBelum" class="btn btn-outline-danger rounded-pill px-3">Belum Scan</button>
+    <button id="btnSudah" class="btn btn-outline-success rounded-pill px-3">Sudah Scan</button>
+</div>
 
 <div class="card">
     <div class="card-header">
-        Data Yang belum Ditemukan
+        Data Stock | Total <span class="text-danger">{{ $data->count() }}</span>
     </div>
-<div class="card-body">
-    <div class="table-responsive">
-    <table class="table table-striped" id="dataTable">
-        <thead>
-            <tr>
-                <th class="sortable">No</th>
-                <th class="sortable">Date</th>
-                <th class="sortable">KPC</th>
-                <th class="sortable">Barcode</th>
-                <th class="sortable">Nama Barang</th>
-                <th class="sortable">Berat</th>
-                <th class="sortable">Lokasi</th>
-                <th>Action</th>
-            </tr>
-        </thead>
 
-        <tbody>
-            @if ($data)
-                @foreach ($data as $d)
+    <div class="card-body">
+        <div class="table-responsive">
+        <table class="table table-striped" id="dataTable">
+            <thead>
                 <tr>
+                    <th class="sortable">No</th>
+                    <th class="sortable">Date</th>
+                    <th class="sortable">KPC</th>
+                    <th class="sortable">Barcode</th>
+                    <th class="sortable">Nama Barang</th>
+                    <th class="sortable">Berat</th>
+                    <th class="sortable">Lokasi</th>
+                    <th class="col-scan sortable">Scanner</th>
+
+                    <!-- Kolom yang harus hilang di mode Belum Scan -->
+                    <th class="col-scan sortable">Berat SO</th>
+                    <th class="col-scan sortable">Selisih SO</th>
+                    <th class="col-scan sortable">Keterangan</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach ($data as $d)
+                <tr class="{{ $d->scanner ? 'row-sudah' : 'row-belum' }}">
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $d->date }}</td>
-                    <td>{{ $d->attribute }}</td>
-                    <td>Group {{ $d->group }}</td>
-                    <td>{{ $d->layout }}</td>
-                    <td>{{ $d->no_so }}</td>
-                    <td>{{ $d->kondisi }}</td>
+                    <td>{{ $d->kpc }}</td>
+                    <td>{{ $d->barcode }}</td>
+                    <td>{{ $d->namabarang }}</td>
+                    <td>{{ $d->berat }}</td>
+                    <td>{{ $d->lokasi }}</td>
 
-                    <td>
-                        <!-- Tombol Edit -->
-                        <button class="btn btn-warning btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editModal{{ $d->id }}">
-                            Edit
-                        </button>
-
-
-
-                        <!-- Tombol Delete -->
-                        <button class="btn btn-danger btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal{{ $d->id }}">
-                            Delete
-                        </button>
-
+                    <td class="col-scan">{{ $d->scanner ?? '-' }}</td>
+                    <td class="col-scan">{{ $d->scanner ? $d->qty_scan : '-' }}</td>
+                    <td class="col-scan">
+                        {{ $d->scanner ? ($d->berat - $d->qty_scan) : '-' }}
                     </td>
-
+                    <td class="col-scan">{{ $d->keterangan }}</td>
                 </tr>
                 @endforeach
-
-
-
-            @endif
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+        </div>
+    </div>
 </div>
-</div>
+
+<!-- JAVASCRIPT SWITCH MODE -->
+<script>
+// FUNGSI UNTUK MENGAKTIFKAN MODE BELUM
+function aktifkanModeBelum() {
+    // button style
+    document.getElementById("btnBelum").classList.remove("btn-outline-danger");
+    document.getElementById("btnBelum").classList.add("btn-danger");
+    document.getElementById("btnSudah").classList.remove("btn-success");
+    document.getElementById("btnSudah").classList.add("btn-outline-success");
+
+    // hide scan columns
+    document.querySelectorAll(".col-scan").forEach(col => col.style.display = "none");
+
+    // show only rows not scanned
+    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
+    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "table-row");
+}
+
+// klik manual
+document.getElementById("btnBelum").addEventListener("click", aktifkanModeBelum);
+
+// AUTO AKTIF SAAT PERTAMA KALI HALAMAN LOAD
+window.addEventListener("load", aktifkanModeBelum);
+</script>
+<script>
+document.getElementById("btnBelum").addEventListener("click", function () {
+    // button style
+    this.classList.remove("btn-outline-danger");
+    this.classList.add("btn-danger");
+    document.getElementById("btnSudah").classList.remove("btn-success");
+    document.getElementById("btnSudah").classList.add("btn-outline-success");
+
+    // hide scan columns
+    document.querySelectorAll(".col-scan").forEach(col => col.style.display = "none");
+
+    // show only rows not scanned
+    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
+    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "table-row");
+});
+
+document.getElementById("btnSudah").addEventListener("click", function () {
+    // button style
+    this.classList.remove("btn-outline-success");
+    this.classList.add("btn-success");
+    document.getElementById("btnBelum").classList.remove("btn-danger");
+    document.getElementById("btnBelum").classList.add("btn-outline-danger");
+
+    // show scan columns
+    document.querySelectorAll(".col-scan").forEach(col => col.style.display = "");
+
+    // show only scanned rows
+    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "none");
+    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "table-row");
+});
+</script>
+
 
 </div>
 
