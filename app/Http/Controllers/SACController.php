@@ -26,6 +26,8 @@ class SACController extends Controller
             'qty' => $data->berat,
             'lokasi' => $data->lokasi,
             'keterangan' => $data->keterangan,
+            'scanner' => $data->scanner,
+            'namabarang' => $data->namabarang,
         ]);
     }
 
@@ -34,12 +36,14 @@ class SACController extends Controller
 
     public function index () {
 
-
-$data = SAC::where('date', '>=', Carbon::now()->subMonth())
-            ->orderBy('created_at', 'desc')
-            ->get();
-        return view ('so.index', compact('data'));
-    }
+        if (!Auth::check()) {
+                return redirect()->route('login')->with('error', 'Silahkan Login terlbih dahulu');
+            }
+        $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+                ->orderBy('created_at', 'desc')
+                ->get();
+            return view ('so.index', compact('data'));
+        }
 
     public function import(Request $request)
     {
@@ -79,7 +83,7 @@ $data = SAC::where('date', '>=', Carbon::now()->subMonth())
 
         $baru->lokasi_scan = $request->lokasi;
         $baru->warehouse = 'WH';
-        $baru->namabarang = 'WH';
+        $baru->namabarang = $request->namabarang;
         $baru->jenis = 'manual';
         $baru->keterangan = $request->keterangan;
 

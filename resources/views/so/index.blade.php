@@ -65,6 +65,10 @@
 
                                 <!-- ATTRIBUTE (SCAN / MANUAL) -->
                                 <div class="col-md-12">
+                                    <div id="scannerWarning" class="text-danger fw-bold mb-2" style="display:none;">
+                                        Attribute telah di-scan!
+                                    </div>
+
                                     <label class="fw-bold mb-1">Attribute</label>
 
                                     <div class="input-group">
@@ -102,6 +106,11 @@
                                         placeholder="Lokasi" required>
                                 </div>
                                 <div class="col-md-12">
+                                    <label class="fw-bold mb-1">Nama Barang</label>
+                                    <input type="text" name="namabarang" class="form-control rounded-pill px-3 py-2"
+                                        placeholder="namabarang" required>
+                                </div>
+                                <div class="col-md-12">
                                     <label class="fw-bold mb-1">Keterangan</label>
                                     <textarea name="keterangan"
                                             class="form-control px-3 py-2 rounded"
@@ -116,7 +125,8 @@
 
                         <div class="modal-footer">
                             <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
-                            <button class="btn btn-primary rounded-pill">Simpan</button>
+                            <button type="submit" class="btn btn-primary rounded-pill" id="submitBtn">Simpan</button>
+
                         </div>
 
                     </form>
@@ -177,24 +187,49 @@ function closeScanner() {
 </script>
 
 <script>
+
 const autofillUrl = "{{ route('so.autofill') }}";
 
 document.getElementById('attributeInput').addEventListener('input', function () {
     let attr = this.value;
-
     if (attr.length < 3) return;
 
     fetch(`${autofillUrl}?attribute=${encodeURIComponent(attr)}`)
         .then(response => response.json())
         .then(data => {
+            const warning = document.getElementById("scannerWarning");
+            const submitBtn = document.getElementById("submitBtn");
+
             if (data.status === true) {
+
+                // Autofill field
                 document.querySelector('input[name="qty"]').value = data.qty ?? '';
                 document.querySelector('input[name="lokasi"]').value = data.lokasi ?? '';
+                document.querySelector('input[name="namabarang"]').value = data.namabarang ?? '';
                 document.querySelector('textarea[name="keterangan"]').value = data.keterangan ?? '';
+
+                // Cek apakah sudah pernah discan
+                if (data.scanner && data.scanner !== "") {
+                    warning.style.display = "block";
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = "0.4";
+                    submitBtn.style.cursor = "not-allowed";
+                } else {
+                    warning.style.display = "none";
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = "1";
+                    submitBtn.style.cursor = "pointer";
+                }
+
+            } else {
+                warning.style.display = "none";
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = "1";
             }
         })
         .catch(err => console.error("Autofill error:", err));
 });
+
 </script>
 
 
