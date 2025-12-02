@@ -70,6 +70,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
 
@@ -78,78 +79,98 @@ document.getElementById("exportExcelBtn").addEventListener("click", function () 
 
     let table = document.getElementById("dataTable");
 
-    // Clone tabel
-    let cloneTable = table.cloneNode(true);
+    let ws = XLSX.utils.table_to_sheet(table);
 
-    // Hapus kolom Action (kolom terakhir)
-    let ths = cloneTable.querySelectorAll("thead th");
-    ths[ths.length - 1].remove();
+    // Hapus kolom ACTION
+    let range = XLSX.utils.decode_range(ws["!ref"]);
+    for (let R = range.s.r; R <= range.e.r; R++) {
+        let addr = XLSX.utils.encode_cell({ r: R, c: range.e.c });
+        delete ws[addr];
+    }
+    range.e.c--;
+    ws["!ref"] = XLSX.utils.encode_range(range);
 
-    let trs = cloneTable.querySelectorAll("tbody tr");
-    trs.forEach(tr => {
-        tr.children[tr.children.length - 1].remove();
+    // Geser isi tabel ke bawah 2 baris
+    let newData = {};
+    Object.keys(ws).forEach(key => {
+        if (key[0] === "!") return;
+
+        let cell = XLSX.utils.decode_cell(key);
+        let newKey = XLSX.utils.encode_cell({ r: cell.r + 2, c: cell.c });
+
+        newData[newKey] = ws[key];
     });
 
-    // Tambahkan border & header abu
-    cloneTable.querySelectorAll("th").forEach(th => {
-        th.style.background = "#d9d9d9";
-        th.style.border = "1px solid #000";
-        th.style.padding = "4px";
-    });
+    ws = newData;
 
-    cloneTable.querySelectorAll("td").forEach(td => {
-        td.style.border = "1px solid #000";
-        td.style.padding = "4px";
-    });
+    let lastCol = range.e.c;
+    let lastColLetter = XLSX.utils.encode_col(lastCol);
 
-    // Header Excel Merge A1–N1
-    let headerExcel = `
-        <table border="1" style="border-collapse:collapse;">
-            <tr>
-                <td colspan="14" style="
-                    text-align:center;
-                    font-weight:bold;
-                    font-size:16px;
-                    border:1px solid #000;
-                    padding:6px;
-                ">
-                    FORM CEK LIST & LAPORAN PACKING
-                </td>
-            </tr>
-            <tr>
-                <td colspan="13" style="border:1px solid #000;"></td>
-                <td style="font-weight:bold; border:1px solid #000;">FM.WH.21.00</td>
-            </tr>
-        </table>
-        <br>
-    `;
+    // HEADER 2 BARIS
+    ws["A1"] = { t: "s", v: "FORM CEK LIST & LAPORAN PACKING" };
+    ws["A2"] = { t: "s", v: "" };
+    ws[lastColLetter + "2"] = { t: "s", v: "FM.WH.21.00" };
 
-    // Nama File
+    ws["!ref"] = `A1:${lastColLetter}${range.e.r + 3}`;
+
+    ws["!merges"] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: lastCol } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: lastCol - 1 } }
+    ];
+
+    // STYLING BORDER & FONT
+    ws["!cols"] = [];
+
+    let totalRows = range.e.r + 3;
+    let totalCols = lastCol + 1;
+
+    for (let c = 0; c < totalCols; c++) {
+        let th = table.querySelectorAll("thead th")[c];
+        let px = th ? th.offsetWidth : 100;
+        ws["!cols"].push({ wch: Math.floor(px / 7) });
+    }
+
+    for (let R = 0; R < totalRows; R++) {
+        for (let C = 0; C < totalCols; C++) {
+
+            let addr = XLSX.utils.encode_cell({ r: R, c: C });
+            let cell = ws[addr];
+            if (!cell) continue;
+
+            cell.s = {
+                font: { name: "Calibri", sz: (R === 0 ? 14 : 12), bold: (R <= 2) },
+                alignment: {
+                    horizontal: "center",
+                    vertical: "center"
+                },
+                border: {
+                    top: { style: "thin", color: { rgb: "000000" } },
+                    bottom: { style: "thin", color: { rgb: "000000" } },
+                    left: { style: "thin", color: { rgb: "000000" } },
+                    right: { style: "thin", color: { rgb: "000000" } }
+                }
+            };
+
+            if (R === 2) {
+                cell.s.fill = {
+                    patternType: "solid",
+                    fgColor: { rgb: "BFBFBF" }
+                };
+            }
+
+            if (R === 0) {
+                cell.s.alignment.horizontal = "center";
+            }
+        }
+    }
+
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Laporan Packing");
+
     let today = new Date().toISOString().slice(0,10);
-    let filename = `FM.21.00 FORM CEK LIST & LAPORAN PACKING - ${today}.xls`;
+    let filename = `FM.21.00 FORM CEK LIST & LAPORAN PACKING - ${today}.xlsx`;
 
-    // Gabungkan HTML Excel
-    let excelContent = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office"
-            xmlns:x="urn:schemas-microsoft-com:office:excel"
-            xmlns="http://www.w3.org/TR/REC-html40">
-        <head><meta charset="UTF-8"></head>
-        <body>
-            ${headerExcel}
-            ${cloneTable.outerHTML}
-        </body>
-        </html>
-    `;
-
-    let blob = new Blob([excelContent], { type: "application/vnd.ms-excel" });
-    let url = URL.createObjectURL(blob);
-
-    let a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-
-    URL.revokeObjectURL(url);
+    XLSX.writeFile(wb, filename);
 });
 
 
