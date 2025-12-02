@@ -313,10 +313,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     </div>
+<style>
+    #dataTable thead th {
+        position: sticky;
+        top: 0;
+        background: #fff; /* atau #f8f9fa agar cocok dengan bootstrap */
+        z-index: 10;
+    }
+
+    /* Untuk scroll hanya di body tabel */
+    .table-responsive {
+        max-height: 500px; /* sesuaikan */
+        overflow-y: auto;
+    }
+
+    .table-wrapper {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+#dataTable thead th {
+    box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+}
+
+
+</style>
 
 
 
-    <div class="table-responsive">
+
+<!-- SCROLLBAR ATAS -->
+<div id="scrollTop" style="overflow-x: auto; overflow-y: hidden; height: 16px;">
+    <div id="scrollTopInner"></div>
+</div>
+
+<!-- TABEL ASLI -->
+<div id="scrollBottom" style="max-height: 500px; overflow: auto;">
     <table class="table table-striped" id="dataTable">
         <thead>
             <tr>
@@ -334,6 +365,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 <th class="sortable">Pallet</th>
                 <th class="sortable">Ikatan Bandazer</th>
                 <th class="sortable">Label</th>
+                <th class="sortable">Plat Inner</th>
+                <th class="sortable">Plat Outer</th>
+                <th class="sortable">Lainnya</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -356,6 +390,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>{{ $d->pallet }}</td>
                     <td>{{ $d->bandazer }}</td>
                     <td>{{ $d->label }}</td>
+                    <td>{{ $d->inner }}</td>
+                    <td>{{ $d->outer }}</td>
+                    <td>{{ $d->lainnya }}</td>
                     <td>
                         <!-- Tombol Edit -->
                         <button class="btn btn-warning btn-sm"
@@ -502,6 +539,30 @@ document.addEventListener("DOMContentLoaded", function () {
                     </select>
                     </div>
 
+                    <div class="col-md-6">
+                    <label class="fw-bold mb-1">Plat Inner</label>
+                    <select name="inner" class="form-select rounded-pill">
+                        <option value="Pakai" {{ $d->inner=='Pakai'?'selected':'' }}>Pakai</option>
+                        <option value="Tidak Pakai" {{ $d->inner=='Tidak Pakai'?'selected':'' }}>Tidak Pakai</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-6">
+                    <label class="fw-bold mb-1">Plat Outer</label>
+                    <select name="outer" class="form-select rounded-pill">
+                        <option value="Pakai" {{ $d->outer=='Pakai'?'selected':'' }}>Pakai</option>
+                        <option value="Tidak Pakai" {{ $d->outer=='Tidak Pakai'?'selected':'' }}>Tidak Pakai</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="fw-bold mb-1">Lainnya</label>
+                        <textarea name="lainnya" class="form-control rounded-4 px-3 py-2"
+                            rows="4">{{ $d->lainnya }}</textarea>
+                    </div>
+
+
+
                 </div>
 
                 </div>
@@ -555,6 +616,26 @@ document.addEventListener("DOMContentLoaded", function () {
 @else
 @endif
 
+<script>
+    const scrollTop = document.getElementById("scrollTop");
+    const scrollTopInner = document.getElementById("scrollTopInner");
+    const scrollBottom = document.getElementById("scrollBottom");
+
+    function syncWidth() {
+        scrollTopInner.style.width = scrollBottom.scrollWidth + "px";
+    }
+
+    window.addEventListener("load", syncWidth);
+    window.addEventListener("resize", syncWidth);
+
+    scrollTop.addEventListener("scroll", () => {
+        scrollBottom.scrollLeft = scrollTop.scrollLeft;
+    });
+
+    scrollBottom.addEventListener("scroll", () => {
+        scrollTop.scrollLeft = scrollBottom.scrollLeft;
+    });
+</script>
 
 {{-- </div> --}}
 @endsection

@@ -19,6 +19,9 @@ class PackingReport extends Model
         'idod',
         'pallet',
         'bandazer',
-        'label'
+        'label',
+        'inner',
+        'outer',
+        'lainnya',
     ];
 }

@@ -43,6 +43,9 @@ class PackingController extends Controller
             'pallet'      => 'required|string|max:255',
             'bandazer'    => 'required|string|max:255',
             'label'    => 'required|string|max:255',
+            'inner'    => 'required|string|max:255',
+            'outer'    => 'required|string|max:255',
+            'lainnya'    => 'nullable',
         ]);
 
         // --- SAVE DATA ---
@@ -73,6 +76,9 @@ class PackingController extends Controller
         'pallet'     => 'required|string',
         'bandazer'   => 'required|string',
         'label'   => 'required|string',
+        'inner'   => 'required|string',
+        'outer'   => 'required|string',
+        'lainnya'   => 'required|string',
     ]);
 
     // Ambil data berdasarkan ID
@@ -93,6 +99,9 @@ class PackingController extends Controller
         'pallet'     => $request->pallet,
         'bandazer'   => $request->bandazer,
         'label'   => $request->label,
+        'inner'   => $request->inner,
+        'outer'   => $request->outer,
+        'lainnya'   => $request->lainnya,
     ]);
 
     return redirect()->back()->with('success', 'Data berhasil diperbarui!');

@@ -428,6 +428,28 @@
                         <option value="Tidak Lengkap">Tidak Lengkap</option>
                     </select>
                 </div>
+                <div class="col-md-6">
+                    <label class="fw-bold mb-1">Plat Inner</label>
+                     <select name="inner" class="form-select rounded-pill px-3 py-2" required>
+                        <option value="" selected disabled>Pilih Kondisi</option>
+                        <option value="Pakai">Pakai</option>
+                        <option value="Tidak Pakai">Tidak Pakai</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold mb-1">Plat Outer</label>
+                    <select name="outer" class="form-select rounded-pill px-3 py-2" required>
+                        <option value="" selected disabled>Pilih Kondisi</option>
+                        <option value="Pakai">Pakai</option>
+                        <option value="Tidak Pakai">Tidak Pakai</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="fw-bold mb-1">Lainnya</label>
+                    <textarea name="lainnya" class="form-control rounded-4 px-3 py-2" rows="4"
+                        placeholder="Isi keterangan lainnya di sini..."></textarea>
+                </div>
 
             </div>
 
