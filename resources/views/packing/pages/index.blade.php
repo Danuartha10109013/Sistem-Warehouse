@@ -314,9 +314,18 @@ document.addEventListener("DOMContentLoaded", function () {
         headerElement.classList.add(sortDirection ? "asc" : "desc");
 
         rows.sort((a, b) => {
-            let A = a.children[columnIndex].innerText.toLowerCase().trim();
-            let B = b.children[columnIndex].innerText.toLowerCase().trim();
+            let A = a.children[columnIndex].innerText.trim();
+            let B = b.children[columnIndex].innerText.trim();
 
+            // --- PERBAIKAN: Detect & Sort Date ---
+            let dateA = Date.parse(A);
+            let dateB = Date.parse(B);
+
+            if (!isNaN(dateA) && !isNaN(dateB)) {
+                return sortDirection ? dateA - dateB : dateB - dateA;
+            }
+
+            // Detect number
             let numA = parseFloat(A.replace(/[^0-9.-]/g, ''));
             let numB = parseFloat(B.replace(/[^0-9.-]/g, ''));
 
@@ -330,6 +339,7 @@ document.addEventListener("DOMContentLoaded", function () {
         rows.forEach(row => tbody.appendChild(row));
     }
 });
+
 </script>
 
 
