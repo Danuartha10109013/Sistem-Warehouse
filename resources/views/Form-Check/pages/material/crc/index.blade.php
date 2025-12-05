@@ -75,6 +75,8 @@
                               <i class="fa fa-sort-{{ $direction === 'asc' ? 'up' : 'down' }}"></i>
                           @endif
                       </a> </th>
+                        <th> Awal Muat </th>
+                        <th> Akhir Muat </th>
                         <th> Action </th>
                       </tr>
                     </thead>
@@ -106,6 +108,8 @@
                             {{ $nama }}
                         </td>
                         <td>{{$d->created_at}}</td>
+                        <td>{{$d->time}}</td>
+                        <td>{{$d->time_last}}</td>
 
                         <td>
                           @if (Auth::user()->role == 0)

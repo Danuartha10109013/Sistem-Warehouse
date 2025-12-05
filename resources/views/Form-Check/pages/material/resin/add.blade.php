@@ -62,7 +62,7 @@
                       </div>
                       <div class="form-group">
                         <label for="exampleInputUsername1">Pengecekan Radiasi<small style="color: red;">*</small></label>
-                        <input type="decimal" class="form-control" name="radiasi" id="exampleInputUsername1" placeholder="Cth : 1.9" required>
+                        <input type="decimal" class="form-control" name="radiasi" id="exampleInputUsername1" placeholder="Cth : 1.9">
                       </div>
                       <div class="form-group">
                             <label for="exampleInputPassword1">KETERANGAN</label>

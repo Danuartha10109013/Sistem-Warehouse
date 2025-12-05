@@ -37,6 +37,8 @@ class CrcM extends Model
         'perganjalan',
         'radiasi',
         'ket_radiasi',
+        'time',
+        'time_last',
     ];
 
     // You can add relationships here if necessary, for example:

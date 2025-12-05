@@ -13,6 +13,8 @@
             <tr>
                 <th>Timestamp</th>
                 <th>Movement Date</th>
+                <th>Awal Muat</th>
+                <th>Akhir Muat</th>
                 <th>Responden</th>
                 <th>Nomor Dokumen</th>
                 <th>Supplier</th>
@@ -41,6 +43,8 @@
                 <tr>
                     <td>{{$d->created_at}}</td>
                     <td>{{$d->date}}</td>
+                    <td>{{$d->time}}</td>
+                    <td>{{$d->time_last}}</td>
                     <td>
                         @php
                             $name = \App\Models\User::where('id',$d->user_id)->value('name');

@@ -58,8 +58,12 @@
                         <input type="Date" class="form-control" name="date" id="exampleInputEmail1" >
                       </div>
                       <div class="form-group">
-                        <label for="exampleInputPassword1">Jam Checklist <small style="color: red;">*</small></label>
-                        <input type="time" class="form-control" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
+                        <label for="exampleInputPassword1">Awal Bongkar <small style="color: red;">*</small></label>
+                        <input type="time" name="time" class="form-control" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputPassword1">Akhir Bongkar <small style="color: red;">*</small></label>
+                        <input type="time" name="time_last" class="form-control" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
                       </div>
                       <div class="form-group">
                         <label for="exampleInputUsername1">Pengecekan Radiasi<small style="color: red;">*</small></label>

@@ -102,6 +102,8 @@ class MaterialController extends Controller
             'foto7' => 'nullable|array',
             'ket_radiasi' => 'nullable',
             'radiasi' => 'required',
+            'time' => 'required',
+            'time_last' => 'required',
         ]);
 
         $data = [
@@ -129,9 +131,12 @@ class MaterialController extends Controller
             'radiasi' => $request->input('radiasi'),
             'ket_radiasi' => $request->input('ket_radiasi'),
             'perganjalan' => $request->input('perganjalan'),
+            'time' => $request->input('time'),
+            'time_last' => $request->input('time_last'),
         ];
 
         $crc = CrcM::create($data);
+        // dd($crc)
 
         try {
             $fileNames = [];

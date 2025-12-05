@@ -181,6 +181,28 @@
       <td width="25%" style="border: none">: ______________________</td>
       @endif
     </tr>
+    <tr>
+      <td style="border: none">Awal Muat</td>
+      @if($submission->time)
+      <td width="25%" style="border: none">:
+        <span style="text-decoration: underline;font-weight: bold">
+            {{ \Carbon\Carbon::parse($submission->time)->format('H-i-s') }}
+        </span>
+      </td>
+      @else
+      <td width="25%" style="border: none">: ______________________</td>
+      @endif
+      <td style="border: none">Akhir Muat</td>
+      @if($submission->time_last)
+      <td width="25%" style="border: none">:
+        <span style="text-decoration: underline;font-weight: bold">
+            {{ \Carbon\Carbon::parse($submission->time_last)->format('H-i-s') }}
+        </span>
+      </td>
+      @else
+      <td width="25%" style="border: none">: ______________________</td>
+      @endif
+    </tr>
   </table>
 
   {{-- <p class="section-title">Checklist Kedatangan</p> --}}
