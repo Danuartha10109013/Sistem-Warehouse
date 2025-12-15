@@ -412,7 +412,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>{{ $d->attribute }}</td>
                     <td>Group {{ $d->group }}</td>
                     <td>{{ $d->layout }}</td>
-                    <td>{{ $d->no_so }}</td>
+                    <td style="text-transform: uppercase;">{{ $d->no_so }}</td>
                     <td>{{ $d->kondisi }}</td>
                     <td>{{ $d->plastik }}</td>
                     <td>{{ $d->wrapping }}</td>

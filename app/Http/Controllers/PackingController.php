@@ -50,6 +50,9 @@ class PackingController extends Controller
 
         // --- SAVE DATA ---
 
+        $validated['no_so'] = isset($validated['no_so'])
+            ? strtoupper($validated['no_so'])
+            : null;
 
         PackingReport::create($validated);
 
@@ -59,9 +62,58 @@ class PackingController extends Controller
             ->with('success', 'Data berhasil disimpan!');
     }
 
-    public function update(Request $request, $id)
+//     public function update(Request $request, $id)
+// {
+//     // Validasi sesuai field
+//     $validated = $request->validate([
+//         'date'       => 'required',
+//         'attribute'  => 'required|string|max:255',
+//         'group'      => 'required|string',
+//         'layout'     => 'required|string',
+//         'no_so'      => 'required|string',
+//         'kondisi'    => 'required|string',
+//         'plastik'    => 'required|string',
+//         'wrapping'   => 'required|string',
+//         'impraboard' => 'required|string',
+//         'idod'       => 'required|string',
+//         'pallet'     => 'required|string',
+//         'bandazer'   => 'required|string',
+//         'label'   => 'required|string',
+//         'inner'   => 'required|string',
+//         'outer'   => 'required|string',
+//         'lainnya'   => 'nullable|string',
+//     ]);
+
+
+//     // Ambil data berdasarkan ID
+//     $data = PackingReport::findOrFail($id);
+//     $validated['no_so'] = strtoupper($validated['no_so']);
+
+//     // Update data
+//     $data->update([
+//         'date'       => $request->date,
+//         'attribute'  => $request->attribute,
+//         'group'      => $request->group,
+//         'layout'     => $request->layout,
+//         'no_so'      => $request->no_so,
+//         'kondisi'    => $request->kondisi,
+//         'plastik'    => $request->plastik,
+//         'wrapping'   => $request->wrapping,
+//         'impraboard' => $request->impraboard,
+//         'idod'       => $request->idod,
+//         'pallet'     => $request->pallet,
+//         'bandazer'   => $request->bandazer,
+//         'label'   => $request->label,
+//         'inner'   => $request->inner,
+//         'outer'   => $request->outer,
+//         'lainnya'   => $request->lainnya,
+//     ]);
+
+//     return redirect()->back()->with('success', 'Data berhasil diperbarui!');
+// }
+
+public function update(Request $request, $id)
 {
-    // Validasi sesuai field
     $validated = $request->validate([
         'date'       => 'required',
         'attribute'  => 'required|string|max:255',
@@ -75,37 +127,22 @@ class PackingController extends Controller
         'idod'       => 'required|string',
         'pallet'     => 'required|string',
         'bandazer'   => 'required|string',
-        'label'   => 'required|string',
-        'inner'   => 'required|string',
-        'outer'   => 'required|string',
-        'lainnya'   => 'required|string',
+        'label'      => 'required|string',
+        'inner'      => 'required|string',
+        'outer'      => 'required|string',
+        'lainnya'    => 'nullable|string',
     ]);
 
-    // Ambil data berdasarkan ID
+    // AUTO UPPERCASE
+    $validated['no_so'] = strtoupper($validated['no_so']);
+
     $data = PackingReport::findOrFail($id);
 
-    // Update data
-    $data->update([
-        'date'       => $request->date,
-        'attribute'  => $request->attribute,
-        'group'      => $request->group,
-        'layout'     => $request->layout,
-        'no_so'      => $request->no_so,
-        'kondisi'    => $request->kondisi,
-        'plastik'    => $request->plastik,
-        'wrapping'   => $request->wrapping,
-        'impraboard' => $request->impraboard,
-        'idod'       => $request->idod,
-        'pallet'     => $request->pallet,
-        'bandazer'   => $request->bandazer,
-        'label'   => $request->label,
-        'inner'   => $request->inner,
-        'outer'   => $request->outer,
-        'lainnya'   => $request->lainnya,
-    ]);
+    $data->update($validated);
 
     return redirect()->back()->with('success', 'Data berhasil diperbarui!');
 }
+
 public function destroy($id)
 {
     // Cari data berdasarkan ID
