@@ -45,6 +45,7 @@ class PackingController extends Controller
             'label'    => 'required|string|max:255',
             'inner'    => 'required|string|max:255',
             'outer'    => 'required|string|max:255',
+            'inerprotector'    => 'required|string|max:255',
             'lainnya'    => 'nullable',
         ]);
 
@@ -130,6 +131,7 @@ public function update(Request $request, $id)
         'label'      => 'required|string',
         'inner'      => 'required|string',
         'outer'      => 'required|string',
+        'inerprotector'      => 'required|string',
         'lainnya'    => 'nullable|string',
     ]);
 

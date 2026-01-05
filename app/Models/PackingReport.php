@@ -22,6 +22,7 @@ class PackingReport extends Model
         'label',
         'inner',
         'outer',
+        'inerprotector',
         'lainnya',
     ];
 }

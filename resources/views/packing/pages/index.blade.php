@@ -398,6 +398,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <th class="sortable">Label</th>
                 <th class="sortable">Plat Inner</th>
                 <th class="sortable">Plat Outer</th>
+                <th class="sortable">Iner Protector</th>
                 <th class="sortable">Lainnya</th>
                 <th>Action</th>
             </tr>
@@ -423,6 +424,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>{{ $d->label }}</td>
                     <td>{{ $d->inner }}</td>
                     <td>{{ $d->outer }}</td>
+                    <td>{{ $d->inerprotector }}</td>
                     <td>{{ $d->lainnya }}</td>
                     <td>
                         <!-- Tombol Edit -->
@@ -587,6 +589,28 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
 
                     <div class="col-md-6">
+                    <label class="fw-bold mb-1">Inner Protector</label>
+                    <select name="inerprotector" class="form-select rounded-pill px-3 py-2" required>
+                        <option value="" disabled {{ empty($d->inerprotector) ? 'selected' : '' }}>
+                            Pilih Kondisi
+                        </option>
+                        <option value="Tidak Pakai" {{ $d->inerprotector=='Tidak Pakai' ? 'selected' : '' }}>
+                            Tidak Pakai
+                        </option>
+                        <option value="Steel Ring" {{ $d->inerprotector=='Steel Ring' ? 'selected' : '' }}>
+                            Steel Ring
+                        </option>
+                        <option value="Duplek" {{ $d->inerprotector=='Duplek' ? 'selected' : '' }}>
+                            Duplek
+                        </option>
+                        <option value="Steel Sleeve" {{ $d->inerprotector=='Steel Sleeve' ? 'selected' : '' }}>
+                            Steel Sleeve
+                        </option>
+                    </select>
+                </div>
+
+
+                    <div class="col-md-12">
                         <label class="fw-bold mb-1">Lainnya</label>
                         <textarea name="lainnya" class="form-control rounded-4 px-3 py-2"
                             rows="4">{{ $d->lainnya }}</textarea>

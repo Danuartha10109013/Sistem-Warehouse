@@ -446,6 +446,17 @@
                 </div>
 
                 <div class="col-md-6">
+                    <label class="fw-bold mb-1">Inner Protector</label>
+                    <select name="inerprotector" class="form-select rounded-pill px-3 py-2" required>
+                        <option value="" selected disabled>Pilih Kondisi</option>
+                        <option value="Tidak Pakai">Tidak Pakai</option>
+                        <option value="Steel Ring">Steel Ring</option>
+                        <option value="Duplek">Duplek</option>
+                        <option value="Steel Sleeve">Steel Sleve</option>
+                    </select>
+                </div>
+
+                <div class="col-md-12">
                     <label class="fw-bold mb-1">Lainnya</label>
                     <textarea name="lainnya" class="form-control rounded-4 px-3 py-2" rows="4"
                         placeholder="Isi keterangan lainnya di sini..."></textarea>
