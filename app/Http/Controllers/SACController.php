@@ -28,6 +28,9 @@ class SACController extends Controller
             'keterangan' => $data->keterangan,
             'scanner' => $data->scanner,
             'namabarang' => $data->namabarang,
+            'storagebin' => $data->storagebin,
+            'qty_scan' => $data->qty_scan ?? 0,
+            'selisih' => ($data->berat ?? 0) - ($data->qty_scan ?? 0),
         ]);
     }
 
@@ -67,16 +70,18 @@ class SACController extends Controller
     }
 
     public function import(Request $request)
-    {
-        $request->validate([
-            'excel' => 'required|mimes:xlsx,xls'
-        ]);
+{
+    $request->validate([
+        'excel' => 'required|mimes:xlsx,xls'
+    ]);
 
+    $kategori = $request->kategori;
 
-        Excel::import(new SACImport, $request->file('excel'));
+    Excel::import(new SACImport($kategori), $request->file('excel'));
 
-        return back()->with('success', 'Data berhasil diimport dari Excel');
-    }
+    return back()->with('success', 'Data berhasil diimport dari Excel');
+}
+
 
    public function store(Request $request){
     $kpc = $request->attribute;
@@ -84,9 +89,46 @@ class SACController extends Controller
     $id = SAC::where('kpc', $kpc)->value('id');
     if($id){
         $data = SAC::find($id);
+        $existingQty = (int) ($data->qty_scan ?? 0);
+        $newQty = (int) $request->qty;
+
         $data->lokasi_scan = $request->lokasi;
-        $data->qty_scan = $request->qty;
-        $data->keterangan = $request->keterangan;
+        // jumlahkan qty scan lama + baru
+        $data->qty_scan = $existingQty + $newQty;
+
+        // susun keterangan scan bertingkat
+        $user = Auth::user()->name;
+        $baseKeterangan = $data->keterangan ?? '';
+
+        // cari nomor scan terakhir di keterangan (Scan 1, Scan 2, dst)
+        $scanNumber = 1;
+        if (preg_match_all('/Scan\s+(\d+)/i', $baseKeterangan, $matches) && count($matches[1]) > 0) {
+            $scanNumber = ((int) max($matches[1])) + 1;
+        } elseif ($existingQty > 0) {
+            // sudah pernah discan tapi belum ada pola "Scan X"
+            $scanNumber = 2;
+        }
+
+        $note = "Scan {$scanNumber} {$user} {$newQty}";
+        // jika storagebin hasil berbeda dengan storagebin awal, catat perubahannya
+        $originalSB = $data->storagebin ?? null;
+        $resultSB = $request->layout;
+        if ($resultSB && $originalSB && $resultSB !== $originalSB) {
+            $note .= " (SB: {$originalSB} -> {$resultSB})";
+        } elseif ($resultSB && !$originalSB) {
+            $note .= " (SB: {$resultSB})";
+        }
+        if ($request->keterangan) {
+            $note .= " - " . $request->keterangan;
+        }
+
+        if ($baseKeterangan) {
+            $data->keterangan = $baseKeterangan . ' | ' . $note;
+        } else {
+            $data->keterangan = $note;
+        }
+
+        $data->storagebin_hasil = $request->layout;
         $data->date_scan = \Carbon\Carbon::now();
         $data->scanner = Auth::user()->name;
         $data->save();
@@ -106,7 +148,15 @@ class SACController extends Controller
         $baru->warehouse = 'WH';
         $baru->namabarang = $request->namabarang;
         $baru->jenis = 'manual';
-        $baru->keterangan = $request->keterangan;
+        $note = "Scan 1 " . Auth::user()->name . " " . (int) $request->qty;
+        if ($request->layout) {
+            $note .= " (SB: {$request->layout})";
+        }
+        if ($request->keterangan) {
+            $note .= " - " . $request->keterangan;
+        }
+        $baru->keterangan = $note;
+        $baru->storagebin_hasil = $request->layout;
 
         $baru->date = \Carbon\Carbon::now();
         $baru->scanner = Auth::user()->name;

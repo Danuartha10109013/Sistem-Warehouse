@@ -120,41 +120,27 @@
                                 </div>
 
 
-<!-- LAYOUT ROLLER -->
+<!-- LAYOUT INPUT (4 kolom) -->
 <div class="mb-3">
-    <label class="fw-bold mb-2 d-block">Layout</label>
-
-    <div class="layout-picker">
-        <div class="wheel">
-            <div class="spacer"></div>
-            <div class="item">A</div>
-            <div class="item">B</div>
-            <div class="item">C</div>
-            <div class="spacer"></div>
+    <label class="fw-bold mb-2 d-block">Layout / Storagebin</label>
+    <div class="row g-2 align-items-center">
+        <div class="col-md-3">
+            <input type="text" class="form-control rounded-pill" id="layoutPrefix" value="WH-L08-SP" readonly>
         </div>
-
-        <div class="wheel">
-            <div class="spacer"></div>
-            <div class="item">01</div>
-            <div class="item">02</div>
-            <div class="item">03</div>
-            <div class="item">04</div>
-            <div class="item">05</div>
-            <div class="spacer"></div>
+        <div class="col-md-2">
+            <input type="text" class="form-control rounded-pill" id="layoutCol1" placeholder="Kolom 1 (contoh: A)">
         </div>
-
-        <div class="wheel">
-            <div class="spacer"></div>
-            <div class="item">01</div>
-            <div class="item">02</div>
-            <div class="item">03</div>
-            <div class="item">04</div>
-            <div class="item">05</div>
-            <div class="spacer"></div>
+        <div class="col-md-2">
+            <input type="text" class="form-control rounded-pill" id="layoutCol2" placeholder="Kolom 2 (contoh: 2)">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control rounded-pill" id="layoutCol3" placeholder="Kolom 3 (contoh: B)">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control rounded-pill" id="layoutCol4" placeholder="Kolom 4 (contoh: 3)">
         </div>
     </div>
 
-    <!-- HASIL -->
     <div class="layout-result" id="layoutPreview">-</div>
     <input type="hidden" name="layout" id="layoutValue">
 </div>
@@ -181,112 +167,65 @@
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 
 <style>
-.layout-picker {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-}
-
-.wheel {
-    width: 70px;
-    height: 120px;
-    overflow-y: auto;
-    scroll-snap-type: y mandatory;
-    border-radius: 35px;
-    background: #fff;
-    box-shadow: inset 0 0 12px rgba(0,0,0,.15);
-}
-
-.wheel::-webkit-scrollbar { display: none; }
-
-.spacer {
-    height: 40px;
-}
-
-.item {
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 14px;
-    opacity: .35;
-    scroll-snap-align: center;
-    transition: .2s;
-}
-
-.item.active {
-    font-size: 18px;
-    font-weight: 800;
-    opacity: 1;
-    color: #000;
-}
-
 .layout-result {
     margin-top: 12px;
     text-align: center;
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: 3px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
 }
-
-.wheel {
-    cursor: pointer;
-}
-
-.item:hover {
-    opacity: 0.8;
-    transform: scale(1.1);
-}
-
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const prefixInput = document.getElementById('layoutPrefix');
+    const col1 = document.getElementById('layoutCol1');
+    const col2 = document.getElementById('layoutCol2');
+    const col3 = document.getElementById('layoutCol3');
+    const col4 = document.getElementById('layoutCol4');
+    const preview = document.getElementById('layoutPreview');
+    const hiddenInput = document.getElementById('layoutValue');
 
-    const modal = document.getElementById('scanModal');
-    let initialized = false;
+    function buildLayout() {
+        const prefix = prefixInput?.value?.trim() || '';
+        const v1 = col1?.value?.trim() || '';
+        const v2 = col2?.value?.trim() || '';
+        const v3 = col3?.value?.trim() || '';
+        const v4 = col4?.value?.trim() || '';
 
-    modal.addEventListener('shown.bs.modal', () => {
-        if (initialized) return;
-        initialized = true;
-
-        const wheels  = modal.querySelectorAll('.wheel');
-        const preview = modal.querySelector('#layoutPreview');
-        const input   = modal.querySelector('#layoutValue');
-
-        wheels.forEach(wheel => {
-            wheel.querySelectorAll('.item').forEach(item => {
-                item.addEventListener('click', () => {
-
-                    wheel.querySelectorAll('.item')
-                        .forEach(i => i.classList.remove('active'));
-
-                    item.classList.add('active');
-                    updateLayout();
-                });
-            });
-        });
-
-        // default selection
-        wheels.forEach(wheel => {
-            const first = wheel.querySelector('.item');
-            first.classList.add('active');
-        });
-
-        updateLayout();
-
-        function updateLayout() {
-            const values = [];
-            wheels.forEach(w => {
-                const active = w.querySelector('.item.active');
-                values.push(active ? active.innerText : '--');
-            });
-
-            const result = values.join('-');
-            preview.innerText = result;
-            input.value = result;
+        if (!prefix || !v1 || !v2 || !v3 || !v4) {
+            if (preview) preview.innerText = '-';
+            if (hiddenInput) hiddenInput.value = '';
+            return;
         }
+
+        const result = `${prefix} ${v1}(${v2}-${v3}-${v4})`;
+        if (preview) preview.innerText = result;
+        if (hiddenInput) hiddenInput.value = result;
+    }
+
+    function parseLayout(storagebin) {
+        const regex = /^([^\s]+)\s+([^(]+)\(([^-]+)-([^-]+)-([^)]+)\)$/;
+        const match = storagebin.match(regex);
+        if (!match) return;
+
+        if (prefixInput) prefixInput.value = match[1];
+        if (col1) col1.value = match[2];
+        if (col2) col2.value = match[3];
+        if (col3) col3.value = match[4];
+        if (col4) col4.value = match[5];
+
+        buildLayout();
+    }
+
+    [col1, col2, col3, col4].forEach(input => {
+        if (!input) return;
+        input.addEventListener('input', buildLayout);
     });
+
+    // expose for autofill usage
+    window.__updateLayoutFromStoragebin = parseLayout;
+    window.__buildLayout = buildLayout;
 });
 </script>
 
@@ -356,6 +295,10 @@ document.getElementById('attributeInput').addEventListener('input', function () 
         .then(data => {
             const warning = document.getElementById("scannerWarning");
             const submitBtn = document.getElementById("submitBtn");
+            const layoutPreview = document.getElementById("layoutPreview");
+            const layoutInput = document.getElementById("layoutValue");
+            const updateLayoutFromStoragebin = window.__updateLayoutFromStoragebin;
+            const buildLayout = window.__buildLayout;
 
             if (data.status === true) {
 
@@ -365,12 +308,46 @@ document.getElementById('attributeInput').addEventListener('input', function () 
                 document.querySelector('input[name="namabarang"]').value = data.namabarang ?? '';
                 document.querySelector('textarea[name="keterangan"]').value = data.keterangan ?? '';
 
+                // Autofill layout from storagebin if available
+                if (data.storagebin) {
+                    if (typeof updateLayoutFromStoragebin === 'function') {
+                        updateLayoutFromStoragebin(data.storagebin);
+                    } else {
+                        if (layoutPreview) layoutPreview.innerText = data.storagebin;
+                        if (layoutInput) layoutInput.value = data.storagebin;
+                    }
+                }
+                else if (typeof buildLayout === 'function') {
+                    buildLayout();
+                }
+
                 // Cek apakah sudah pernah discan
                 if (data.scanner && data.scanner !== "") {
+                    // Tampilkan peringatan. Jika selisih 0, tombol submit dimatikan.
+                    let selisih = 0;
+                    if (typeof data.selisih === 'number') {
+                        selisih = data.selisih;
+                    } else if (typeof data.qty === 'number' && typeof data.qty_scan === 'number') {
+                        selisih = data.qty - data.qty_scan;
+                    }
+                    if (selisih < 0) selisih = 0;
+
+                    warning.textContent =
+                        `Attribute telah di-scan sebelumnya. Sisa yang belum di-scan: ${selisih}. ` +
+                        (selisih > 0
+                            ? `Submit lagi akan menambah qty scan untuk attribute ini.`
+                            : `Qty sudah terpenuhi, tidak bisa submit lagi.`);
                     warning.style.display = "block";
-                    submitBtn.disabled = true;
-                    submitBtn.style.opacity = "0.4";
-                    submitBtn.style.cursor = "not-allowed";
+
+                    if (selisih > 0) {
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = "1";
+                        submitBtn.style.cursor = "pointer";
+                    } else {
+                        submitBtn.disabled = true;
+                        submitBtn.style.opacity = "0.4";
+                        submitBtn.style.cursor = "not-allowed";
+                    }
                 } else {
                     warning.style.display = "none";
                     submitBtn.disabled = false;
@@ -568,6 +545,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     <th class="sortable">Nama Barang</th>
                     <th class="sortable">Berat</th>
                     <th class="sortable">Lokasi</th>
+                    <th class="sortable">Storagebin Awal</th>
+                    <th class="sortable">Storagebin Hasil</th>
                     <th class="col-scan sortable">Scanner</th>
 
                     <!-- Kolom yang harus hilang di mode Belum Scan -->
@@ -587,6 +566,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>{{ $d->namabarang }}</td>
                     <td>{{ $d->berat }}</td>
                     <td>{{ $d->lokasi }}</td>
+                    <td>{{ $d->storagebin ?? '-' }}</td>
+                    <td>{{ $d->storagebin_hasil ?? '-' }}</td>
 
                     <td class="col-scan">{{ $d->scanner ?? '-' }}</td>
                     <td class="col-scan">{{ $d->scanner ? $d->qty_scan : '-' }}</td>

@@ -9,6 +9,13 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class SACImport implements ToModel, WithHeadingRow
 {
+    protected $kategori;
+
+    public function __construct($kategori)
+    {
+        $this->kategori = $kategori;
+    }
+
     public function model(array $row)
     {
         return new SAC([
@@ -19,8 +26,8 @@ class SACImport implements ToModel, WithHeadingRow
             'namabarang' => $row['namabarang'],
             'berat'      => $row['berat'],
             'lokasi'     => $row['lokasi'],
-            'jenis'      => 'otomatis',
+            'storagebin' => $row['storagebin'],
+            'jenis'      => $this->kategori,
         ]);
     }
 }
-

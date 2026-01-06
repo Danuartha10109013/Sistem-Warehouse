@@ -22,5 +22,7 @@ class SAC extends Model
         'qty_scan',
         'keterangan',
         'scanner',
+        'storagebin',
+        'storagebin_hasil',
     ];
 }

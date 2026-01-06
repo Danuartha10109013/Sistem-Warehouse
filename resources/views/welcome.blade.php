@@ -110,7 +110,7 @@ $menuItems = [
     "CK"  => ["title" => "Checklist Kendaraan", "icon" => "mdi-car", "route" => Auth::user()->role == 0 ? route('Kendaraan.admin.dashboard') : route('Kendaraan.pegawai.dashboard')],
     "SL"  => ["title" => "Scan Layout", "icon" => "mdi-qrcode", "route" => Auth::user()->role == 0 ? route('Scan-Layout.admin.dashboard') : route('Scan-Layout.pegawai.dashboard')],
     "CD"  => ["title" => "Coil Damage", "icon" => "mdi-package-variant-closed-remove", "route" => Auth::user()->role == 0 ? route('Coil-Damage.admin.dashboard') : route('Coil-Damage.pegawai.dashboard')],
-    "SO"  => ["title" => "SAC SO", "icon" => "mdi-package-variant-closed-check", "route" => Auth::user()->role == 0 ? route('so') : route('so')],
+    "SO"  => ["title" => "SAC SO", "icon" => "mdi-package-variant-closed-check", "route" => Auth::user()->role == 0 ? route('so.utama') : route('so.utama')],
     // "L8"  => ["title" => "Packing L08", "icon" => "mdi-numeric-8-box-multiple", "route" => Auth::user()->role == 0 ? route('L-08.admin.dashboard') : route('L-08.pegawai.dashboard')],
     // "PC"  => ["title" => "Form Packing", "icon" => "mdi-numeric-8-box-multiple", "route" => Auth::user()->role == 0 ? route('L-08.admin.dashboard') : route('L-08.pegawai.dashboard')],
 ];
