@@ -306,7 +306,9 @@ document.getElementById('attributeInput').addEventListener('input', function () 
                 document.querySelector('input[name="qty"]').value = data.qty ?? '';
                 document.querySelector('input[name="lokasi"]').value = data.lokasi ?? '';
                 document.querySelector('input[name="namabarang"]').value = data.namabarang ?? '';
-                document.querySelector('textarea[name="keterangan"]').value = data.keterangan ?? '';
+
+                // Keterangan TIDAK di-autofill dari database supaya catatan baru tidak membawa riwayat lama
+                document.querySelector('textarea[name="keterangan"]').value = '';
 
                 // Autofill layout from storagebin if available
                 if (data.storagebin) {
