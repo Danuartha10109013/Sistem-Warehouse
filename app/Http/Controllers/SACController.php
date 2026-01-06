@@ -96,7 +96,7 @@ class SACController extends Controller
         // jumlahkan qty scan lama + baru
         $data->qty_scan = $existingQty + $newQty;
 
-        // susun keterangan scan bertingkat
+        // susun keterangan scan bertingkat (lebih mudah dibaca)
         $user = Auth::user()->name;
         $baseKeterangan = $data->keterangan ?? '';
 
@@ -109,7 +109,7 @@ class SACController extends Controller
             $scanNumber = 2;
         }
 
-        $note = "Scan {$scanNumber} {$user} {$newQty}";
+        $note = "Scan {$scanNumber} - {$user} - Qty: {$newQty}";
         // jika storagebin hasil berbeda dengan storagebin awal, catat perubahannya
         $originalSB = $data->storagebin ?? null;
         $resultSB = $request->layout;
@@ -119,11 +119,12 @@ class SACController extends Controller
             $note .= " (SB: {$resultSB})";
         }
         if ($request->keterangan) {
-            $note .= " - " . $request->keterangan;
+            $note .= " | Catatan: " . $request->keterangan;
         }
 
         if ($baseKeterangan) {
-            $data->keterangan = $baseKeterangan . ' | ' . $note;
+            // tiap scan pada baris baru
+            $data->keterangan = $baseKeterangan . "\n" . $note;
         } else {
             $data->keterangan = $note;
         }
@@ -148,12 +149,12 @@ class SACController extends Controller
         $baru->warehouse = 'WH';
         $baru->namabarang = $request->namabarang;
         $baru->jenis = 'manual';
-        $note = "Scan 1 " . Auth::user()->name . " " . (int) $request->qty;
+        $note = "Scan 1 - " . Auth::user()->name . " - Qty: " . (int) $request->qty;
         if ($request->layout) {
             $note .= " (SB: {$request->layout})";
         }
         if ($request->keterangan) {
-            $note .= " - " . $request->keterangan;
+            $note .= " | Catatan: " . $request->keterangan;
         }
         $baru->keterangan = $note;
         $baru->storagebin_hasil = $request->layout;

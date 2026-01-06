@@ -574,7 +574,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td class="col-scan">
                         {{ $d->scanner ? ($d->berat - $d->qty_scan) : '-' }}
                     </td>
-                    <td class="col-scan">{{ $d->keterangan }}</td>
+                    <td class="col-scan">{!! nl2br(e($d->keterangan)) !!}</td>
                 </tr>
                 @endforeach
             </tbody>
