@@ -12,12 +12,12 @@
                 class="nav-item nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}">
                 Home
             </a>
-            <a href="{{route('so')}}" class="nav-item nav-link {{ request()->routeIs('so') ? 'active' : '' }}">Stock</a>
+            <a href="{{route('so.utama')}}" class="nav-item nav-link {{ request()->routeIs('so.utama') ? 'active' : '' }}">Stock</a>
             <a href="#" class="nav-item nav-link" data-bs-toggle="modal" data-bs-target="#uploadExcelModal">
                 Tambah Data
             </a>
 
-            
+
 
 
         </div>

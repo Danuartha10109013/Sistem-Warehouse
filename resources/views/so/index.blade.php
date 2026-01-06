@@ -1,6 +1,6 @@
 @extends('so.main')
 @section('title')
-    SAC SO
+     SO {{$key}}
 @endsection
 @section('content')
 
@@ -32,7 +32,7 @@
     <!-- Page Title -->
     <div class="row mb-4">
         <div class="col-12 text-center">
-            <h3 class="m-0 fw-bold text-dark">SAC Stock Opname</h3>
+            <h3 class="m-0 fw-bold text-dark">STOCK OPNAME {{$key}}</h3>
         </div>
     </div>
     <!-- Action Buttons + Search -->
@@ -120,6 +120,50 @@
                                 </div>
 
 
+<!-- LAYOUT ROLLER -->
+<div class="mb-3">
+    <label class="fw-bold mb-2 d-block">Layout</label>
+
+    <div class="layout-picker">
+        <div class="wheel">
+            <div class="spacer"></div>
+            <div class="item">A</div>
+            <div class="item">B</div>
+            <div class="item">C</div>
+            <div class="spacer"></div>
+        </div>
+
+        <div class="wheel">
+            <div class="spacer"></div>
+            <div class="item">01</div>
+            <div class="item">02</div>
+            <div class="item">03</div>
+            <div class="item">04</div>
+            <div class="item">05</div>
+            <div class="spacer"></div>
+        </div>
+
+        <div class="wheel">
+            <div class="spacer"></div>
+            <div class="item">01</div>
+            <div class="item">02</div>
+            <div class="item">03</div>
+            <div class="item">04</div>
+            <div class="item">05</div>
+            <div class="spacer"></div>
+        </div>
+    </div>
+
+    <!-- HASIL -->
+    <div class="layout-result" id="layoutPreview">-</div>
+    <input type="hidden" name="layout" id="layoutValue">
+</div>
+
+
+
+
+
+
                             </div>
                         </div>
 
@@ -135,6 +179,119 @@
         </div>
 
 <script src="https://unpkg.com/@zxing/library@latest"></script>
+
+<style>
+.layout-picker {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.wheel {
+    width: 70px;
+    height: 120px;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    border-radius: 35px;
+    background: #fff;
+    box-shadow: inset 0 0 12px rgba(0,0,0,.15);
+}
+
+.wheel::-webkit-scrollbar { display: none; }
+
+.spacer {
+    height: 40px;
+}
+
+.item {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+    opacity: .35;
+    scroll-snap-align: center;
+    transition: .2s;
+}
+
+.item.active {
+    font-size: 18px;
+    font-weight: 800;
+    opacity: 1;
+    color: #000;
+}
+
+.layout-result {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+.wheel {
+    cursor: pointer;
+}
+
+.item:hover {
+    opacity: 0.8;
+    transform: scale(1.1);
+}
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const modal = document.getElementById('scanModal');
+    let initialized = false;
+
+    modal.addEventListener('shown.bs.modal', () => {
+        if (initialized) return;
+        initialized = true;
+
+        const wheels  = modal.querySelectorAll('.wheel');
+        const preview = modal.querySelector('#layoutPreview');
+        const input   = modal.querySelector('#layoutValue');
+
+        wheels.forEach(wheel => {
+            wheel.querySelectorAll('.item').forEach(item => {
+                item.addEventListener('click', () => {
+
+                    wheel.querySelectorAll('.item')
+                        .forEach(i => i.classList.remove('active'));
+
+                    item.classList.add('active');
+                    updateLayout();
+                });
+            });
+        });
+
+        // default selection
+        wheels.forEach(wheel => {
+            const first = wheel.querySelector('.item');
+            first.classList.add('active');
+        });
+
+        updateLayout();
+
+        function updateLayout() {
+            const values = [];
+            wheels.forEach(w => {
+                const active = w.querySelector('.item.active');
+                values.push(active ? active.innerText : '--');
+            });
+
+            const result = values.join('-');
+            preview.innerText = result;
+            input.value = result;
+        }
+    });
+});
+</script>
+
+
+
 
 <script>
 let stream;

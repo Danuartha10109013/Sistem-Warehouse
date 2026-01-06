@@ -55,6 +55,20 @@
                                     <input type="file" name="excel" class="form-control" accept=".xlsx,.xls" required>
                                 </div>
 
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Pilih Kategori</label>
+                                    <select name="kategori" class="form-select" required>
+                                        <option value="" disabled selected>-- Pilih Kategori --</option>
+                                            <option value="BB - BJ - BJS - SP">BB - BJ - BJS - SP</option>
+                                            <option value="Electric">Electric</option>
+                                            <option value="Mechanic">Mechanic</option>
+                                            <option value="Proyek">Proyek</option>
+                                            <option value="Safety">Safety</option>
+                                            <option value="Utility">tility</option>
+                                            <option value="General Storag">General Storag</option>
+                                    </select>
+                                </div>
+
                                 <p class="text-muted small">
                                     * File wajib format <strong>.xlsx</strong> atau <strong>.xls</strong><br>
                                     <a href="{{asset('templateso.xls')}}"> Download Template</a>

@@ -36,14 +36,35 @@ class SACController extends Controller
 
     public function index () {
 
+    if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silahkan Login terlbih dahulu');
+        }
+    $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view ('so.index', compact('data'));
+    }
+
+    public function utama () {
+
+    if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silahkan Login terlbih dahulu');
+        }
+    $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view ('so.utama', compact('data'));
+    }
+    public function cs () {
+
         if (!Auth::check()) {
                 return redirect()->route('login')->with('error', 'Silahkan Login terlbih dahulu');
             }
         $data = SAC::where('date', '>=', Carbon::now()->subMonth())
                 ->orderBy('created_at', 'desc')
                 ->get();
-            return view ('so.index', compact('data'));
-        }
+            return view ('so.cs', compact('data'));
+    }
 
     public function import(Request $request)
     {
@@ -97,6 +118,39 @@ class SACController extends Controller
 
     }
 
+}
+
+    public function sparepart () {
+
+    if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silahkan Login terlbih dahulu');
+        }
+
+        $key = 'SPAREPART';
+
+    $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view ('so.index', compact('data','key'));
+    }
+
+public function electric (){
+    return view ('so.cs');
+}
+public function mechanic (){
+    return view ('so.cs');
+}
+public function proyek (){
+    return view ('so.cs');
+}
+public function safety (){
+    return view ('so.cs');
+}
+public function utility (){
+    return view ('so.cs');
+}
+public function general (){
+    return view ('so.cs');
 }
 
 }

@@ -110,6 +110,19 @@ Route::middleware([AutoLogout::class])->group(function () {
     Route::get('/welcome', [LoginController::class, 'welcome'])->name('welcome');
 
     Route::prefix('so-sac')->group(function () {
+        Route::get('/cs',[SACController::class,'cs'])->name('so.cs');
+        Route::get('/utama',[SACController::class,'utama'])->name('so.utama');
+        Route::get('/bahan-baku', [SACController::class, 'bahanBaku'])->name('so.bahan_baku');
+        Route::get('/barang-jadi', [SACController::class, 'barangJadi'])->name('so.barang_jadi');
+        Route::get('/barang-jadi-sliting', [SACController::class, 'barangJadiSliting'])->name('so.barang_jadi_sliting');
+        Route::get('/sparepart', [SACController::class, 'sparepart'])->name('so.sparepart');
+        // KATEGORI LAIN
+        Route::get('/electric', [SACController::class, 'electric'])->name('so.electric');
+        Route::get('/mechanic', [SACController::class, 'mechanic'])->name('so.mechanic');
+        Route::get('/proyek', [SACController::class, 'proyek'])->name('so.proyek');
+        Route::get('/safety', [SACController::class, 'safety'])->name('so.safety');
+        Route::get('/utility', [SACController::class, 'utility'])->name('so.utility');
+        Route::get('/general-storage', [SACController::class, 'general'])->name('so.general');
         Route::get('/',[SACController::class,'index'])->name('so');
         Route::get('/so/autofill', [SACController::class, 'autofill'])->name('so.autofill');
         Route::post('/so/import', [SACController::class, 'import'])->name('so.import');
