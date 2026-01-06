@@ -96,38 +96,29 @@ class SACController extends Controller
         // jumlahkan qty scan lama + baru
         $data->qty_scan = $existingQty + $newQty;
 
-        // susun keterangan scan bertingkat (lebih mudah dibaca)
+        // susun riwayat scan dalam format terstruktur:
+        // 1. Nama -> Qty : X | SB : Y
         $user = Auth::user()->name;
-        $baseKeterangan = $data->keterangan ?? '';
+        $baseText = $data->keterangan ?? '';
 
-        // cari nomor scan terakhir di keterangan (Scan 1, Scan 2, dst)
-        $scanNumber = 1;
-        if (preg_match_all('/Scan\s+(\d+)/i', $baseKeterangan, $matches) && count($matches[1]) > 0) {
-            $scanNumber = ((int) max($matches[1])) + 1;
-        } elseif ($existingQty > 0) {
-            // sudah pernah discan tapi belum ada pola "Scan X"
-            $scanNumber = 2;
-        }
+        // pecah keterangan lama ke dalam array baris (setiap baris = 1 scan)
+        $lines = array_filter(preg_split("/\r\n|\n|\r/", $baseText));
+        $scanNumber = count($lines) + 1;
 
-        $note = "Scan {$scanNumber} - {$user} - Qty: {$newQty}";
-        // jika storagebin hasil berbeda dengan storagebin awal, catat perubahannya
+        // siapkan info storagebin untuk ditampilkan
         $originalSB = $data->storagebin ?? null;
         $resultSB = $request->layout;
-        if ($resultSB && $originalSB && $resultSB !== $originalSB) {
-            $note .= " (SB: {$originalSB} -> {$resultSB})";
-        } elseif ($resultSB && !$originalSB) {
-            $note .= " (SB: {$resultSB})";
-        }
+        $sbDisplay = $resultSB ?: ($originalSB ?: '-');
+
+        // bentuk 1 baris keterangan untuk scan saat ini
+        $line = "{$scanNumber}. {$user} -> Qty : {$newQty} | SB : {$sbDisplay}";
         if ($request->keterangan) {
-            $note .= " | Catatan: " . $request->keterangan;
+            $line .= " | Catatan : " . $request->keterangan;
         }
 
-        if ($baseKeterangan) {
-            // tiap scan pada baris baru
-            $data->keterangan = $baseKeterangan . "\n" . $note;
-        } else {
-            $data->keterangan = $note;
-        }
+        // gabungkan dengan riwayat lama (jika ada)
+        $lines[] = $line;
+        $data->keterangan = implode("\n", $lines);
 
         $data->storagebin_hasil = $request->layout;
         $data->date_scan = \Carbon\Carbon::now();
@@ -149,14 +140,13 @@ class SACController extends Controller
         $baru->warehouse = 'WH';
         $baru->namabarang = $request->namabarang;
         $baru->jenis = 'manual';
-        $note = "Scan 1 - " . Auth::user()->name . " - Qty: " . (int) $request->qty;
-        if ($request->layout) {
-            $note .= " (SB: {$request->layout})";
-        }
+        // baris pertama riwayat scan
+        $sbDisplayBaru = $request->layout ?: '-';
+        $line = "1. " . Auth::user()->name . " -> Qty : " . (int) $request->qty . " | SB : " . $sbDisplayBaru;
         if ($request->keterangan) {
-            $note .= " | Catatan: " . $request->keterangan;
+            $line .= " | Catatan : " . $request->keterangan;
         }
-        $baru->keterangan = $note;
+        $baru->keterangan = $line;
         $baru->storagebin_hasil = $request->layout;
 
         $baru->date = \Carbon\Carbon::now();
