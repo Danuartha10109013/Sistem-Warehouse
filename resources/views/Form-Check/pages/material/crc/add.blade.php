@@ -10,6 +10,88 @@
   @endif
 @endsection
 @section('content')
+<style>
+    /* Fixed background STOP SUAP yang selalu terlihat saat scroll - Di atas item-item form */
+    .stop-suap-background {
+        position: fixed;
+        top: 0%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('{{ asset("STOP SUAP.png") }}');
+        background-size: 30% auto;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.25;
+    }
+    
+    /* Wrapper untuk memastikan konten ada di atas background */
+    .content-wrapper {
+        position: relative;
+        z-index: 10;
+        background-color: transparent;
+    }
+    
+    /* Membuat background card transparan agar gambar STOP SUAP terlihat */
+    .stretch-card .card {
+        background-color: rgba(255, 255, 255, 0.5) !important;
+        backdrop-filter: blur(2px);
+    }
+    
+    .card-body {
+        background-color: transparent !important;
+    }
+    
+    .page-header {
+        background-color: transparent !important;
+    }
+    
+    /* Pastikan card dan elemen form tetap terlihat */
+    .card, .page-header, .breadcrumb {
+        position: relative;
+        z-index: 9999;
+    }
+    
+    /* Responsive untuk tablet */
+    @media (max-width: 768px) {
+        .stop-suap-background {
+            background-size: 60% auto;
+            opacity: 0.2;
+        }
+        .stretch-card .card {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+        }
+    }
+    
+    /* Responsive untuk mobile */
+    @media (max-width: 576px) {
+        .stop-suap-background {
+            background-size: 80% auto;
+            opacity: 0.18;
+        }
+        .stretch-card .card {
+            background-color: rgba(255, 255, 255, 0.75) !important;
+        }
+    }
+    
+    /* Untuk layar sangat kecil (mobile portrait) */
+    @media (max-width: 480px) {
+        .stop-suap-background {
+            background-size: 90% auto;
+            opacity: 0.15;
+        }
+        .stretch-card .card {
+            background-color: rgba(255, 255, 255, 0.7) !important;
+        }
+    }
+</style>
+
+<!-- Fixed Background STOP SUAP -->
+<div class="stop-suap-background" aria-label="Stop Suap - Hargai Petugas Kami"></div>
+
 <div class="col-md-12 container-fluid">
     <div class="content-wrapper">
       <div class="page-header">

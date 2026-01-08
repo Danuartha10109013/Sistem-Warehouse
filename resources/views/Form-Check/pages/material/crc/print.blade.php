@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <title>FM.WH.02.02 - CEKLIST KEDATANGAN RAW MATERIAL</title>
 <style>
-  @page { size: A4; margin: 20mm; }
+  @page { 
+    size: A4; 
+    margin: 20mm;
+  }
   body {
     font-family: "Arial", sans-serif;
     font-size: 12px;
@@ -12,12 +15,44 @@
     background: #fff;
     margin: 0;
     padding: 0;
+    position: relative;
   }
+  
+  /* Watermark STOP SUAP - Background transparan di tengah dokumen */
+  .stop-suap-watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background-image: url('{{ asset("STOP SUAP.png") }}');
+    background-size: 40% auto;
+    background-repeat: no-repeat;
+    background-position: center center;
+    opacity: 0.2;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  @media print {
+    .stop-suap-watermark {
+      position: absolute;
+      opacity: 0.25;
+      background-size: 45% auto;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+  
   .page {
     width: 210mm;
     min-height: 297mm;
     padding: 20mm;
     box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+    background: transparent;
   }
   header {
     display: flex;
@@ -93,9 +128,19 @@
     font-size: 11px;
     margin-top: 10px;
   }
+  
+  /* Memastikan semua konten di atas watermark */
+  header, table, .notes, .section-title, .signature-block {
+    position: relative;
+    z-index: 3;
+    background: transparent;
+  }
 </style>
 </head>
 <body>
+<!-- Watermark STOP SUAP -->
+<div class="stop-suap-watermark"></div>
+
 <div class="page">
 
   <header>
