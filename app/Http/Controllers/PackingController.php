@@ -15,14 +15,36 @@ class PackingController extends Controller
 {
     public function index(Request $request)
     {
-        $data = PackingReport::orderBy('created_at', 'desc')->get();
+        $query = PackingReport::query();
 
+        // Filter berdasarkan rentang tanggal
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('date', [$request->start_date, $request->end_date]);
+        } elseif ($request->filled('start_date')) {
+            $query->where('date', '>=', $request->start_date);
+        } elseif ($request->filled('end_date')) {
+            $query->where('date', '<=', $request->end_date);
+        }
+
+        $data = $query->orderBy('date', 'desc')->get();
 
         return view('packing.pages.index', compact('data'));
     }
 
     public function add (){
         return view ('packing.pages.add');
+    }
+
+    public function checkAttribute(Request $request)
+    {
+        $attribute = $request->input('attribute');
+        if (!$attribute) {
+            return response()->json(['exists' => false]);
+        }
+
+        $exists = PackingReport::where('attribute', $attribute)->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 
     public function store(Request $request)

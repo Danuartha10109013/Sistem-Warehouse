@@ -36,7 +36,7 @@
         </div>
     </div>
     <!-- Action Buttons + Search -->
-    <div class="row g-3 mb-3">
+    <div class="row g-3 mb-1" style="margin-bottom: -70px !important;">
 
         <!-- New -->
         <div class="col-12 col-md-3">
@@ -47,27 +47,81 @@
         </div>
 
         <div class="col-12 col-md-3">
-    <!-- Export -->
-            <div class="dropdown mb-3">
-            <button class="btn btn-success dropdown-toggle" type="button" id="exportMenu" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa fa-download"></i> Export
-            </button>
-
-            <ul class="dropdown-menu" aria-labelledby="exportMenu">
-                <li>
-                    <a class="dropdown-item" href="#" id="exportExcelBtn">
-                        <i class="fa fa-file-excel-o text-success"></i> Export to Excel
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="#" id="exportPdfBtn">
-                        <i class="fa fa-file-pdf-o text-danger"></i> Export to PDF
-                    </a>
-                </li>
-            </ul>
+            <!-- Export -->
+            <div class="dropdown">
+                <button class="btn btn-success dropdown-toggle w-100 rounded-pill py-2" type="button" id="exportMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-download me-2"></i> Export
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="exportMenu">
+                    <li>
+                        <a class="dropdown-item" href="#" id="exportExcelBtn">
+                            <i class="fa fa-file-excel-o text-success me-2"></i> Export to Excel
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#" id="exportPdfBtn">
+                            <i class="fa fa-file-pdf-o text-danger me-2"></i> Export to PDF
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
-</div>
+        <!-- Search -->
+        <div class="col-12 col-md-3">
+            <div class="d-flex w-100">
+                <input type="text" id="tableSearch"
+                    class="form-control rounded-pill px-3 py-2"
+                    placeholder="Cari di tabel...">
+                <button class="btn btn-danger rounded-pill ms-2 px-4 py-2">
+                    Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter by Date -->
+        <div class="col-12 col-md-3">
+            <form action="{{ route('pac') }}" method="GET" id="filterForm">
+                <label class="form-label small text-muted fw-bold mb-1">
+                    <i class="fa fa-filter me-1"></i> Filter Tanggal
+                </label>
+                <div class="input-group mb-2">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fa fa-calendar text-primary"></i>
+                    </span>
+                    <input type="date" 
+                           name="start_date" 
+                           id="start_date" 
+                           class="form-control border-start-0 border-end-0" 
+                           value="{{ request('start_date') }}"
+                           placeholder="Dari Tanggal">
+                    <span class="input-group-text bg-white border-start-0 small text-muted">Dari</span>
+                </div>
+                <div class="input-group mb-2">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fa fa-calendar text-primary"></i>
+                    </span>
+                    <input type="date" 
+                           name="end_date" 
+                           id="end_date" 
+                           class="form-control border-start-0 border-end-0" 
+                           value="{{ request('end_date') }}"
+                           placeholder="Sampai Tanggal">
+                    <span class="input-group-text bg-white border-start-0 small text-muted">Sampai</span>
+                </div>
+                <div class="d-flex gap-1">
+                    <button type="submit" class="btn btn-primary flex-fill rounded-pill py-2">
+                        <i class="fa fa-search me-1"></i> Cari
+                    </button>
+                    @if(request('start_date') || request('end_date'))
+                    <a href="{{ route('pac') }}" class="btn btn-outline-danger rounded-pill px-3 py-2" title="Reset Filter">
+                        <i class="fa fa-times"></i>
+                    </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+    </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -262,18 +316,6 @@ document.getElementById("exportPdfBtn").addEventListener("click", function () {
                 transform: translateY(2px);
             }
         </style>
-
-        <!-- Search -->
-        <div class="col-12 col-md-6">
-            <div class="d-flex w-100">
-                <input type="text" id="tableSearch"
-                    class="form-control rounded-pill px-3 py-2"
-                    placeholder="Cari di tabel...">
-                    <button class="btn btn-danger rounded-pill ms-2 px-4 py-2">
-                            Search
-                    </button>
-            </div>
-        </div>
 
        <script>
 // ========== SEARCH ==========

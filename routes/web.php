@@ -64,6 +64,7 @@ Route::prefix('Laporan-packing')->group(function () {
     Route::get('/',[PackingController::class,'index'])->name('pac');
     Route::get('/add',[PackingController::class,'add'])->name('pac.add');
     Route::post('/store',[PackingController::class,'store'])->name('pac.store');
+    Route::get('/check-attribute',[PackingController::class,'checkAttribute'])->name('pac.checkAttribute');
     Route::delete('/delete/{id}',[PackingController::class,'destroy'])->name('pac.delete');
     Route::get('/edit/{id}',[PackingController::class,'edit'])->name('pac.edit');
     Route::put('/update/{id}',[PackingController::class,'update'])->name('pac.update');

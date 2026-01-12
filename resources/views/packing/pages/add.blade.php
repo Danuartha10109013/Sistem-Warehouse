@@ -85,6 +85,7 @@
                             <i class="fa fa-qrcode"></i>
                         </button>
                     </div>
+                    <small id="attrWarning" class="text-danger fw-bold" style="display:none;">Attribute sudah discan.</small>
 
                     <!-- Area kamera tersembunyi -->
                     <div id="qrScanner" class="mt-2" style="display:none;">
@@ -99,6 +100,43 @@
                 <script src="https://unpkg.com/@zxing/library@latest"></script>
 
                 <script>
+                    const checkAttrUrl = "{{ route('pac.checkAttribute') }}";
+                    const attrInput = document.getElementById("attributeInput");
+                    const attrWarning = document.getElementById("attrWarning");
+                    let attrExists = false;
+
+                    async function checkAttribute(value) {
+                        if (!value) {
+                            attrExists = false;
+                            attrWarning.style.display = "none";
+                            return false;
+                        }
+                        try {
+                            const res = await fetch(`${checkAttrUrl}?attribute=${encodeURIComponent(value)}`);
+                            const data = await res.json();
+                            attrExists = data.exists;
+                            attrWarning.style.display = attrExists ? "inline" : "none";
+                            return attrExists;
+                        } catch (e) {
+                            console.error(e);
+                            return false;
+                        }
+                    }
+
+                    attrInput.addEventListener("blur", () => {
+                        checkAttribute(attrInput.value.trim());
+                    });
+
+                    const addForm = document.querySelector('form');
+                    addForm.addEventListener('submit', async (e) => {
+                        const exists = await checkAttribute(attrInput.value.trim());
+                        if (exists) {
+                            e.preventDefault();
+                            attrInput.focus();
+                            alert("Attribute sudah ada di database, silakan gunakan nilai lain.");
+                        }
+                    });
+
                     let stream;
                     let codeReader;
 
