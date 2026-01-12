@@ -109,6 +109,11 @@ Kelola User @if(Auth::user()->role == 0)
             {{ in_array('SIK', json_decode($data->type, true) ?? []) ? 'checked' : '' }}>
           <label class="form-check-label" for="typeSIK">Surat Izin Keluar</label>
         </div>
+        <div class="form-check">
+          <input class="form-check-input type-checkbox all-role form-check-only" type="checkbox" name="type[]" value="SO" id="typeSO"
+            {{ in_array('SO', json_decode($data->type, true) ?? []) ? 'checked' : '' }}>
+          <label class="form-check-label" for="typeSO">Stock Opname</label>
+        </div>
 
         
       </div>
