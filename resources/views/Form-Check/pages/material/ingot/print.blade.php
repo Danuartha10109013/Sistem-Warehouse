@@ -40,9 +40,9 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -84%) !important;
+      transform: translate(-50%, -40%) !important;
       opacity: 0.55;
-      background-position: center center;
+      background-position: center top;
       background-size: 53% auto;
       background-repeat: no-repeat;
       -webkit-print-color-adjust: exact;
@@ -302,4 +302,9 @@
 
 </div>
 </body>
+<script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
 </html>

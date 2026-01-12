@@ -40,9 +40,9 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -84%) !important;
+      transform: translate(-50%, -30%) !important;
       opacity: 0.55;
-      background-position: center center;
+      background-position: center top;
       background-size: 53% auto;
       background-repeat: no-repeat;
       -webkit-print-color-adjust: exact;
@@ -305,7 +305,7 @@
 
   <div class="section-title">Catatan:</div>
   <table>
-    <tr><td style="height:300px"></td></tr>
+    <tr><td style="height:250px"></td></tr>
   </table>
 
   <div class="signature-block">
@@ -321,4 +321,9 @@
 
 </div>
 </body>
+<script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
 </html>

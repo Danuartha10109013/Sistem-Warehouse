@@ -5,14 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vehicle Checklist</title>
     <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid black; padding: 5px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        @page { 
+            size: A4; 
+            margin: 20mm;
+        }
+        body {
+            font-family: "Arial", sans-serif;
+            color: #000;
+            background: #fff;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        
+        /* Watermark STOP SUAP - Background transparan di tengah dokumen */
+        .stop-suap-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            width: 100%;
+            height: 100%;
+            background-image: url('{{ asset("STOP SUAP.png") }}');
+            background-size: 45% auto;
+            background-repeat: no-repeat;
+            background-position: center center;
+            opacity: 0.3;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        @media print {
+            .stop-suap-watermark {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) !important;
+                opacity: 0.3;
+                background-position: center top;
+                background-size: 60% auto;
+                background-repeat: no-repeat;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            .button-print {
+                display: none;
+            }
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse;
+            position: relative;
+            z-index: 3;
+            background: transparent;
+        }
+        th, td { 
+            border: 1px solid black; 
+            padding: 5px; 
+            text-align: left;
+            color: #000;
+            background: transparent;
+        }
+        th { 
+            background-color: #f2f2f2; 
+        }
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            position: relative;
+            z-index: 3;
+            background: transparent;
         }
         .logo img {
             width: 100px; /* Adjust the width as needed */
@@ -21,14 +87,18 @@
             text-align: center;
             font-size: 24px;
             font-weight: bold;
+            color: #000;
         }
         .no-urut {
             text-align: right;
+            color: #000;
         }
         .container {
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
+            position: relative;
+            z-index: 3;
         }
         .img-preview {
             max-width: 100%;
@@ -45,16 +115,12 @@
             cursor: pointer;
             font-size: 16px;
         }
-        /* Print Styles */
-        @media print {
-           .button-print{
-            display: none;
-           }
-            
-        }
     </style>
 </head>
 <body>
+<!-- Watermark STOP SUAP -->
+<div class="stop-suap-watermark"></div>
+
     <div class="header-container">
         <div class="logo">
             <style>
