@@ -100,36 +100,31 @@
                 <script src="https://unpkg.com/@zxing/library@latest"></script>
 
                 <script>
-                    const checkAttrUrl = "{{ route('pac.checkAttribute') }}";
+                    const existingAttributes = @json($attributes ?? []);
                     const attrInput = document.getElementById("attributeInput");
                     const attrWarning = document.getElementById("attrWarning");
                     let attrExists = false;
 
-                    async function checkAttribute(value) {
-                        if (!value) {
+                    function checkAttribute(value) {
+                        const normalized = (value || '').trim().toLowerCase();
+                        if (!normalized) {
                             attrExists = false;
                             attrWarning.style.display = "none";
                             return false;
                         }
-                        try {
-                            const res = await fetch(`${checkAttrUrl}?attribute=${encodeURIComponent(value)}`);
-                            const data = await res.json();
-                            attrExists = data.exists;
-                            attrWarning.style.display = attrExists ? "inline" : "none";
-                            return attrExists;
-                        } catch (e) {
-                            console.error(e);
-                            return false;
-                        }
+
+                        attrExists = existingAttributes.some(a => (a || '').toLowerCase() === normalized);
+                        attrWarning.style.display = attrExists ? "inline" : "none";
+                        return attrExists;
                     }
 
                     attrInput.addEventListener("blur", () => {
-                        checkAttribute(attrInput.value.trim());
+                        checkAttribute(attrInput.value);
                     });
 
                     const addForm = document.querySelector('form');
-                    addForm.addEventListener('submit', async (e) => {
-                        const exists = await checkAttribute(attrInput.value.trim());
+                    addForm.addEventListener('submit', (e) => {
+                        const exists = checkAttribute(attrInput.value);
                         if (exists) {
                             e.preventDefault();
                             attrInput.focus();
@@ -167,7 +162,11 @@
                                         console.log("SCAN:", result.text);
 
                                         // Isi input otomatis
-                                        document.getElementById("attributeInput").value = result.text;
+                                        const val = result.text;
+                                        document.getElementById("attributeInput").value = val;
+
+                                        // Langsung periksa duplikasi juga untuk hasil scan
+                                        checkAttribute(val);
 
                                         // Tutup scanner
                                         closeScanner();

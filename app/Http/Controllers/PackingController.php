@@ -32,7 +32,8 @@ class PackingController extends Controller
     }
 
     public function add (){
-        return view ('packing.pages.add');
+        $attributes = PackingReport::pluck('attribute')->filter()->values()->toArray();
+        return view ('packing.pages.add', compact('attributes'));
     }
 
     public function checkAttribute(Request $request)
