@@ -133,7 +133,12 @@
                         if (exists) {
                             e.preventDefault();
                             attrInput.focus();
-                            alert("Attribute sudah ada di database, silakan gunakan nilai lain.");
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Duplikat Attribute',
+                                text: 'Attribute sudah discan, silakan gunakan nilai lain.',
+                                confirmButtonColor: '#d33'
+                            });
                         }
                     });
 
@@ -515,6 +520,9 @@
     </div>
 
 </div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @if(session('success'))
         <script>
