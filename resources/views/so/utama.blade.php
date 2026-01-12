@@ -107,6 +107,14 @@
                 </div>
             </a>
         </div>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <a href="{{ route('so.kbi') }}" class="text-decoration-none">
+                <div class="card bg-dark text-white text-center p-4 shadow-sm border-0 h-100">
+                    <i class="fa-solid fa-building fs-1 mb-2"></i>
+                    <strong>KRAKATAU BAJA INDUSTRI</strong>
+                </div>
+            </a>
+        </div>
 
     </div>
 </div>

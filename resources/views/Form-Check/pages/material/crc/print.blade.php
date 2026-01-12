@@ -27,10 +27,10 @@
     width: 100%;
     height: 100%;
     background-image: url('{{ asset("STOP SUAP.png") }}');
-    background-size: 40% auto;
+    background-size: 60% auto;
     background-repeat: no-repeat;
     background-position: center center;
-    opacity: 0.2;
+    opacity: 0.5;
     z-index: 1;
     pointer-events: none;
   }
@@ -38,10 +38,16 @@
   @media print {
     .stop-suap-watermark {
       position: absolute;
-      opacity: 0.25;
-      background-size: 45% auto;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -84%) !important;
+      opacity: 0.55;
+      background-position: center center;
+      background-size: 53% auto;
+      background-repeat: no-repeat;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
+      color-adjust: exact;
     }
   }
   
@@ -134,6 +140,15 @@
     position: relative;
     z-index: 3;
     background: transparent;
+  }
+  
+  /* Memastikan teks tetap jelas dan terbaca */
+  header, table th, table td, .notes, .section-title, .signature {
+    color: #000;
+  }
+  
+  table {
+    background-color: transparent;
   }
 </style>
 </head>

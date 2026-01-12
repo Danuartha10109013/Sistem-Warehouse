@@ -17,28 +17,82 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             color: white;
+            position: relative;
+            padding: 20px;
+         }
+
+         /* Background STOP SUAP - Seperti cap air (watermark) di tengah bawah */
+         .stop-suap-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('{{ asset("STOP SUAP.png") }}');
+            background-size: 15% auto;
+            transform: translate(40%, -17%) !important;
+            background-repeat: no-repeat;
+            background-position: center 60%;
+            background-attachment: fixed;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.3;
+         }
+
+         /* Wrapper untuk konten */
+         .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
          }
 
          .judul {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 10;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
          }
 
          .judul h1 {
             font-size: 2.5rem;
             color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3),
+                        0 0 20px rgba(255, 255, 255, 0.1);
          }
 
          .gambar {
             text-align: center;
-            margin-bottom: 20px;
+            margin: 0 auto 30px auto;
+            position: relative;
+            z-index: 10;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+            display: inline-block;
+            width: fit-content;
          }
 
          .gambar img {
             max-width: 150px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
          }
 
          .menu-container {
@@ -47,47 +101,225 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 20px;
+            position: relative;
+            z-index: 10;
          }
 
          .menu-item {
             width: 150px;
             height: 150px;
-            background-color: rgba(255, 255, 255, 0.3); /* Transparent white */
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 15px;
-            transition: transform 0.3s ease, background-color 0.3s ease;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-align: center;
             text-decoration: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+         }
+
+         /* Efek shimmer/glow pada menu item */
+         .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+               90deg,
+               transparent,
+               rgba(255, 255, 255, 0.2),
+               transparent
+            );
+            transition: left 0.5s;
+         }
+
+         .menu-item:hover::before {
+            left: 100%;
          }
 
          .menu-item i {
             font-size: 50px;
             margin-bottom: 10px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s ease;
          }
 
          .menu-item:hover {
-            transform: translateY(-10px);
-            background-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.3),
+                        inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+                        0 0 20px rgba(255, 255, 255, 0.2);
+         }
+
+         .menu-item:hover i {
+            transform: scale(1.1);
          }
 
          .menu-title {
             font-size: 18px;
+            font-weight: 500;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
          }
+
+         .menu-item:hover .menu-title {
+            transform: translateY(-2px);
+         }
+         
          h1 {
             font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-            font-weight: bold; /* Memberikan ketebalan yang kuat */
-            letter-spacing: 1px; /* Menambah spasi antar huruf */
-            text-transform: uppercase; /* Mengubah huruf menjadi kapital */
-            font-style: italic; /* Memberikan style italic */
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-style: italic;
+         }
+
+         /* Responsive untuk tablet */
+         @media (max-width: 768px) {
+            .stop-suap-background {
+               background-size: 30% auto;
+               background-position: center 65%;
+               opacity: 0.3;
             }
+            
+            .judul {
+               padding: 20px;
+               margin-bottom: 20px;
+            }
+            
+            .judul h1 {
+               font-size: 1.8rem;
+            }
+            
+            .gambar {
+               padding: 20px;
+               margin-bottom: 20px;
+            }
+            
+            .menu-item {
+               width: 120px;
+               height: 120px;
+               border-radius: 15px;
+            }
+            
+            .menu-item i {
+               font-size: 40px;
+            }
+            
+            .menu-title {
+               font-size: 14px;
+            }
+         }
+
+         /* Responsive untuk mobile */
+         @media (max-width: 576px) {
+            .stop-suap-background {
+               background-size: 30% auto;
+               background-position: center 65%;
+               opacity: 0.3;
+            }
+            
+            body {
+               padding: 15px;
+            }
+            
+            .judul {
+               padding: 15px;
+               margin-bottom: 15px;
+               border-radius: 15px;
+            }
+            
+            .judul h1 {
+               font-size: 1.5rem;
+            }
+            
+            .gambar {
+               padding: 15px;
+               margin-bottom: 15px;
+               border-radius: 15px;
+            }
+            
+            .gambar img {
+               max-width: 120px;
+            }
+            
+            .menu-item {
+               width: 100px;
+               height: 100px;
+               border-radius: 15px;
+            }
+            
+            .menu-item i {
+               font-size: 35px;
+            }
+            
+            .menu-title {
+               font-size: 12px;
+            }
+            
+            .menu-container {
+               gap: 15px;
+            }
+         }
+
+         /* Untuk layar sangat kecil (mobile portrait) */
+         @media (max-width: 480px) {
+            .stop-suap-background {
+               background-size: 30% auto;
+               background-position: center 60%;
+               opacity: 0.3;
+            }
+            
+            .judul {
+               padding: 12px;
+               border-radius: 12px;
+            }
+            
+            .judul h1 {
+               font-size: 1.2rem;
+            }
+            
+            .gambar {
+               padding: 12px;
+               border-radius: 12px;
+            }
+            
+            .menu-item {
+               width: 90px;
+               height: 90px;
+               border-radius: 12px;
+            }
+            
+            .menu-item i {
+               font-size: 30px;
+            }
+            
+            .menu-title {
+               font-size: 11px;
+            }
+         }
 
       </style>
    </head>
    <body>
+      <!-- Background STOP SUAP -->
+      <div class="stop-suap-background" aria-label="Stop Suap - Hargai Petugas Kami"></div>
+      
+      <div class="content-wrapper">
       <div class="judul">
          <h1 style="font-size: 2em;font-weight: bolder">Sistem Informasi Manajemen Operasional</h1>
          <h1 style="font-size: 1em">PT. Tata Metal Lestari</h1>
@@ -110,7 +342,7 @@ $menuItems = [
     "CK"  => ["title" => "Checklist Kendaraan", "icon" => "mdi-car", "route" => Auth::user()->role == 0 ? route('Kendaraan.admin.dashboard') : route('Kendaraan.pegawai.dashboard')],
     "SL"  => ["title" => "Scan Layout", "icon" => "mdi-qrcode", "route" => Auth::user()->role == 0 ? route('Scan-Layout.admin.dashboard') : route('Scan-Layout.pegawai.dashboard')],
     "CD"  => ["title" => "Coil Damage", "icon" => "mdi-package-variant-closed-remove", "route" => Auth::user()->role == 0 ? route('Coil-Damage.admin.dashboard') : route('Coil-Damage.pegawai.dashboard')],
-    "SO"  => ["title" => "SAC SO", "icon" => "mdi-package-variant-closed-check", "route" => Auth::user()->role == 0 ? route('so.utama') : route('so.utama')],
+    "SO"  => ["title" => "Stock Opname", "icon" => "mdi-package-variant-closed-check", "route" => Auth::user()->role == 0 ? route('so.utama') : route('so.utama')],
     // "L8"  => ["title" => "Packing L08", "icon" => "mdi-numeric-8-box-multiple", "route" => Auth::user()->role == 0 ? route('L-08.admin.dashboard') : route('L-08.pegawai.dashboard')],
     // "PC"  => ["title" => "Form Packing", "icon" => "mdi-numeric-8-box-multiple", "route" => Auth::user()->role == 0 ? route('L-08.admin.dashboard') : route('L-08.pegawai.dashboard')],
 ];
@@ -197,7 +429,7 @@ $menuItems = [
 <script>window.location = "{{ route('login') }}";</script>
 @endif
 
-
+      </div> <!-- End content-wrapper -->
       <!-- Bootstrap JS -->
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
    </body>

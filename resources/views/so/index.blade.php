@@ -30,7 +30,7 @@
 
 
     <!-- Page Title -->
-    <div class="row mb-4">
+    <div class="row mb-4 mt-4">
         <div class="col-12 text-center">
             <h3 class="m-0 fw-bold text-dark">STOCK OPNAME {{$key}}</h3>
         </div>

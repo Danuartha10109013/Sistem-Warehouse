@@ -116,6 +116,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::get('/barang-jadi', [SACController::class, 'barangJadi'])->name('so.barang_jadi');
         Route::get('/barang-jadi-sliting', [SACController::class, 'barangJadiSliting'])->name('so.barang_jadi_sliting');
         Route::get('/sparepart', [SACController::class, 'sparepart'])->name('so.sparepart');
+        Route::get('/kbi', [SACController::class, 'kbi'])->name('so.kbi');
         // KATEGORI LAIN
         Route::get('/electric', [SACController::class, 'electric'])->name('so.electric');
         Route::get('/mechanic', [SACController::class, 'mechanic'])->name('so.mechanic');

@@ -174,6 +174,20 @@ class SACController extends Controller
             ->get();
         return view ('so.index', compact('data','key'));
     }
+    public function kbi () {
+
+    if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silahkan Login terlbih dahulu');
+        }
+
+        $key = 'KRAKATAU BAJA INDUSTRI';
+
+    $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+            ->where('jenis', $key)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view ('so.index', compact('data','key'));
+    }
 
 public function electric (){
     return view ('so.cs');

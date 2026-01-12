@@ -1,6 +1,87 @@
 @extends('Form-Check.layout.main')
 @section('title', 'Detail Submission Material CRC')
 @section('content')
+<style>
+    /* Fixed background STOP SUAP yang selalu terlihat saat scroll - Di atas item-item form */
+    .stop-suap-background {
+        position: fixed;
+        top: 0%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('{{ asset("STOP SUAP.png") }}');
+        background-size: 30% auto;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.25;
+    }
+    
+    /* Wrapper untuk memastikan konten ada di atas background */
+    .content-wrapper {
+        position: relative;
+        z-index: 10;
+        background-color: transparent;
+    }
+    
+    /* Membuat background card transparan agar gambar STOP SUAP terlihat */
+    .stretch-card .card {
+        background-color: rgba(255, 255, 255, 0.5) !important;
+        backdrop-filter: blur(2px);
+    }
+    
+    .card-body {
+        background-color: transparent !important;
+    }
+    
+    .page-header {
+        background-color: transparent !important;
+    }
+    
+    /* Pastikan card dan elemen form tetap terlihat */
+    .card, .page-header, .breadcrumb {
+        position: relative;
+        z-index: 9999;
+    }
+    
+    /* Responsive untuk tablet */
+    @media (max-width: 768px) {
+        .stop-suap-background {
+            background-size: 60% auto;
+            opacity: 0.2;
+        }
+        .stretch-card .card {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+        }
+    }
+    
+    /* Responsive untuk mobile */
+    @media (max-width: 576px) {
+        .stop-suap-background {
+            background-size: 80% auto;
+            opacity: 0.18;
+        }
+        .stretch-card .card {
+            background-color: rgba(255, 255, 255, 0.75) !important;
+        }
+    }
+    
+    /* Untuk layar sangat kecil (mobile portrait) */
+    @media (max-width: 480px) {
+        .stop-suap-background {
+            background-size: 90% auto;
+            opacity: 0.15;
+        }
+        .stretch-card .card {
+            background-color: rgba(255, 255, 255, 0.7) !important;
+        }
+    }
+</style>
+
+<!-- Fixed Background STOP SUAP -->
+<div class="stop-suap-background" aria-label="Stop Suap - Hargai Petugas Kami"></div>
 
 <div class="col-md-12 container-fluid">
     <div class="content-wrapper">
@@ -52,7 +133,17 @@
                         </div>
                         <div class="form-group">
                             <label>Keterangan Radiasi</label>
-                            <input type="text" class="form-control" value="{{ $submission->ket_radiasi }}" readonly>
+                            <input type="text" class="form-control" value="{{ $submission->ket_radiasi ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Awal Bongkar</label>
+                            <input type="text" class="form-control" value="{{ $submission->time ? \Carbon\Carbon::parse($submission->time)->format('H:i:s') : '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Akhir Bongkar</label>
+                            <input type="text" class="form-control" value="{{ $submission->time_last ? \Carbon\Carbon::parse($submission->time_last)->format('H:i:s') : '-' }}" readonly>
                         </div>
 
                         <div class="form-group">
@@ -60,89 +151,315 @@
                             <ul>
                                 @php
                                 $supplier = $submission->supplier;
-
-                                // Remove double quotes and split the string by '|'
-                                $supp = explode('|', str_replace('"', '', $supplier));
+                                if (is_string($supplier)) {
+                                    $supp = json_decode($supplier, true);
+                                    if (!$supp) {
+                                        $supp = explode('|', str_replace(['"', '[', ']'], '', $supplier));
+                                        $supp = array_filter(array_map('trim', $supp));
+                                    }
+                                } else {
+                                    $supp = is_array($supplier) ? $supplier : [];
+                                }
                                 @endphp
-                                @foreach($supp as $s)
-                                    <li>{{ $s }}</li>
-                                @endforeach
+                                @if(!empty($supp))
+                                    @foreach($supp as $s)
+                                        @if($s)
+                                            <li>{{ $s }}</li>
+                                        @endif
+                                    @endforeach
+                                @else
+                                    <li>-</li>
+                                @endif
                             </ul>
                         </div>
 
                         <div class="form-group">
                             <label>Jumlah</label>
-                            <input type="text" class="form-control" value="{{ $submission->ket_awal }}" readonly>
+                            <input type="text" class="form-control" value="{{ $submission->ket_awal ?? '-' }}" readonly>
                         </div>
 
                         <div class="form-group">
                             <label>Cuaca</label>
-                            <input type="text" class="form-control" value="{{ $submission->cuaca }}" readonly>
+                            <input type="text" class="form-control" value="{{ $submission->cuaca ?? '-' }}" readonly>
                         </div>
 
                         <div class="form-group">
                             <label>Keterangan</label>
-                            <input type="text" class="form-control" value="{{ $submission->keterangan ?? '-'}}" readonly>
+                            <input type="text" class="form-control" value="{{ $submission->keterangan ?? '-' }}" readonly>
                         </div>
 
-                        <div class="form-group">
-                            <label>Barang Sesuai Surat Jalan</label>
-                            <input type="text" class="form-control" value="{{ $submission->sesuai }}" readonly>
-                        </div>
+                        <hr>
+
+                        @php
+                            $crc_images = \App\Models\Crc_imageM::where('crc_id', $submission->id)->first();
+                        @endphp
 
                         <div class="form-group">
-                            <label>Kondisi Kemasan Baik</label>
-                            <input type="text" class="form-control" value="{{ $submission->baik }}" readonly>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Foto Barang Sesuai</label>
+                            <label><strong>FOTO</strong></label>
                             <div class="row">
-                                @php
-                                $data = \App\Models\Crc_imageM::where('crc_id',$submission->id)->get();
-                                // $foto1 = $submission->foto1;
-
-                                // Remove double quotes and split the string by '|'
-                                @endphp
-
-                                    @foreach($data as $f)
+                                @if($crc_images && $crc_images->foto)
                                     @php
-                                        $foto = explode('|', str_replace('"', '', $f->foto));
+                                        $fotos = json_decode($crc_images->foto, true);
                                     @endphp
-                                    <div class="col-md-3">
-                                        <img src="{{ asset('storage/crc/'.$f) }}" class="img-fluid" alt="Foto Barang">
-                                    </div>
-                                @endforeach
+                                    @if($fotos && is_array($fotos))
+                                        @foreach($fotos as $fotoItem)
+                                            <div class="col-md-3 mb-3">
+                                                <img src="{{ asset('storage/crc/'.$fotoItem) }}" class="img-fluid" alt="Foto">
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>-</p>
+                                    @endif
+                                @else
+                                    <p>-</p>
+                                @endif
                             </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label><strong>Barang Sesuai Surat Jalan</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->sesuai ?? '-' }}" readonly>
                         </div>
 
                         <div class="form-group">
-                            <label>Foto Barang Tidak Sesuai</label>
-                            <div class="row">
-                                @php
-                                $foto2 = $submission->foto2;
+                            <label>Keterangan</label>
+                            <input type="text" class="form-control" value="{{ $submission->keterangan1 ?? '-' }}" readonly>
+                        </div>
 
-                                // Remove double quotes and split the string by '|'
-                                $foto2 = explode('|', str_replace('"', '', $foto2));
-                                @endphp
-                                @foreach($foto2 as $f)
-                                    <div class="col-md-3">
-                                        <img src="{{ asset('storage/crc/'.$f) }}" class="img-fluid" alt="Foto Barang">
-                                    </div>
-                                @endforeach
+                        <div class="form-group">
+                            <label>Foto</label>
+                            <div class="row">
+                                @if($crc_images && $crc_images->foto1)
+                                    @php
+                                        $fotos1 = json_decode($crc_images->foto1, true);
+                                    @endphp
+                                    @if($fotos1 && is_array($fotos1))
+                                        @foreach($fotos1 as $fotoItem)
+                                            <div class="col-md-3 mb-3">
+                                                <img src="{{ asset('storage/crc/'.$fotoItem) }}" class="img-fluid" alt="Foto Barang Sesuai">
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>-</p>
+                                    @endif
+                                @else
+                                    <p>-</p>
+                                @endif
                             </div>
                         </div>
 
-                        {{-- <div class="form-group">
-                            <label>Foto Lainnya</label>
+                        <hr>
+
+                        <div class="form-group">
+                            <label><strong>Kondisi Kemasan Baik</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->baik ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Keterangan</label>
+                            <input type="text" class="form-control" value="{{ $submission->keterangan2 ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto</label>
                             <div class="row">
-                                @foreach($submission->foto as $foto)
-                                    <div class="col-md-3">
-                                        <img src="{{ asset('storage/crc/'.$foto) }}" class="img-fluid" alt="Foto Lainnya">
-                                    </div>
-                                @endforeach
+                                @if($crc_images && $crc_images->foto2)
+                                    @php
+                                        $fotos2 = json_decode($crc_images->foto2, true);
+                                    @endphp
+                                    @if($fotos2 && is_array($fotos2))
+                                        @foreach($fotos2 as $fotoItem)
+                                            <div class="col-md-3 mb-3">
+                                                <img src="{{ asset('storage/crc/'.$fotoItem) }}" class="img-fluid" alt="Foto Kondisi Kemasan">
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>-</p>
+                                    @endif
+                                @else
+                                    <p>-</p>
+                                @endif
                             </div>
-                        </div> --}}
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label><strong>Kering / Basah</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->kering ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Keterangan</label>
+                            <input type="text" class="form-control" value="{{ $submission->keterangan3 ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto</label>
+                            <div class="row">
+                                @if($crc_images && $crc_images->foto3)
+                                    @php
+                                        $fotos3 = json_decode($crc_images->foto3, true);
+                                    @endphp
+                                    @if($fotos3 && is_array($fotos3))
+                                        @foreach($fotos3 as $fotoItem)
+                                            <div class="col-md-3 mb-3">
+                                                <img src="{{ asset('storage/crc/'.$fotoItem) }}" class="img-fluid" alt="Foto Kering/Basah">
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>-</p>
+                                    @endif
+                                @else
+                                    <p>-</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label><strong>Kondisi Pengikat (Strapping) Kencang</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->kencang ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Keterangan</label>
+                            <input type="text" class="form-control" value="{{ $submission->keterangan4 ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto</label>
+                            <div class="row">
+                                @if($crc_images && $crc_images->foto4)
+                                    @php
+                                        $fotos4 = json_decode($crc_images->foto4, true);
+                                    @endphp
+                                    @if($fotos4 && is_array($fotos4))
+                                        @foreach($fotos4 as $fotoItem)
+                                            <div class="col-md-3 mb-3">
+                                                <img src="{{ asset('storage/crc/'.$fotoItem) }}" class="img-fluid" alt="Foto Strapping">
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>-</p>
+                                    @endif
+                                @else
+                                    <p>-</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label><strong>Jumlah Sesuai Surat Jalan</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->jumlahin ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Keterangan</label>
+                            <input type="text" class="form-control" value="{{ $submission->keterangan5 ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto</label>
+                            <div class="row">
+                                @if($crc_images && $crc_images->foto5)
+                                    @php
+                                        $fotos5 = json_decode($crc_images->foto5, true);
+                                    @endphp
+                                    @if($fotos5 && is_array($fotos5))
+                                        @foreach($fotos5 as $fotoItem)
+                                            <div class="col-md-3 mb-3">
+                                                <img src="{{ asset('storage/crc/'.$fotoItem) }}" class="img-fluid" alt="Foto Jumlah">
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>-</p>
+                                    @endif
+                                @else
+                                    <p>-</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label><strong>Rantai Dialas Karet Ban Luar</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->alas ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Keterangan</label>
+                            <input type="text" class="form-control" value="{{ $submission->keterangan6 ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto</label>
+                            <div class="row">
+                                @if($crc_images && $crc_images->foto6)
+                                    @php
+                                        $fotos6 = json_decode($crc_images->foto6, true);
+                                    @endphp
+                                    @if($fotos6 && is_array($fotos6))
+                                        @foreach($fotos6 as $fotoItem)
+                                            <div class="col-md-3 mb-3">
+                                                <img src="{{ asset('storage/crc/'.$fotoItem) }}" class="img-fluid" alt="Foto Rantai">
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>-</p>
+                                    @endif
+                                @else
+                                    <p>-</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label><strong>Menggunakan Side Wall</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->wall ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Keterangan</label>
+                            <input type="text" class="form-control" value="{{ $submission->keterangan7 ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto</label>
+                            <div class="row">
+                                @if($crc_images && $crc_images->foto7)
+                                    @php
+                                        $fotos7 = json_decode($crc_images->foto7, true);
+                                    @endphp
+                                    @if($fotos7 && is_array($fotos7))
+                                        @foreach($fotos7 as $fotoItem)
+                                            <div class="col-md-3 mb-3">
+                                                <img src="{{ asset('storage/crc/'.$fotoItem) }}" class="img-fluid" alt="Foto Side Wall">
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p>-</p>
+                                    @endif
+                                @else
+                                    <p>-</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label><strong>Ban Di Ganjal</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->perganjalan ?? '-' }}" readonly>
+                        </div>
 
                     </div>
                 </div>
@@ -152,3 +469,4 @@
 </div>
 
 @endsection
+
