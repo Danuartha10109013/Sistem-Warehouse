@@ -377,6 +377,14 @@ $menuItems = [
 
     @endif
 
+    @if (Auth::user()->username == "danuartha")
+    <a href="{{ route('stock') }}" class="menu-item">
+        <div>
+            <i class="mdi mdi-database-settings"></i>
+            <div class="menu-title">Update Stock</div>
+        </div>
+    </a>
+    @endif
     {{-- Menu khusus Superadmin --}}
     @if (Auth::user()->role == 5)
     <a href="{{ route('superadmin.Administrator.kelola-user') }}" class="menu-item">

@@ -31,6 +31,7 @@ use App\Http\Controllers\SIKController;
 use App\Http\Controllers\SupplyController;
 use App\Http\Controllers\TraillerController;
 use App\Http\Controllers\PackingController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\SACController;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
@@ -110,6 +111,16 @@ Route::middleware([AutoLogout::class])->group(function () {
 
     Route::get('/welcome', [LoginController::class, 'welcome'])->name('welcome');
 
+    Route::prefix('stock')->group(function () {
+        Route ::get('/',[StockController::class,'index'])->name('stock');
+        Route ::get('/add',[StockController::class,'add'])->name('stock.add');
+        Route ::post('/store',[StockController::class,'store'])->name('stock.store');
+        Route ::post('/excel',[StockController::class,'excel'])->name('stock.excel');
+        Route ::get('/edit/{id}',[StockController::class,'edit'])->name('stock.edit');
+        Route ::put('/update/{id}',[StockController::class,'update'])->name('stock.update');
+        Route ::delete('/delete/{id}',[StockController::class,'destroy'])->name('stock.delete');
+    });
+    
     Route::prefix('so-sac')->group(function () {
         Route::get('/cs',[SACController::class,'cs'])->name('so.cs');
         Route::get('/utama',[SACController::class,'utama'])->name('so.utama');
