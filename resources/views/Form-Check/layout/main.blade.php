@@ -35,7 +35,7 @@
     <!-- Layout styles -->
     <link rel="stylesheet" href="{{asset('vendorfc/dist/assets/css/style.css')}}">
    </head>
-   
+
    <body class="sidebar-main-active right-column-fixed header-top-bgcolor">
       <!-- loader Start -->
       {{-- <div id="loading">
@@ -111,7 +111,7 @@
             @yield('content')
          </div>
 
- 
+
             {{-- <div class="iq-right-fixed">
                 <div class="iq-card mb-0" style="box-shadow: none;">
                 <div class="iq-card-header d-flex justify-content-between">
@@ -182,13 +182,13 @@
          @include('layout.pegawai.footer')
       </footer>
 
-      
+
       <!-- Footer END -->
       <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-      
+
       <script src="{{asset('vendor')}}/js/jquery.min.js"></script>
-      
+
       <script src="{{asset('vendor')}}/js/popper.min.js"></script>
       <script src="{{asset('vendor')}}/js/bootstrap.min.js"></script>
       <!-- Appear JavaScript -->

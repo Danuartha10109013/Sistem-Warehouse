@@ -179,7 +179,7 @@
          .menu-item:hover .menu-title {
             transform: translateY(-2px);
          }
-         
+
          h1 {
             font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             font-weight: bold;
@@ -195,31 +195,31 @@
                background-position: center 65%;
                opacity: 0.3;
             }
-            
+
             .judul {
                padding: 20px;
                margin-bottom: 20px;
             }
-            
+
             .judul h1 {
                font-size: 1.8rem;
             }
-            
+
             .gambar {
                padding: 20px;
                margin-bottom: 20px;
             }
-            
+
             .menu-item {
                width: 120px;
                height: 120px;
                border-radius: 15px;
             }
-            
+
             .menu-item i {
                font-size: 40px;
             }
-            
+
             .menu-title {
                font-size: 14px;
             }
@@ -232,45 +232,45 @@
                background-position: center 65%;
                opacity: 0.3;
             }
-            
+
             body {
                padding: 15px;
             }
-            
+
             .judul {
                padding: 15px;
                margin-bottom: 15px;
                border-radius: 15px;
             }
-            
+
             .judul h1 {
                font-size: 1.5rem;
             }
-            
+
             .gambar {
                padding: 15px;
                margin-bottom: 15px;
                border-radius: 15px;
             }
-            
+
             .gambar img {
                max-width: 120px;
             }
-            
+
             .menu-item {
                width: 100px;
                height: 100px;
                border-radius: 15px;
             }
-            
+
             .menu-item i {
                font-size: 35px;
             }
-            
+
             .menu-title {
                font-size: 12px;
             }
-            
+
             .menu-container {
                gap: 15px;
             }
@@ -283,31 +283,31 @@
                background-position: center 60%;
                opacity: 0.3;
             }
-            
+
             .judul {
                padding: 12px;
                border-radius: 12px;
             }
-            
+
             .judul h1 {
                font-size: 1.2rem;
             }
-            
+
             .gambar {
                padding: 12px;
                border-radius: 12px;
             }
-            
+
             .menu-item {
                width: 90px;
                height: 90px;
                border-radius: 12px;
             }
-            
+
             .menu-item i {
                font-size: 30px;
             }
-            
+
             .menu-title {
                font-size: 11px;
             }
@@ -318,7 +318,7 @@
    <body>
       <!-- Background STOP SUAP -->
       <div class="stop-suap-background" aria-label="Stop Suap - Hargai Petugas Kami"></div>
-      
+
       <div class="content-wrapper">
       <div class="judul">
          <h1 style="font-size: 2em;font-weight: bolder">Sistem Informasi Manajemen Operasional</h1>
@@ -372,6 +372,12 @@ $menuItems = [
         <div>
             <i class="mdi mdi-note"></i>
             <div class="menu-title">Laporan Packing</div>
+        </div>
+    </a>
+    <a href="{{ route('opc') }}" class="menu-item">
+        <div>
+            <i class="mdi mdi-note"></i>
+            <div class="menu-title">Report Open Packing</div>
         </div>
     </a>
 

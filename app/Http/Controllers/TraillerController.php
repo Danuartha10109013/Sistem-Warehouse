@@ -17,10 +17,10 @@ class TraillerController extends Controller
         $direction = $request->get('direction', 'asc'); // Default direction 'asc'
         $start = $request->get('start', null);
         $end = $request->get('end', null);
-    
+
         // Fetch data with search and sorting applied
         $query = TraillerM::query();
-    
+
         // Apply search if it exists
         if ($searchTerm) {
             $results = User::where('name', 'LIKE', '%' . $searchTerm . '%')->pluck('id');
@@ -35,7 +35,7 @@ class TraillerController extends Controller
         } elseif ($end) {
             $query->whereDate('created_at', '<=', $end);
         }
-    
+
         // Apply sorting
         if(Auth::user()->role == 0){
             // $data = ForkliftM::paginate(10); // 10 items per page
@@ -46,7 +46,7 @@ class TraillerController extends Controller
         }
         return view('Form-Check.pages.trailler.index', compact('data', 'searchTerm', 'sort', 'direction','start','end'));
     }
-    
+
 
     public function add (){
         return view('Form-Check.pages.trailler.add');
@@ -87,7 +87,7 @@ class TraillerController extends Controller
         'triangle' => 'nullable|string',
         'tools' => 'nullable|string',
         'catatan' => 'nullable|string',
-        
+
         // Nullable ket fields
         'ket_carrier' => 'nullable|string',
         'ket_rantai' => 'nullable|string',
@@ -141,7 +141,7 @@ class TraillerController extends Controller
     }
 
     public function export(){
-        $date = now()->format('d-m-Y'); 
+        $date = now()->format('d-m-Y');
 
         return Excel::download(new TraillerExportExcel, $date.'Trailler.xlsx');
     }

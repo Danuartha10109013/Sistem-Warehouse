@@ -1,6 +1,6 @@
-@extends('so.main')
+@extends('openpack.main')
 @section('title')
-     SO {{$key}}
+     {{$key}}
 @endsection
 @section('content')
 
@@ -32,7 +32,7 @@
     <!-- Page Title -->
     <div class="row mb-4 mt-4">
         <div class="col-12 text-center">
-            <h3 class="m-0 fw-bold text-dark">STOCK OPNAME {{$key}}</h3>
+            <h3 class="m-0 fw-bold text-dark">{{$key}}</h3>
         </div>
     </div>
     <!-- Action Buttons + Search -->
@@ -41,17 +41,13 @@
         <!-- New -->
         <div class="col-12 col-md-3">
             <button class="btn btn-primary w-100 rounded-pill py-2"
-            data-bs-toggle="modal"
-                @if($key == 'KRAKATAU BAJA INDUSTRI')
-                    data-bs-target="#scanModalKBI">
-                @elseif($key == "SPAREPART")
+                    data-bs-toggle="modal"
                     data-bs-target="#scanModal">
-                @endif
-                <i class="fa fa-qrcode me-2"></i> Scan
+                <i class="fa fa-qrcode me-2"></i> Open Pack
             </button>
         </div>
 
-        <!-- Modal Scan / Input Attribute default -->
+        <!-- Modal Scan / Input Attribute -->
         <div class="modal fade" id="scanModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -124,111 +120,35 @@
                                 </div>
 
 
-            <!-- LAYOUT INPUT (4 kolom) -->
-            <div class="mb-3">
-                <label class="fw-bold mb-2 d-block">Layout / Storagebin</label>
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-3">
-                        <input type="text" class="form-control rounded-pill" id="layoutPrefix" value="WH-L08-SP" readonly>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" class="form-control rounded-pill" id="layoutCol1" placeholder="Kolom 1 (contoh: A)">
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" class="form-control rounded-pill" id="layoutCol2" placeholder="Kolom 2 (contoh: 2)">
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" class="form-control rounded-pill" id="layoutCol3" placeholder="Kolom 3 (contoh: B)">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control rounded-pill" id="layoutCol4" placeholder="Kolom 4 (contoh: 3)">
-                    </div>
-                </div>
-
-                <div class="layout-result" id="layoutPreview">-</div>
-                <input type="hidden" name="layout" id="layoutValue">
-            </div>
-
-
-
-
-
-
-                            </div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary rounded-pill" id="submitBtn">Simpan</button>
-
-                        </div>
-
-                    </form>
-                </div>
-            </div>
+<!-- LAYOUT INPUT (4 kolom) -->
+<div class="mb-3">
+    <label class="fw-bold mb-2 d-block">Layout / Storagebin</label>
+    <div class="row g-2 align-items-center">
+        <div class="col-md-3">
+            <input type="text" class="form-control rounded-pill" id="layoutPrefix" value="WH-L08-SP" readonly>
         </div>
-        {{-- KBI --}}
-        <div class="modal fade" id="scanModalKBI" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+        <div class="col-md-2">
+            <input type="text" class="form-control rounded-pill" id="layoutCol1" placeholder="Kolom 1 (contoh: A)">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control rounded-pill" id="layoutCol2" placeholder="Kolom 2 (contoh: 2)">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control rounded-pill" id="layoutCol3" placeholder="Kolom 3 (contoh: B)">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control rounded-pill" id="layoutCol4" placeholder="Kolom 4 (contoh: 3)">
+        </div>
+    </div>
 
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Tambah Data Scan / Manual</h5>
-                        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <form action="{{ route('so.store') }}" method="POST">
-                        @csrf
-
-                        <div class="modal-body">
-                            <div class="row g-3">
-
-                                <!-- ATTRIBUTE (SCAN / MANUAL) -->
-                                <div class="col-md-12">
-                                    <div id="scannerWarning" class="text-danger fw-bold mb-2" style="display:none;">
-                                        Attribute telah di-scan!
-                                    </div>
-
-                                    <label class="fw-bold mb-1">No coil</label>
-
-                                    <div class="input-group">
-                                        <input type="text" id="attributeInput" name="attribute"
-                                            class="form-control rounded-pill px-3 py-2 me-2"
-                                            placeholder="Scan / Input Manual" required>
-
-                                        <button type="button" class="btn btn-primary rounded-pill px-3"
-                                                onclick="openScanner()">
-                                            <i class="fa fa-qrcode"></i>
-                                        </button>
-                                    </div>
-
-                                    <!-- CAMERA AREA -->
-                                    <div id="qrScanner" class="mt-3" style="display:none;">
-                                        <video id="cameraPreview" width="100%" class="rounded" autoplay></video>
-                                        <button type="button" class="btn btn-danger rounded-pill mt-2 w-100"
-                                                onclick="closeScanner()">
-                                            Tutup Kamera
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- QTY -->
-                                <div class="col-md-6">
-                                    <label class="fw-bold mb-1">Qty</label>
-                                    <input type="number" name="qty" class="form-control rounded-pill px-3 py-2"
-                                        placeholder="Qty" required>
-                                </div>
+    <div class="layout-result" id="layoutPreview">-</div>
+    <input type="hidden" name="layout" id="layoutValue">
+</div>
 
 
 
-                                <div class="col-md-12">
-                                    <label class="fw-bold mb-1">Keterangan</label>
-                                    <textarea name="keterangan"
-                                            class="form-control px-3 py-2 rounded"
-                                            rows="3"
-                                            placeholder="Keterangan"
-                                            ></textarea>
-                                </div>
+
+
 
                             </div>
                         </div>
@@ -256,113 +176,111 @@
 }
 </style>
 
-{{-- LAYOUTING --}}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const prefixInput = document.getElementById('layoutPrefix');
-        const col1 = document.getElementById('layoutCol1');
-        const col2 = document.getElementById('layoutCol2');
-        const col3 = document.getElementById('layoutCol3');
-        const col4 = document.getElementById('layoutCol4');
-        const preview = document.getElementById('layoutPreview');
-        const hiddenInput = document.getElementById('layoutValue');
+document.addEventListener('DOMContentLoaded', () => {
+    const prefixInput = document.getElementById('layoutPrefix');
+    const col1 = document.getElementById('layoutCol1');
+    const col2 = document.getElementById('layoutCol2');
+    const col3 = document.getElementById('layoutCol3');
+    const col4 = document.getElementById('layoutCol4');
+    const preview = document.getElementById('layoutPreview');
+    const hiddenInput = document.getElementById('layoutValue');
 
-        function buildLayout() {
-            const prefix = prefixInput?.value?.trim() || '';
-            const v1 = col1?.value?.trim() || '';
-            const v2 = col2?.value?.trim() || '';
-            const v3 = col3?.value?.trim() || '';
-            const v4 = col4?.value?.trim() || '';
+    function buildLayout() {
+        const prefix = prefixInput?.value?.trim() || '';
+        const v1 = col1?.value?.trim() || '';
+        const v2 = col2?.value?.trim() || '';
+        const v3 = col3?.value?.trim() || '';
+        const v4 = col4?.value?.trim() || '';
 
-            if (!prefix || !v1 || !v2 || !v3 || !v4) {
-                if (preview) preview.innerText = '-';
-                if (hiddenInput) hiddenInput.value = '';
-                return;
-            }
-
-            const result = `${prefix} ${v1}(${v2}-${v3}-${v4})`;
-            if (preview) preview.innerText = result;
-            if (hiddenInput) hiddenInput.value = result;
+        if (!prefix || !v1 || !v2 || !v3 || !v4) {
+            if (preview) preview.innerText = '-';
+            if (hiddenInput) hiddenInput.value = '';
+            return;
         }
 
-        function parseLayout(storagebin) {
-            const regex = /^([^\s]+)\s+([^(]+)\(([^-]+)-([^-]+)-([^)]+)\)$/;
-            const match = storagebin.match(regex);
-            if (!match) return;
+        const result = `${prefix} ${v1}(${v2}-${v3}-${v4})`;
+        if (preview) preview.innerText = result;
+        if (hiddenInput) hiddenInput.value = result;
+    }
 
-            if (prefixInput) prefixInput.value = match[1];
-            if (col1) col1.value = match[2];
-            if (col2) col2.value = match[3];
-            if (col3) col3.value = match[4];
-            if (col4) col4.value = match[5];
+    function parseLayout(storagebin) {
+        const regex = /^([^\s]+)\s+([^(]+)\(([^-]+)-([^-]+)-([^)]+)\)$/;
+        const match = storagebin.match(regex);
+        if (!match) return;
 
-            buildLayout();
-        }
+        if (prefixInput) prefixInput.value = match[1];
+        if (col1) col1.value = match[2];
+        if (col2) col2.value = match[3];
+        if (col3) col3.value = match[4];
+        if (col4) col4.value = match[5];
 
-        [col1, col2, col3, col4].forEach(input => {
-            if (!input) return;
-            input.addEventListener('input', buildLayout);
-        });
+        buildLayout();
+    }
 
-        // expose for autofill usage
-        window.__updateLayoutFromStoragebin = parseLayout;
-        window.__buildLayout = buildLayout;
+    [col1, col2, col3, col4].forEach(input => {
+        if (!input) return;
+        input.addEventListener('input', buildLayout);
     });
+
+    // expose for autofill usage
+    window.__updateLayoutFromStoragebin = parseLayout;
+    window.__buildLayout = buildLayout;
+});
 </script>
 
-
-
-{{-- SCANNER --}}
+{{-- Perscanan --}}
 <script>
-    let stream;
-    let codeReader;
+let stream;
+let codeReader;
 
-    function openScanner() {
-        const qrBox = document.getElementById("qrScanner");
-        qrBox.style.display = "block";
+function openScanner() {
+    const qrBox = document.getElementById("qrScanner");
+    qrBox.style.display = "block";
 
-        codeReader = new ZXing.BrowserMultiFormatReader();
+    codeReader = new ZXing.BrowserMultiFormatReader();
 
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(s => {
-                stream = s;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(s => {
+            stream = s;
 
-                const video = document.getElementById("cameraPreview");
-                video.srcObject = s;
-                video.play();
+            const video = document.getElementById("cameraPreview");
+            video.srcObject = s;
+            video.play();
 
-                codeReader.decodeFromVideoDevice(null, "cameraPreview", (result, err) => {
-                    if (result) {
-                        const input = document.getElementById("attributeInput");
-                        input.value = result.text;
+            codeReader.decodeFromVideoDevice(null, "cameraPreview", (result, err) => {
+                if (result) {
+                    const input = document.getElementById("attributeInput");
+                    input.value = result.text;
 
-                        // TRIGGER INPUT EVENT
-                        input.dispatchEvent(new Event('input'));
+                    // TRIGGER INPUT EVENT
+                    input.dispatchEvent(new Event('input'));
 
-                        closeScanner();
-                    }
-                });
-            })
-            .catch(err => {
-                alert("Tidak bisa mengakses kamera");
-                console.error(err);
+                    closeScanner();
+                }
             });
+        })
+        .catch(err => {
+            alert("Tidak bisa mengakses kamera");
+            console.error(err);
+        });
+}
+
+function closeScanner() {
+    const qrBox = document.getElementById("qrScanner");
+    qrBox.style.display = "none";
+
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
     }
 
-    function closeScanner() {
-        const qrBox = document.getElementById("qrScanner");
-        qrBox.style.display = "none";
-
-        if (stream) {
-            stream.getTracks().forEach(t => t.stop());
-        }
-
-        if (codeReader) {
-            codeReader.reset();
-        }
+    if (codeReader) {
+        codeReader.reset();
     }
+}
 </script>
-{{-- AUTOFILL --}}
+
+{{-- Autofill --}}
 <script>
 
     const autofillUrl = "{{ route('so.autofill') }}";
@@ -450,50 +368,59 @@
 </script>
 
 
+
+
+
+        {{-- <div class="col-12 col-md-3">
+            <a href="{{ route('pac.add') }}"
+               class="btn btn-primary w-100 rounded-pill py-2">
+                <i class="fa fa-plus me-2"></i>New
+            </a>
+        </div> --}}
+
         <div class="col-12 col-md-3">
             <!-- Export -->
         <button id="exportExcel" class="btn btn-success mb-3">
            <i class="fa fa-download"></i> Export to Excel
         </button>
         </div>
-
-        {{-- export excel --}}
+{{-- Export to excel --}}
         <script>
-            document.getElementById("exportExcel").addEventListener("click", function () {
-                let table = document.getElementById("dataTable");
-                let tableHTML = table.outerHTML.replace(/ /g, '%20');
+        document.getElementById("exportExcel").addEventListener("click", function () {
+            let table = document.getElementById("dataTable");
+            let tableHTML = table.outerHTML.replace(/ /g, '%20');
 
-                let filename = "Packing_Report_" + new Date().toISOString().slice(0,10) + ".xls";
+            let filename = "Packing_Report_" + new Date().toISOString().slice(0,10) + ".xls";
 
-                let excelContent = `
-                    <html xmlns:o="urn:schemas-microsoft-com:office:office"
-                        xmlns:x="urn:schemas-microsoft-com:office:excel"
-                        xmlns="http://www.w3.org/TR/REC-html40">
-                    <head>
-                        <meta charset="UTF-8">
-                    </head>
-                    <body>
-                        ${table.outerHTML}
-                    </body>
-                    </html>
-                `;
+            let excelContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                    xmlns:x="urn:schemas-microsoft-com:office:excel"
+                    xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="UTF-8">
+                </head>
+                <body>
+                    ${table.outerHTML}
+                </body>
+                </html>
+            `;
 
-                let blob = new Blob([excelContent], {
-                    type: "application/vnd.ms-excel"
-                });
-
-                let url = URL.createObjectURL(blob);
-
-                let a = document.createElement("a");
-                a.href = url;
-                a.download = filename;
-                a.click();
-
-                URL.revokeObjectURL(url);
+            let blob = new Blob([excelContent], {
+                type: "application/vnd.ms-excel"
             });
+
+            let url = URL.createObjectURL(blob);
+
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+
+            URL.revokeObjectURL(url);
+        });
         </script>
 
-
+{{-- Styel Sorting --}}
         <style>
             th.sortable {
                 cursor: pointer;
@@ -538,7 +465,7 @@
             </div>
         </div>
 
-        {{-- SORTING --}}
+        {{-- sorting --}}
        <script>
             // ========== SEARCH ==========
             document.getElementById("tableSearch").addEventListener("keyup", function () {
@@ -599,118 +526,65 @@
 
    <!-- BUTTON FILTER -->
 <div class="mb-3">
-    <button id="btnBelum" class="btn btn-outline-danger rounded-pill px-3">Belum Scan</button>
-    <button id="btnSudah" class="btn btn-outline-success rounded-pill px-3">Sudah Scan</button>
+    <button id="btnBelum" class="btn btn-outline-danger rounded-pill px-3">Open Pack</button>
+    <button id="btnBelum" class="btn btn-outline-warning rounded-pill px-3">Tindak Lanjut</button>
+    <button id="btnSudah" class="btn btn-outline-success rounded-pill px-3">Selesai</button>
 </div>
-@if ($key == "SPAREPART")
-    {{-- sparepart --}}
-    <div class="card">
-        <div class="card-header">
-            Data Stock | Total <span class="text-danger">{{ $data->count() }}</span>
-        </div>
 
-        <div class="card-body">
-            <div class="table-responsive">
-            <table class="table table-striped" id="dataTable">
-                <thead>
-                    <tr>
-                        <th class="sortable">No</th>
-                        <th class="sortable">Date</th>
-                        <th class="sortable">KPC</th>
-                        <th class="sortable">Barcode</th>
-                        <th class="sortable">Nama Barang</th>
-                        <th class="sortable">Berat</th>
-                        <th class="sortable">Lokasi</th>
-                        <th class="sortable">Storagebin Awal</th>
-                        <th class="sortable">Storagebin Hasil</th>
-                        <th class="col-scan sortable">Scanner</th>
+<div class="card">
+    <div class="card-header">
+        Data Stock | Total <span class="text-danger">{{ $data->count() }}</span>
+    </div>
 
-                        <!-- Kolom yang harus hilang di mode Belum Scan -->
-                        <th class="col-scan sortable">Berat SO</th>
-                        <th class="col-scan sortable">Selisih SO</th>
-                        <th class="col-scan sortable">Keterangan</th>
-                    </tr>
-                </thead>
+    <div class="card-body">
+        <div class="table-responsive">
+        <table class="table table-striped" id="dataTable">
+            <thead>
+                <tr>
+                    <th class="sortable">No</th>
+                    <th class="sortable">Date</th>
+                    <th class="sortable">KPC</th>
+                    <th class="sortable">Barcode</th>
+                    <th class="sortable">Nama Barang</th>
+                    <th class="sortable">Berat</th>
+                    <th class="sortable">Lokasi</th>
+                    <th class="sortable">Storagebin Awal</th>
+                    <th class="sortable">Storagebin Hasil</th>
+                    <th class="col-scan sortable">Scanner</th>
 
-                <tbody>
-                    @foreach ($data as $d)
-                    <tr class="{{ $d->scanner ? 'row-sudah' : 'row-belum' }}">
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $d->date }}</td>
-                        <td>{{ $d->kpc }}</td>
-                        <td>{{ $d->barcode }}</td>
-                        <td>{{ $d->namabarang }}</td>
-                        <td>{{ $d->berat }}</td>
-                        <td>{{ $d->lokasi }}</td>
-                        <td>{{ $d->storagebin ?? '-' }}</td>
-                        <td>{{ $d->storagebin_hasil ?? '-' }}</td>
+                    <!-- Kolom yang harus hilang di mode Belum Scan -->
+                    <th class="col-scan sortable">Berat SO</th>
+                    <th class="col-scan sortable">Selisih SO</th>
+                    <th class="col-scan sortable">Keterangan</th>
+                </tr>
+            </thead>
 
-                        <td class="col-scan">{{ $d->scanner ?? '-' }}</td>
-                        <td class="col-scan">{{ $d->scanner ? $d->qty_scan : '-' }}</td>
-                        <td class="col-scan">
-                            {{ $d->scanner ? ($d->berat - $d->qty_scan) : '-' }}
-                        </td>
-                        <td class="col-scan">{!! nl2br(e($d->keterangan)) !!}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            </div>
+            <tbody>
+                @foreach ($data as $d)
+                <tr class="{{ $d->scanner ? 'row-sudah' : 'row-belum' }}">
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $d->date }}</td>
+                    <td>{{ $d->kpc }}</td>
+                    <td>{{ $d->barcode }}</td>
+                    <td>{{ $d->namabarang }}</td>
+                    <td>{{ $d->berat }}</td>
+                    <td>{{ $d->lokasi }}</td>
+                    <td>{{ $d->storagebin ?? '-' }}</td>
+                    <td>{{ $d->storagebin_hasil ?? '-' }}</td>
+
+                    <td class="col-scan">{{ $d->scanner ?? '-' }}</td>
+                    <td class="col-scan">{{ $d->scanner ? $d->qty_scan : '-' }}</td>
+                    <td class="col-scan">
+                        {{ $d->scanner ? ($d->berat - $d->qty_scan) : '-' }}
+                    </td>
+                    <td class="col-scan">{!! nl2br(e($d->keterangan)) !!}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
         </div>
     </div>
-@elseif ($key == "KRAKATAU BAJA INDUSTRI")
-    {{-- kbi --}}
-    <div class="card">
-        <div class="card-header">
-            Data Stock | Total <span class="text-danger">{{ $data->count() }}</span>
-        </div>
-
-        <div class="card-body">
-            <div class="table-responsive">
-            <table class="table table-striped" id="dataTable">
-                <thead>
-                    <tr>
-                        <th class="sortable">No</th>
-                        <th class="sortable">Date</th>
-                        <th class="sortable">NO COIL</th>
-                        <th class="sortable">Berat</th>
-                        <th class="col-scan sortable">Scanner</th>
-
-
-                        <!-- Kolom yang harus hilang di mode Belum Scan -->
-                        <th class="sortable">Layout</th>
-                        <th class="col-scan sortable">Selisih SO</th>
-                        <th class="sortable">Keterangan</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach ($data as $d)
-                    <tr class="{{ $d->scanner ? 'row-sudah' : 'row-belum' }}">
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $d->date }}</td>
-                        <td>{{ $d->kpc }}</td>
-                        <td>{{ $d->barcode }}</td>
-                        <td>{{ $d->namabarang }}</td>
-                        <td>{{ $d->berat }}</td>
-                        <td>{{ $d->lokasi }}</td>
-                        <td>{{ $d->storagebin ?? '-' }}</td>
-                        <td>{{ $d->storagebin_hasil ?? '-' }}</td>
-
-                        <td class="col-scan">{{ $d->scanner ?? '-' }}</td>
-                        <td class="col-scan">{{ $d->scanner ? $d->qty_scan : '-' }}</td>
-                        <td class="col-scan">
-                            {{ $d->scanner ? ($d->berat - $d->qty_scan) : '-' }}
-                        </td>
-                        <td class="col-scan">{!! nl2br(e($d->keterangan)) !!}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            </div>
-        </div>
-    </div>
-@endif
+</div>
 
 <!-- JAVASCRIPT SWITCH MODE -->
 <script>

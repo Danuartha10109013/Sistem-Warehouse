@@ -55,11 +55,11 @@
                           <option value="" selected disabled>--Pilih Shift Leader--</option>
                           @foreach ($team_lead as $tl)
                           <option value="{{$tl->name}}">{{$tl->name}}</option>
-                              
+
                           @endforeach <!-- Add this option -->
                       </select>
                     </div>
-                  
+
                   <!-- Input field for custom keterangan -->
                   <div class="mb-3" id="other-keterangan-container" style="display: none;">
                       <label for="other-keterangan" class="form-label">Please specify</label>
@@ -75,7 +75,7 @@
                           }
                       });
                   </script>
-                    
+
 
                     <div class="form-group">
                         <label for="label">NO TRAILER/DRIVER<small style="color: red;">*</small>
@@ -87,7 +87,7 @@
                             @endphp
 
                             @foreach ($trailer as $t)
-                                <option value="{{ $t->no_mobil }}/{{ $t->pengguna }}" 
+                                <option value="{{ $t->no_mobil }}/{{ $t->pengguna }}"
                                     {{ old('jenis_forklift') == $t->no_mobil . '/' . $t->pengguna ? 'selected' : '' }}>
                                     {{ $t->no_mobil }}/{{ $t->pengguna }}
                                 </option>
@@ -95,7 +95,7 @@
 
                         </select>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="exampleInputEmail1">Hari / Tanggal<small style="color: red;">*</small></label>
                         <input type="Date" class="form-control" name="date" id="exampleInputEmail1" >
@@ -135,7 +135,7 @@
                                     O
                                 </label>
                             </div>
-                        </div> 
+                        </div>
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Pastikan kondisi Carrier Trailer bagus atau tidak</label>
                             <input type="text" class="form-control" name="ket_carrier" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -285,7 +285,7 @@
                                     O
                                 </label>
                             </div>
-                        </div>                       
+                        </div>
                         <div class="form-group">
                             <label for="exampleInputPassword1">Pengecekan Lampu rotating</label>
                             <input type="text" class="form-control" name="ket_rotating" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -315,7 +315,7 @@
                                     O
                                 </label>
                             </div>
-                        </div>                        
+                        </div>
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Lampu stop</label>
                             <input type="text" class="form-control" name="ket_stop" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -339,8 +339,8 @@
                                     L
                                 </label>
                             </div>
-                            
-                        </div>                       
+
+                        </div>
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Pengecekan Level Air utama (H/L)</label>
                             <input type="text" class="form-control" name="ket_utama" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -377,7 +377,7 @@
                         </div>
                         <hr>
 
-                        
+
 
                         <div class="form-group p-3 border rounded bg-light">
                             <label for="exampleInputPassword1" class="text-dark">
@@ -426,9 +426,9 @@
                                     L
                                 </label>
                             </div>
-                            
+
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Level air accu (H/L)</label>
                             <input type="text" class="form-control" name="ket_accu" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -452,9 +452,9 @@
                                     L
                                 </label>
                             </div>
-                            
+
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Air coolant</label>
                             <input type="text" class="form-control" name="ket_coolant" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -485,18 +485,18 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Brake parking</label>
                             <input type="text" class="form-control" name="ket_parking" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
                         </div>
                     </div>
 
-                    
-                    
+
+
                     <div class="col-md-6">
 
-                        
+
 
                         <div class="form-group p-3 border rounded bg-light">
                             <label for="exampleInputPassword1" class="text-dark">
@@ -522,7 +522,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Brake</label>
                             <input type="text" class="form-control" name="ket_brake" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -553,7 +553,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Horn</label>
                             <input type="text" class="form-control" name="ket_horn" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -584,7 +584,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Alarm mundur</label>
                             <input type="text" class="form-control" name="ket_mundur" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -615,7 +615,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan All U bolt clamp per</label>
                             <input type="text" class="form-control" name="ket_clamp" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -646,7 +646,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Terpal</label>
                             <input type="text" class="form-control" name="ket_terpal" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -677,7 +677,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Rantai pengikat</label>
                             <input type="text" class="form-control" name="ket_rantai_pe" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -709,7 +709,7 @@
                             </div>
 
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Ganjal ban</label>
                             <input type="text" class="form-control" name="ket_ganjal" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -740,7 +740,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Palet/ganjalan coil + karet</label>
                             <input type="text" class="form-control" name="ket_pallet" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -771,7 +771,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan apar ban</label>
                             <input type="text" class="form-control" name="ket_apar" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -802,7 +802,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Kotak P3K</label>
                             <input type="text" class="form-control" name="ket_p3k" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -833,7 +833,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Fancing/pembatas di atas Carrier</label>
                             <input type="text" class="form-control" name="ket_fancing" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -864,7 +864,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Red triangle</label>
                             <input type="text" class="form-control" name="ket_triangle" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -895,7 +895,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="exampleInputPassword1">Keterangan Tools penggantian roda</label>
                             <input type="text" class="form-control" name="ket_tools" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
@@ -919,7 +919,7 @@
 
                       <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
                       <button class="btn btn-light">Cancel</button>
-                    
+
             </form>
             </div>
         </div>

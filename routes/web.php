@@ -9,6 +9,7 @@ use App\Http\Controllers\DataMasterController;
 use App\Http\Controllers\EUPController;
 use App\Http\Controllers\ForkliftController;
 use App\Http\Controllers\InputDataExcel;
+use App\Http\Controllers\OpenPackingController;
 use App\Http\Controllers\KendaraanController;
 use App\Http\Controllers\KUserController;
 use App\Http\Controllers\LoginController;
@@ -72,6 +73,17 @@ Route::prefix('Laporan-packing')->group(function () {
     Route::get('/print/{id}',[PackingController::class,'print'])->name('pac.print');
     Route::get('/export',[PackingController::class,'export'])->name('pac.export');
 });
+Route::prefix('openpacking')->group(function () {
+    Route::get('/',[OpenPackingController::class,'index'])->name('opc');
+    Route::get('/add',[OpenPackingController::class,'add'])->name('opc.add');
+    Route::post('/store',[OpenPackingController::class,'store'])->name('opc.store');
+    Route::get('/check-attribute',[OpenPackingController::class,'checkAttribute'])->name('opc.checkAttribute');
+    Route::delete('/delete/{id}',[OpenPackingController::class,'destroy'])->name('opc.delete');
+    Route::get('/edit/{id}',[OpenPackingController::class,'edit'])->name('opc.edit');
+    Route::put('/update/{id}',[OpenPackingController::class,'update'])->name('opc.update');
+    Route::get('/print/{id}',[OpenPackingController::class,'print'])->name('opc.print');
+    Route::get('/export',[OpenPackingController::class,'export'])->name('opc.export');
+});
 Route::prefix('Surat-Izin-Keluar')->group(function () {
     Route::get('/',[SIKController::class,'index'])->name('sik');
     Route::get('/add',[SIKController::class,'add'])->name('sik.add');
@@ -120,7 +132,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route ::put('/update/{id}',[StockController::class,'update'])->name('stock.update');
         Route ::delete('/delete/{id}',[StockController::class,'destroy'])->name('stock.delete');
     });
-    
+
     Route::prefix('so-sac')->group(function () {
         Route::get('/cs',[SACController::class,'cs'])->name('so.cs');
         Route::get('/utama',[SACController::class,'utama'])->name('so.utama');
