@@ -1,6 +1,6 @@
 @extends('so.main')
 @section('title')
-     SO SPAREPART
+     SO BARANG JADI
 @endsection
 @section('content')
 
@@ -32,7 +32,7 @@
     <!-- Page Title -->
     <div class="row mb-4 mt-4">
         <div class="col-12 text-center">
-            <h3 class="m-0 fw-bold text-dark">STOCK OPNAME SPAREPART</h3>
+            <h3 class="m-0 fw-bold text-dark">STOCK OPNAME BARANG JADI</h3>
         </div>
     </div>
     <!-- Action Buttons + Search -->
@@ -59,6 +59,7 @@
 
                     <form action="{{ route('so.store') }}" method="POST">
                         @csrf
+                        <input type="hidden" name="jenis" value="{{ $jenis ?? 'BARANG JADI' }}">
 
                         <div class="modal-body">
                             <div class="row g-3">
@@ -125,7 +126,7 @@
                 <label class="fw-bold mb-2 d-block">Layout / Storagebin</label>
                 <div class="row g-2 align-items-center">
                     <div class="col-md-3">
-                        <input type="text" class="form-control rounded-pill" id="layoutPrefix" value="WH-L08-SP" readonly>
+                        <input type="text" class="form-control rounded-pill" id="layoutPrefix" value="WH-L08-BJ" readonly>
                     </div>
                     <div class="col-md-2">
                         <input type="text" class="form-control rounded-pill" id="layoutCol1" placeholder="Kolom 1 (contoh: A)">
@@ -144,7 +145,6 @@
                 <div class="layout-result" id="layoutPreview">-</div>
                 <input type="hidden" name="layout" id="layoutValue">
             </div>
-
 
 
 
@@ -224,7 +224,6 @@
             input.addEventListener('input', buildLayout);
         });
 
-        // expose for autofill usage
         window.__updateLayoutFromStoragebin = parseLayout;
         window.__buildLayout = buildLayout;
     });
@@ -256,7 +255,6 @@
                         const input = document.getElementById("attributeInput");
                         input.value = result.text;
 
-                        // TRIGGER INPUT EVENT
                         input.dispatchEvent(new Event('input'));
 
                         closeScanner();
@@ -303,15 +301,12 @@
 
                 if (data.status === true) {
 
-                    // Autofill field
                     document.querySelector('input[name="qty"]').value = data.qty ?? '';
                     document.querySelector('input[name="lokasi"]').value = data.lokasi ?? '';
                     document.querySelector('input[name="namabarang"]').value = data.namabarang ?? '';
 
-                    // Keterangan TIDAK di-autofill dari database supaya catatan baru tidak membawa riwayat lama
                     document.querySelector('textarea[name="keterangan"]').value = '';
 
-                    // Autofill layout from storagebin if available
                     if (data.storagebin) {
                         if (typeof updateLayoutFromStoragebin === 'function') {
                             updateLayoutFromStoragebin(data.storagebin);
@@ -324,9 +319,7 @@
                         buildLayout();
                     }
 
-                    // Cek apakah sudah pernah discan
                     if (data.scanner && data.scanner !== "") {
-                        // Tampilkan peringatan. Jika selisih 0, tombol submit dimatikan.
                         let selisih = 0;
                         if (typeof data.selisih === 'number') {
                             selisih = data.selisih;
@@ -381,9 +374,7 @@
         <script>
             document.getElementById("exportExcel").addEventListener("click", function () {
                 let table = document.getElementById("dataTable");
-                let tableHTML = table.outerHTML.replace(/ /g, '%20');
-
-                let filename = "Packing_Report_" + new Date().toISOString().slice(0,10) + ".xls";
+                let filename = "SO_BARANG_JADI_" + new Date().toISOString().slice(0,10) + ".xls";
 
                 let excelContent = `
                     <html xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -422,7 +413,6 @@
                 padding-right: 20px !important;
             }
 
-            /* Icon panah */
             th.sortable::after {
                 content: "↕";
                 position: absolute;
@@ -431,14 +421,12 @@
                 transition: transform 0.3s ease, opacity 0.2s;
             }
 
-            /* Sort ASC */
             th.sortable.asc::after {
                 content: "↑";
                 opacity: 1;
                 transform: translateY(-2px);
             }
 
-            /* Sort DESC */
             th.sortable.desc::after {
                 content: "↓";
                 opacity: 1;
@@ -460,7 +448,6 @@
 
         {{-- SORTING --}}
        <script>
-            // ========== SEARCH ==========
             document.getElementById("tableSearch").addEventListener("keyup", function () {
                 let input = this.value.toLowerCase();
                 let rows = document.querySelectorAll("#dataTable tbody tr");
@@ -470,7 +457,6 @@
                 });
             });
 
-            // ========== SORT ==========
             document.addEventListener("DOMContentLoaded", function () {
                 let currentSortColumn = -1;
                 let sortDirection = true;
@@ -553,7 +539,6 @@
                         <th class="sortable">Storagebin Hasil</th>
                         <th class="col-scan sortable">Scanner</th>
 
-                        <!-- Kolom yang harus hilang di mode Belum Scan -->
                         <th class="col-scan sortable">Berat SO</th>
                         <th class="col-scan sortable">Selisih SO</th>
                         <th class="col-scan sortable">Keterangan</th>
@@ -592,9 +577,7 @@
 
 <!-- JAVASCRIPT SWITCH MODE -->
 <script>
-// FUNGSI UNTUK MENGAKTIFKAN MODE BELUM
 function aktifkanModeBelum() {
-    // button style
     document.getElementById("btnBelum").classList.remove("btn-outline-danger");
     document.getElementById("btnBelum").classList.add("btn-danger");
     document.getElementById("btnSudah").classList.remove("btn-success");
@@ -602,15 +585,12 @@ function aktifkanModeBelum() {
     document.getElementById("btnSelisih").classList.remove("btn-warning");
     document.getElementById("btnSelisih").classList.add("btn-outline-warning");
 
-    // hide scan columns
     document.querySelectorAll(".col-scan").forEach(col => col.style.display = "none");
 
-    // show only rows not scanned
     document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
     document.querySelectorAll(".row-belum").forEach(r => r.style.display = "table-row");
     document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "none");
 
-    // update total badge (belum scan)
     const totalBelum = document.getElementById("totalBelum");
     const totalSudah = document.getElementById("totalSudah");
     const totalSelisih = document.getElementById("totalSelisih");
@@ -621,15 +601,11 @@ function aktifkanModeBelum() {
     }
 }
 
-// klik manual
 document.getElementById("btnBelum").addEventListener("click", aktifkanModeBelum);
-
-// AUTO AKTIF SAAT PERTAMA KALI HALAMAN LOAD
 window.addEventListener("load", aktifkanModeBelum);
 </script>
 <script>
 document.getElementById("btnBelum").addEventListener("click", function () {
-    // button style
     this.classList.remove("btn-outline-danger");
     this.classList.add("btn-danger");
     document.getElementById("btnSudah").classList.remove("btn-success");
@@ -637,15 +613,12 @@ document.getElementById("btnBelum").addEventListener("click", function () {
     document.getElementById("btnSelisih").classList.remove("btn-warning");
     document.getElementById("btnSelisih").classList.add("btn-outline-warning");
 
-    // hide scan columns
     document.querySelectorAll(".col-scan").forEach(col => col.style.display = "none");
 
-    // show only rows not scanned
     document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
     document.querySelectorAll(".row-belum").forEach(r => r.style.display = "table-row");
     document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "none");
 
-    // update total badge (belum scan)
     const totalBelum = document.getElementById("totalBelum");
     const totalSudah = document.getElementById("totalSudah");
     const totalSelisih = document.getElementById("totalSelisih");
@@ -657,7 +630,6 @@ document.getElementById("btnBelum").addEventListener("click", function () {
 });
 
 document.getElementById("btnSudah").addEventListener("click", function () {
-    // button style
     this.classList.remove("btn-outline-success");
     this.classList.add("btn-success");
     document.getElementById("btnBelum").classList.remove("btn-danger");
@@ -665,14 +637,11 @@ document.getElementById("btnSudah").addEventListener("click", function () {
     document.getElementById("btnSelisih").classList.remove("btn-warning");
     document.getElementById("btnSelisih").classList.add("btn-outline-warning");
 
-    // show scan columns
     document.querySelectorAll(".col-scan").forEach(col => col.style.display = "");
 
-    // show only scanned rows (sudah scan, termasuk yang selisih)
     document.querySelectorAll(".row-belum").forEach(r => r.style.display = "none");
     document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "table-row");
 
-    // update total badge (sudah scan)
     const totalBelum = document.getElementById("totalBelum");
     const totalSudah = document.getElementById("totalSudah");
     const totalSelisih = document.getElementById("totalSelisih");
@@ -684,7 +653,6 @@ document.getElementById("btnSudah").addEventListener("click", function () {
 });
 
 document.getElementById("btnSelisih").addEventListener("click", function () {
-    // button style
     this.classList.remove("btn-outline-warning");
     this.classList.add("btn-warning");
     document.getElementById("btnBelum").classList.remove("btn-danger");
@@ -692,15 +660,12 @@ document.getElementById("btnSelisih").addEventListener("click", function () {
     document.getElementById("btnSudah").classList.remove("btn-success");
     document.getElementById("btnSudah").classList.add("btn-outline-success");
 
-    // show scan columns
     document.querySelectorAll(".col-scan").forEach(col => col.style.display = "");
 
-    // show only rows with selisih (sudah scan tapi berat != qty_scan)
     document.querySelectorAll(".row-belum").forEach(r => r.style.display = "none");
     document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
     document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "table-row");
 
-    // update total badge (selisih)
     const totalBelum = document.getElementById("totalBelum");
     const totalSudah = document.getElementById("totalSudah");
     const totalSelisih = document.getElementById("totalSelisih");

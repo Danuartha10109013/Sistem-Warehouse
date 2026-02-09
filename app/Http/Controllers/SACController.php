@@ -37,15 +37,9 @@ class SACController extends Controller
     return response()->json(['status' => false]);
 }
 
-    public function index () {
-
-    if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Silahkan Login terlbih dahulu');
-        }
-    $data = SAC::where('date', '>=', Carbon::now()->subMonth())
-            ->orderBy('created_at', 'desc')
-            ->get();
-        return view ('so.index', compact('data'));
+    public function index ()
+    {
+        return redirect()->route('so.sparepart');
     }
 
     public function utama () {
@@ -139,7 +133,7 @@ class SACController extends Controller
         $baru->lokasi_scan = $request->lokasi;
         $baru->warehouse = 'WH';
         $baru->namabarang = $request->namabarang;
-        $baru->jenis = 'manual';
+        $baru->jenis = $request->jenis ?? 'manual';
         // baris pertama riwayat scan
         $sbDisplayBaru = $request->layout ?: '-';
         $line = "1. " . Auth::user()->name . " -> Qty : " . (int) $request->qty . " | SB : " . $sbDisplayBaru;
@@ -161,51 +155,109 @@ class SACController extends Controller
 
 }
 
-    public function sparepart () {
-
-    if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Silahkan Login terlbih dahulu');
+    public function sparepart ()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silahkan Login terlebih dahulu');
         }
 
-        $key = 'SPAREPART';
-
-    $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+        $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+            ->where(function ($q) {
+                $q->whereNull('jenis')
+                    ->orWhere('jenis', '!=', 'KRAKATAU BAJA INDUSTRI');
+            })
             ->orderBy('created_at', 'desc')
             ->get();
-        return view ('so.index', compact('data','key'));
-    }
-    public function kbi () {
 
-    if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Silahkan Login terlbih dahulu');
+        return view('so.index', compact('data'));
+    }
+    public function kbi ()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silahkan Login terlebih dahulu');
         }
 
-        $key = 'KRAKATAU BAJA INDUSTRI';
-
-    $data = SAC::where('date', '>=', Carbon::now()->subMonth())
-            ->where('jenis', $key)
+        $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+            ->where('jenis', 'KRAKATAU BAJA INDUSTRI')
             ->orderBy('created_at', 'desc')
             ->get();
-        return view ('so.index', compact('data','key'));
+
+        return view('so.kbi', compact('data'));
     }
 
-public function electric (){
-    return view ('so.cs');
-}
-public function mechanic (){
-    return view ('so.cs');
-}
-public function proyek (){
-    return view ('so.cs');
-}
-public function safety (){
-    return view ('so.cs');
-}
-public function utility (){
-    return view ('so.cs');
-}
-public function general (){
-    return view ('so.cs');
-}
+    public function bahanBaku ()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silahkan Login terlebih dahulu');
+        }
+
+        $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+            ->where('jenis', 'BAHAN BAKU')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $jenis = 'BAHAN BAKU';
+        return view('so.bahan_baku', compact('data', 'jenis'));
+    }
+
+    public function barangJadi ()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silahkan Login terlebih dahulu');
+        }
+
+        $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+            ->where('jenis', 'BARANG JADI')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $jenis = 'BARANG JADI';
+        return view('so.barang_jadi', compact('data', 'jenis'));
+    }
+
+    public function barangJadiSliting ()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silahkan Login terlebih dahulu');
+        }
+
+        $data = SAC::where('date', '>=', Carbon::now()->subMonth())
+            ->where('jenis', 'BARANG JADI SLITING')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $jenis = 'BARANG JADI SLITING';
+        return view('so.barang_jadi_sliting', compact('data', 'jenis'));
+    }
+
+    public function electric ()
+    {
+        return view('so.cs');
+    }
+
+    public function mechanic ()
+    {
+        return view('so.cs');
+    }
+
+    public function proyek ()
+    {
+        return view('so.cs');
+    }
+
+    public function safety ()
+    {
+        return view('so.cs');
+    }
+
+    public function utility ()
+    {
+        return view('so.cs');
+    }
+
+    public function general ()
+    {
+        return view('so.cs');
+    }
 
 }
