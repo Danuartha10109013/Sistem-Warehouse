@@ -381,6 +381,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/delete/{id}', [DashboardController::class, 'destroy'])->name('delete-shipment');
                 Route::get('shipmentcreate/{gs}', [DashboardController::class, 'create'])->name('create-shipment');
                 Route::post('shipmentcreated', [DashboardController::class, 'store'])->name('store-shipment');
+                Route::get('/export', [DashboardController::class, 'export'])->name('export-shipment');
             });
 
 

@@ -15,6 +15,7 @@
     <div class="mb-3 d-flex justify-content-between align-items-center">
       <!-- Left: Form -->
       <a href="{{ route('Mapping.admin.input-excel') }}" class="btn btn-primary">Buat Shipment</a>
+      <a href="{{ route('Mapping.admin.export-shipment') }}" class="btn btn-success">EXPORT</a>
       <form action="{{ route('Mapping.admin.shipment') }}" method="GET" class="d-flex align-items-center">
           <input type="date" name="start" value="{{ request('start') }}" placeholder="Start Date" class="form-control me-2">
           <input type="date" name="end" value="{{ request('end') }}" placeholder="End Date" class="form-control me-2">

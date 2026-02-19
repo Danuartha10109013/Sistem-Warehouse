@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\MappingContainerExportExcel;
 use App\Models\Coil;
 use App\Models\MapCoil;
 use App\Models\MapCoilTruck;
 use App\Models\Pengecekan;
 use App\Models\Shipment;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DashboardController extends Controller
 {
@@ -105,8 +107,11 @@ class DashboardController extends Controller
         return redirect()->back()->with('success','Shipment has been deleted');
     }
 
-
-
+    public function export()
+    {
+        $date = now()->format('d-m-Y');
+        return Excel::download(new MappingContainerExportExcel, 'Mapping-Container-' . $date . '.xlsx');
+    }
 
     
 }
