@@ -103,8 +103,7 @@ class MappingContainerExportExcel implements FromCollection, WithHeadings, Shoul
     }
 
     /**
-     * Calculate time difference between two time strings
-     * Returns format: HH:MM:SS
+     * Calculate time difference between two time strings, return as "X menit"
      */
     private function calculateTimeDifference($startTime, $endTime)
     {
@@ -113,12 +112,11 @@ class MappingContainerExportExcel implements FromCollection, WithHeadings, Shoul
         }
 
         try {
-            // Parse time strings (format: HH:MM:SS or HH:MM)
             $start = \DateTime::createFromFormat('H:i:s', $startTime);
             if (!$start) {
                 $start = \DateTime::createFromFormat('H:i', $startTime);
             }
-            
+
             $end = \DateTime::createFromFormat('H:i:s', $endTime);
             if (!$end) {
                 $end = \DateTime::createFromFormat('H:i', $endTime);
@@ -128,18 +126,12 @@ class MappingContainerExportExcel implements FromCollection, WithHeadings, Shoul
                 return null;
             }
 
-            // If end time is earlier than start time, assume it's next day
             if ($end < $start) {
                 $end->modify('+1 day');
             }
 
-            $diff = $start->diff($end);
-            
-            return sprintf('%02d:%02d:%02d', 
-                $diff->h + ($diff->days * 24), 
-                $diff->i, 
-                $diff->s
-            );
+            $totalMenit = (int) (($end->getTimestamp() - $start->getTimestamp()) / 60);
+            return $totalMenit . ' menit';
         } catch (\Exception $e) {
             return null;
         }
