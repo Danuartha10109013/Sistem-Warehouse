@@ -80,8 +80,8 @@ class MappingContainerExportExcel implements FromCollection, WithHeadings, Shoul
             'Awal Muat',
             'Selesai Muat',
             'Selesai Seling',
-            'Time Muat',
-            'Total Muat (Segel)',
+            'Time Muat (Menit)',
+            'Awal Muat - Segel (Menit)',
         ];
     }
 
@@ -130,8 +130,7 @@ class MappingContainerExportExcel implements FromCollection, WithHeadings, Shoul
                 $end->modify('+1 day');
             }
 
-            $totalMenit = (int) (($end->getTimestamp() - $start->getTimestamp()) / 60);
-            return $totalMenit . ' menit';
+            return (int) (($end->getTimestamp() - $start->getTimestamp()) / 60);
         } catch (\Exception $e) {
             return null;
         }
