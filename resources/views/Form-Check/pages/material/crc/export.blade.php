@@ -15,6 +15,9 @@
                 <th>Movement Date</th>
                 <th>Awal Muat</th>
                 <th>Akhir Muat</th>
+                <th>Total Time (Menit)</th>
+                <th>Radiasi</th>
+                <th>Ket Radiasi</th>
                 <th>Responden</th>
                 <th>Nomor Dokumen</th>
                 <th>Supplier</th>
@@ -45,6 +48,22 @@
                     <td>{{$d->date}}</td>
                     <td>{{$d->time}}</td>
                     <td>{{$d->time_last}}</td>
+                    <td>
+                        @php
+                            $totalTime = null;
+                            if ($d->time && $d->time_last) {
+                                $start = \DateTime::createFromFormat('H:i:s', $d->time) ?: \DateTime::createFromFormat('H:i', $d->time);
+                                $end = \DateTime::createFromFormat('H:i:s', $d->time_last) ?: \DateTime::createFromFormat('H:i', $d->time_last);
+                                if ($start && $end) {
+                                    if ($end < $start) $end->modify('+1 day');
+                                    $totalTime = (int)(($end->getTimestamp() - $start->getTimestamp()) / 60);
+                                }
+                            }
+                        @endphp
+                        {{ $totalTime !== null ? $totalTime : '-' }}
+                    </td>
+                    <td>{{$d->radiasi}}</td>
+                    <td>{{$d->ket_radiasi}}</td>
                     <td>
                         @php
                             $name = \App\Models\User::where('id',$d->user_id)->value('name');

@@ -249,6 +249,8 @@ class MaterialController extends Controller
             'jalan' => 'required|string',
             'date' => 'required|date',
             'time' => 'required|date_format:H:i',
+            'time_awal_bongkar' => 'nullable|date_format:H:i',
+            'time_akhir_bongkar' => 'nullable|date_format:H:i',
             'supplier' => 'required|array',
             'jenis' => 'nullable|string',
 
@@ -279,6 +281,8 @@ class MaterialController extends Controller
             'jalan' => $request->input('jalan'),
             'date' => $request->input('date'),
             'time' => $request->input('time'),
+            'time_awal_bongkar' => $request->input('time_awal_bongkar'),
+            'time_akhir_bongkar' => $request->input('time_akhir_bongkar'),
             'supplier' => json_encode($request->input('supplier')), // Convert array to JSON
             'jenis' => $request->input('jenis'),
 
@@ -422,6 +426,8 @@ class MaterialController extends Controller
             'shift_leader' => 'required|string',
             'date' => 'required|date',
             'time' => 'required|date_format:H:i',
+            'time_awal_bongkar' => 'nullable|date_format:H:i',
+            'time_akhir_bongkar' => 'nullable|date_format:H:i',
             'supplier' => 'required|array',
             'jenis' => 'nullable|string',
 
@@ -455,6 +461,8 @@ class MaterialController extends Controller
             'shift_leader' => $request->input('shift_leader'),
             'date' => $request->input('date'),
             'time' => $request->input('time'),
+            'time_awal_bongkar' => $request->input('time_awal_bongkar'),
+            'time_akhir_bongkar' => $request->input('time_akhir_bongkar'),
             'supplier' => json_encode($request->input('supplier')), // Convert array to JSON
             'jenis' => $request->input('jenis'),
 

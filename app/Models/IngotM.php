@@ -16,6 +16,8 @@ class IngotM extends Model
         'jalan',
         'date',
         'time',
+        'time_awal_bongkar',
+        'time_akhir_bongkar',
         'supplier',
         'jenis',
         'cuaca',

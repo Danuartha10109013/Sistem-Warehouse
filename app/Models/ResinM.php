@@ -14,6 +14,8 @@ class ResinM extends Model
         'shift_leader',
         'date',
         'time',
+        'time_awal_bongkar',
+        'time_akhir_bongkar',
         'supplier',
         'jenis',
         'cuaca',
