@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\MappingContainerExportExcel;
+use App\Exports\MappingContainerExportExcelPenilaian;
 use App\Models\Coil;
 use App\Models\MapCoil;
 use App\Models\MapCoilTruck;
@@ -46,15 +47,50 @@ class DashboardController extends Controller
         $same = Shipment::where('id',$id)->value('no_gs');
         $coil = Coil::where('no_gs', $same)->get();
         $pengecekan = Pengecekan::where('no_gs',$same)->value('pembeda');
-    
+
         // Mengembalikan view dengan data Shipment yang diambil
         return view('Mapping-Container.content.dashboard.index', compact('data','coil','pengecekan'));
     }
 
     public function create($gs){
-        
+
         return view('Mapping-Container.content.dashboard.create',compact('gs'));
     }
+    public function edit($gs){
+
+        $ids = Shipment::where('no_gs',$gs)->value('id');
+
+        $data = Shipment::find($ids);
+        return view('Mapping-Container.content.dashboard.edit',compact('gs','data'));
+    }
+
+    public function update(Request $request, $id)
+        {
+            $validatedData = $request->validate([
+                'no_gs' => 'required|string',
+                'tgl_gs' => 'nullable|date',
+                'no_so' => 'nullable|string',
+                'no_po' => 'nullable|string',
+                'no_do' => 'nullable|string',
+                'no_container' => 'nullable|string',
+                'no_seal' => 'nullable|string',
+                'no_mobil' => 'nullable|string',
+                'forwarding' => 'nullable|string',
+                'kepada' => 'nullable|string',
+                'alamat_pengirim' => 'nullable|string',
+                'alamat_tujuan' => 'nullable|string',
+                'tare' => 'nullable|integer',
+            ]);
+
+            $shipment = Shipment::findOrFail($id);
+
+            $shipment->update($validatedData);
+
+            return redirect()
+                ->route('Mapping.admin.shipment')
+                ->with('success', 'Data shipment berhasil diupdate');
+        }
+
     public function store(Request $request){
         // dd($request->all());
         $validatedData = $request->validate([
@@ -110,8 +146,13 @@ class DashboardController extends Controller
     public function export()
     {
         $date = now()->format('d-m-Y');
-        return Excel::download(new MappingContainerExportExcel, 'Mapping-Container-' . $date . '.xlsx');
+        return Excel::download(new MappingContainerExportExcel, 'Mapping-Container-Time-' . $date . '.xlsx');
+    }
+    public function exporting()
+    {
+        $date = now()->format('d-m-Y');
+        return Excel::download(new MappingContainerExportExcelPenilaian, 'Mapping-Container-Penilaian-' . $date . '.xlsx');
     }
 
-    
+
 }

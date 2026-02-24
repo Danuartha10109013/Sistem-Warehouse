@@ -10,22 +10,49 @@
   @endif
 @endsection
 @section('content')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <div class="container-xxl">
     <h3 class="title text-center">DATA SHIPMENT</h3>
     <div class="mb-3 d-flex justify-content-between align-items-center">
       <!-- Left: Form -->
       <a href="{{ route('Mapping.admin.input-excel') }}" class="btn btn-primary">Buat Shipment</a>
-      <a href="{{ route('Mapping.admin.export-shipment') }}" class="btn btn-success">EXPORT</a>
+      {{-- <a href="{{ route('Mapping.admin.export-shipment') }}" class="btn btn-success">EXPORT</a> --}}
+      <div class="dropdown">
+    <button class="btn btn-success dropdown-toggle px-4 shadow-sm"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+        <i class="bi bi-download me-2"></i> EXPORT DATA
+    </button>
+
+    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2">
+        <li>
+            <a class="dropdown-item d-flex align-items-center rounded-3 mb-1 py-2"
+               href="{{ route('Mapping.admin.export-shipment') }}">
+                <i class="bi bi-clock-history text-primary me-2"></i>
+                <span>Export Time</span>
+            </a>
+        </li>
+
+        <li>
+            <a class="dropdown-item d-flex align-items-center rounded-3 py-2"
+               href="{{ route('Mapping.admin.export-penilaian') }}">
+                <i class="bi bi-clipboard-data text-success me-2"></i>
+                <span>Export Penilaian</span>
+            </a>
+        </li>
+    </ul>
+</div>
       <form action="{{ route('Mapping.admin.shipment') }}" method="GET" class="d-flex align-items-center">
           <input type="date" name="start" value="{{ request('start') }}" placeholder="Start Date" class="form-control me-2">
           <input type="date" name="end" value="{{ request('end') }}" placeholder="End Date" class="form-control me-2">
           <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by No GS" class="form-control me-2">
           <button type="submit" class="btn btn-primary">Search</button>
       </form>
-  
+
       <!-- Right: Button -->
   </div>
-  
+
 <div class="col-12">
     <div class="card">
       <div class="table-responsive">
@@ -35,25 +62,27 @@
               <th style="color: black" class="text-truncate">No</th>
               <th style="color: black" class="text-truncate">No GS</th>
               <th style="color: black" class="text-truncate">Tanggal GS</th>
-              <th style="color: black" class="text-truncate">No PO</th>
-              <th style="color: black" class="text-truncate">No Seal</th>
+              {{-- <th style="color: black" class="text-truncate">No PO</th> --}}
+              {{-- <th style="color: black" class="text-truncate">No Seal</th> --}}
               <th style="color: black" class="text-truncate">No Mobil</th>
-              <th style="color: black" class="text-truncate">Action</th>
+              <th style="color: black" class="text-center">Action</th>
             </tr>
           </thead>
           <tbody>
             @foreach ($data as $c)
-  
+
             <tr>
               <td style="color: black">{{$loop->iteration}}</td>
               <td style="color: black">{{$c->no_gs}}</td>
               <td style="color: black" class="text-truncate">{{$c->tgl_gs}}</td>
-              <td style="color: black" class="text-truncate">{{$c->no_po}}</td>
-              <td style="color: black" class="text-truncate">{{$c->no_seal}}</td>
+              {{-- <td style="color: black" class="text-truncate">{{$c->no_po}}</td> --}}
+              {{-- <td style="color: black" class="text-truncate">{{$c->no_seal}}</td> --}}
               <td style="color: black" class="text-truncate">{{$c->no_mobil}}</td>
-              <td>
+              <td class="text-center">
                 @if ($c->tare == null || $c->no_container == null || $c->tgl_gs == null || $c->no_mobil == null || $c->kepada == null)
                 <a href="{{route('Mapping.admin.create-shipment',$c->no_gs)}}" class="btn btn-secondary">Lengkapi Data</a>
+                @elseif ($c->tare !== null || $c->no_container !== null || $c->tgl_gs !== null || $c->no_mobil !== null || $c->kepada !== null)
+                <a href="{{route('Mapping.admin.edit-shipment',$c->no_gs)}}" class="btn btn-warning"><i class="fa fa-edit"></i> Edit</a>
                 @endif
                 <a href="{{route('Mapping.admin.coiling',$c->no_gs)}}" class="btn btn-success">Koil</a>
                 <a href="{{route('Mapping.admin.show-shipment',$c->id)}}" class="btn btn-primary"><i class="ri-eye-line"></i> Mapping</a>
@@ -66,7 +95,7 @@
                       document.querySelectorAll('.btn-delete').forEach(function (button) {
                           button.addEventListener('click', function () {
                               const url = this.getAttribute('data-url');
-                  
+
                               Swal.fire({
                                   title: 'Yakin ingin menghapus?',
                                   text: "Data yang dihapus tidak dapat dikembalikan!",
@@ -86,7 +115,7 @@
                   });
                   </script>
                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-       
+
               </td>
             </tr>
             @endforeach

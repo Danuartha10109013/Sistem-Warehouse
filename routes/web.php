@@ -380,8 +380,11 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/shipment/{id}', [DashboardController::class, 'show'])->name('show-shipment');
                 Route::get('/delete/{id}', [DashboardController::class, 'destroy'])->name('delete-shipment');
                 Route::get('shipmentcreate/{gs}', [DashboardController::class, 'create'])->name('create-shipment');
+                Route::put('shipmentupdate/{id}', [DashboardController::class, 'update'])->name('update-shipment');
+                Route::get('shipmentedit/{gs}', [DashboardController::class, 'edit'])->name('edit-shipment');
                 Route::post('shipmentcreated', [DashboardController::class, 'store'])->name('store-shipment');
                 Route::get('/export', [DashboardController::class, 'export'])->name('export-shipment');
+                Route::get('/export-penilaian', [DashboardController::class, 'exporting'])->name('export-penilaian');
             });
 
 

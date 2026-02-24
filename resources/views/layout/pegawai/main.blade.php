@@ -17,6 +17,7 @@
       <link rel="stylesheet" href="{{asset('vendor')}}/css/style.css">
       <!-- Responsive CSS -->
       <link rel="stylesheet" href="{{asset('vendor')}}/css/responsive.css">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
    </head>
    <body class="sidebar-main-active right-column-fixed header-top-bgcolor">
       <!-- loader Start -->
@@ -41,7 +42,7 @@
             @yield('content')
          </div>
 
- 
+
          {{-- <div class="iq-right-fixed">
             <div class="iq-card mb-0" style="box-shadow: none;">
                <div class="iq-card-header d-flex justify-content-between">
@@ -112,13 +113,13 @@
          @include('layout.pegawai.footer')
       </footer>
 
-      
+
       <!-- Footer END -->
       <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-      
+
       <script src="{{asset('vendor')}}/js/jquery.min.js"></script>
-      
+
       <script src="{{asset('vendor')}}/js/popper.min.js"></script>
       <script src="{{asset('vendor')}}/js/bootstrap.min.js"></script>
       <!-- Appear JavaScript -->

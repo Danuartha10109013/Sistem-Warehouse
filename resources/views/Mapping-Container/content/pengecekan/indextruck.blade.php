@@ -44,7 +44,7 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Awal Muat 1</span>
                             <input
@@ -59,12 +59,12 @@ Form Pengecekan ||
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
-                            @enderror                   
+                            @enderror
                     @endforeach
                         </div>
 
                         <div class="input-group">
-                            
+
                             <input
                                 type="text"
                                 class="form-control"
@@ -75,7 +75,7 @@ Form Pengecekan ||
                         </div>
 
                         <div class="input-group">
-                            
+
                             <input
                                 type="text"
                                 class="form-control"
@@ -124,12 +124,12 @@ Form Pengecekan ||
                         </div>
 
                         <p class="text-center" style="font-weight:bold;">KONTAINER / TRAILER / TRUK</p>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Lantai</span>
                             <select class="form-select @error('lantai') is-invalid @enderror" name="lantai" aria-label="Floor Rating">
                                 <option value="-" {{ old('lantai', $p->lantai) == '' ? 'selected' : '' }}>-- - --</option>
-             
+
                             </select>
                             @error('lantai')
                                 <div class="invalid-feedback">
@@ -137,7 +137,7 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Dinding</span>
                             <select class="form-select @error('dinding') is-invalid @enderror" name="dinding" aria-label="Floor Rating">
@@ -150,7 +150,7 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Pengunci Kontainer</span>
                             <select class="form-select @error('pengunci_kontainer') is-invalid @enderror" name="pengunci_kontainer" aria-label="Pengunci Kontainer">
@@ -177,8 +177,8 @@ Form Pengecekan ||
                                         </div>
                                     @enderror
                                 </div>
-                                
-                                
+
+
                                 <div class="col-md-4">
                                     <input type="hidden" name="vacum" value="">
                                     <span>Vacum</span>
@@ -205,7 +205,7 @@ Form Pengecekan ||
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Choke</span>
                             <input
@@ -222,7 +222,7 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Stopper</span>
                             <input
@@ -239,7 +239,7 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Sling</span>
                             <input
@@ -399,16 +399,16 @@ Form Pengecekan ||
                               <option value="other">Other</option> <!-- Add this option -->
                           </select>
                         </div>
-                        
+
                         <p class="text-center" style="font-weight:bold;">TRAILER / TRUK</p>
-                    
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Kondisi Ban</span>
                             <select class="form-select @error('kondisi_ban') is-invalid @enderror" name="kondisi_ban" aria-label="Kondisi Ban">
                                 <option value="" {{ old('kondisi_ban',$p->kondisi_ban) == '' ? 'selected' : '' }} >-- Pilih Kondisi Ban --</option>
                                 <option value="bagus" {{ old('kondisi_ban',$p->kondisi_ban) == 'bagus' ? 'selected' : '' }}>Bagus</option>
                                 <option value="kurang bagus" {{ old('kondisi_ban',$p->kondisi_ban) == 'kurang bagus' ? 'selected' : '' }}>Kurang Bagus</option>
-                                <option value="kurang bagus" {{ old('kondisi_ban',$p->kondisi_ban) == 'kurang bagus' ? 'selected' : '' }}>Jelek</option>
+                                <option value="jelek" {{ old('kondisi_ban',$p->kondisi_ban) == 'jelek' ? 'selected' : '' }}>Jelek</option>
                             </select>
                             @error('kondisi_ban')
                                 <div class="invalid-feedback">
@@ -416,15 +416,15 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
-                        
+
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Kondisi Lantai</span>
                             <select class="form-select @error('kondisi_lantai') is-invalid @enderror" name="kondisi_lantai" aria-label="Kondisi Lantai">
                                 <option value="" {{ old('kondisi_lantai',$p->kondisi_lantai) == '' ? 'selected' : '' }} >-- Pilih Kondisi Lantai --</option>
                                 <option value="bagus" {{ old('kondisi_lantai',$p->kondisi_lantai) == 'bagus' ? 'selected' : '' }}>Bagus</option>
                                 <option value="kurang bagus" {{ old('kondisi_lantai',$p->kondisi_lantai) == 'kurang bagus' ? 'selected' : '' }}>Kurang Bagus</option>
-                                <option value="kurang bagus" {{ old('kondisi_lantai',$p->kondisi_lantai) == 'kurang bagus' ? 'selected' : '' }}>Jelek</option>
+                                <option value="jelek" {{ old('kondisi_lantai',$p->kondisi_lantai) == 'jelek' ? 'selected' : '' }}>Jelek</option>
                             </select>
                             @error('kondisi_lantai')
                                 <div class="invalid-feedback">
@@ -432,7 +432,7 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Rantai Webbing</span>
                             <select class="form-select @error('rantai_webbing') is-invalid @enderror" name="rantai_webbing" aria-label="Rantai Webbing">
@@ -447,7 +447,7 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Tonase</span>
                             <select class="form-select @error('tonase') is-invalid @enderror" name="tonase" aria-label="Tonase">
@@ -461,7 +461,7 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
+
                         <div class="input-group">
                             <span class="input-group-text" id="basic-addon41">Terpal</span>
                             <select class="form-select @error('terpal') is-invalid @enderror" name="terpal" aria-label="Terpal">
@@ -476,14 +476,14 @@ Form Pengecekan ||
                                 </div>
                             @enderror
                         </div>
-                        
-                        
-                        
-                        @endforeach       
-                        
+
+
+
+                        @endforeach
+
                     </div>
                 </div>
-                
+
             </div>
         </div>
 
@@ -509,7 +509,7 @@ Form Pengecekan ||
                                     $coordinateB = 'b' . $i;
                                     $coordinateC = 'c' . $i;
                                 @endphp
-                                
+
 
                                 <!-- Coordinate Select -->
                                 <label class="fw-bold mb-1">{{ strtoupper($coordinateA) }}</label>
@@ -521,8 +521,8 @@ Form Pengecekan ||
                                 >
                                 <option value="">Pilih</option>
                                 @foreach ($coil as $c)
-                                    <option 
-                                        value="{{ $c->kode_produk }}" 
+                                    <option
+                                        value="{{ $c->kode_produk }}"
                                         {{ old($coordinateA, $m->$coordinateA) == $c->kode_produk ? 'selected' : '' }}>
                                         {{ substr($c->kode_produk, -5) }}
                                     </option>
@@ -573,7 +573,7 @@ Form Pengecekan ||
                                 </script>
 
 
-                                
+
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -640,14 +640,14 @@ Form Pengecekan ||
                     @endfor
                 </div>
             @endforeach
-            
+
             <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const coilSelects = Array.from(document.querySelectorAll('.coil-select'));
-            
+
                 function updateOptions() {
                     const selectedValues = coilSelects.map(select => select.value).filter(value => value);
-            
+
                     coilSelects.forEach((select) => {
                         const options = select.querySelectorAll("option");
                         options.forEach((option) => {
@@ -656,29 +656,29 @@ Form Pengecekan ||
                                 option.style.display = selectedValues.includes(option.value) && option.value !== select.value ? "none" : "";
                             }
                         });
-            
+
                         const eyeSelect = document.querySelector(`select[name="${select.name}_eye"]`);
                         if (eyeSelect) {
                             eyeSelect.disabled = !select.value;
                         }
                     });
                 }
-            
+
                 coilSelects.forEach((select) => {
                     select.addEventListener("change", updateOptions);
                 });
-            
+
                 // Initial call to set the correct state on page load
                 updateOptions();
             });
         </script>
-                
-        
+
+
                 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
             </div>
         </div>
         @endforeach
-         
+
         @foreach ( $pengecekan as $p)
        {{-- text area --}}
        <div class="input-group mb-5">
@@ -692,7 +692,7 @@ Form Pengecekan ||
             value="{{$p->catatan}}"></input>
         </div>
         @endforeach
-        
+
         <div class="row">
             <!-- Pengemudi Section -->
             <div class="col-md-6">
@@ -713,7 +713,7 @@ Form Pengecekan ||
                     </div>
                 </div>
             </div>
-        
+
             <!-- Security Section -->
             <div class="col-md-6">
                 <div class="form-group mb-3">
@@ -734,7 +734,7 @@ Form Pengecekan ||
                 </div>
             </div>
         </div>
-        
+
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 // Function to initialize a signature pad
@@ -742,45 +742,45 @@ Form Pengecekan ||
                     const canvas = document.getElementById(canvasId);
                     const clearButton = document.getElementById(clearButtonId);
                     const hiddenInput = document.getElementById(hiddenInputId);
-        
+
                     const signaturePad = new SignaturePad(canvas, {
                         backgroundColor: 'rgba(255, 255, 255, 0)',
                         penColor: 'black'
                     });
-        
+
                     // Resize the canvas dynamically
                     function resizeCanvas() {
                         const ratio = Math.max(window.devicePixelRatio || 1, 1);
                         const container = canvas.parentElement;
                         const oldData = signaturePad.toData(); // Save the signature data
-        
+
                         canvas.width = container.offsetWidth * ratio;
                         canvas.height = 200 * ratio; // Adjust height to 200px
                         const ctx = canvas.getContext('2d');
                         ctx.scale(ratio, ratio);
-        
+
                         // Restore the previous signature data
                         if (oldData.length > 0) {
                             signaturePad.fromData(oldData);
                         }
                     }
-        
+
                     // Initial resize and attach resize event
                     resizeCanvas();
                     window.addEventListener('resize', resizeCanvas);
-        
+
                     // Clear button functionality
                     clearButton.addEventListener('click', () => {
                         signaturePad.clear();
                     });
-        
+
                     return { signaturePad, hiddenInput };
                 }
-        
+
                 // Initialize signature pads for TL and Checker
                 const tlSignature = initializeSignaturePad('signature-pad', 'clear', 'signature'); // For Team Leader
                 const checkerSignature = initializeSignaturePad('signature-pad1', 'clear1', 'signature1'); // For Checker
-        
+
                 // Handle form submission
                 document.querySelector('#sik-form').addEventListener('submit', (e) => {
                     // Only set value if signature is not empty
@@ -789,7 +789,7 @@ Form Pengecekan ||
                     } else {
                         tlSignature.hiddenInput.value = ''; // Clear input if empty
                     }
-        
+
                     if (!checkerSignature.signaturePad.isEmpty()) {
                         checkerSignature.hiddenInput.value = checkerSignature.signaturePad.toDataURL();
                     } else {
@@ -800,7 +800,7 @@ Form Pengecekan ||
         </script>
         <button type="submit" class="btn btn-primary mb-5">Simpan</button>
 
-            
+
         @if($p->isComplete())
     <a href="{{route('Mapping.admin.prints',$p->no_gs)}}" class="btn btn-danger mb-5">Cetak</a>
 @else
