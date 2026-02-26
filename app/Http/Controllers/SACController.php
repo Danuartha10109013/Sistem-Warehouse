@@ -38,6 +38,38 @@ class SACController extends Controller
     return response()->json(['status' => false]);
 }
 
+    public function autofillKbi(Request $request)
+    {
+        $attribute = $request->attribute;
+
+        // Cari berdasarkan nomor coil di tabel khusus KBI
+        $data = SO_KBI::where('coil_no', $attribute)->first();
+
+        if ($data) {
+            $berat   = $data->delv_weight ?? 0;
+            $qtyScan = $data->weight_scan ?? 0;
+
+            return response()->json([
+                'status'       => true,
+                // kolom Qty di form diisi dari delv_weight
+                'qty'          => $berat,
+                // kolom Lokasi diisi dari storagebin_kbi
+                'lokasi'       => $data->storagebin_kbi,
+                // kolom Nama Barang diisi dari thicknes (sesuai permintaan)
+                'namabarang'   => $data->thicknes,
+                'keterangan'   => $data->keterangan,
+                'scanner'      => $data->scanner,
+                'storagebin'   => $data->storagebin_kbi,
+                'qty_scan'     => $qtyScan,
+                'weight_scan'  => $data->weight_scan,
+                'waktu_scan'   => $data->waktu_scan,
+                'selisih'      => (float)$berat - (float)$qtyScan,
+            ]);
+        }
+
+        return response()->json(['status' => false]);
+    }
+
     public function index ()
     {
         return redirect()->route('so.sparepart');
@@ -155,6 +187,58 @@ class SACController extends Controller
     }
 
 }
+
+    /**
+     * Simpan hasil scan / input manual khusus SO KBI.
+     */
+    public function storeKbi(Request $request)
+    {
+        $request->validate([
+            'attribute'  => 'required|string',
+            'qty'        => 'required|numeric',
+            'lokasi'     => 'required|string',
+            'namabarang' => 'required|string',
+        ]);
+
+        $coilNo = $request->attribute;
+
+        // Cari data SO_KBI berdasarkan coil_no
+        $data = SO_KBI::where('coil_no', $coilNo)->first();
+
+        if ($data) {
+            // Update data hasil scan
+            $data->coil_scan   = $coilNo;
+            $data->weight_scan = (float) $request->qty;
+            $data->storagebin_kbi = $request->lokasi;
+            $data->thicknes    = $request->namabarang;
+            $data->waktu_scan  = Carbon::now();
+            $data->scanner     = Auth::user()->name ?? null;
+
+            // Tambah / update keterangan jika ada input baru
+            if ($request->filled('keterangan')) {
+                $prefix = $data->keterangan ? $data->keterangan . "\n" : '';
+                $data->keterangan = $prefix . $request->keterangan;
+            }
+
+            $data->save();
+        } else {
+            // Jika coil belum ada di tabel SO_KBI, buat entri baru minimal
+            SO_KBI::create([
+                'date'          => Carbon::now(),
+                'coil_no'       => $coilNo,
+                'delv_weight'   => (float) $request->qty,
+                'storagebin_kbi'=> $request->lokasi,
+                'thicknes'      => $request->namabarang,
+                'coil_scan'     => $coilNo,
+                'weight_scan'   => (float) $request->qty,
+                'waktu_scan'    => Carbon::now(),
+                'scanner'       => Auth::user()->name ?? null,
+                'keterangan'    => $request->keterangan,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Data KBI berhasil disimpan');
+    }
 
     public function sparepart ()
     {

@@ -150,7 +150,9 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::get('/general-storage', [SACController::class, 'general'])->name('so.general');
         Route::get('/',[SACController::class,'index'])->name('so');
         Route::get('/so/autofill', [SACController::class, 'autofill'])->name('so.autofill');
+        Route::get('/so/autofill-kbi', [SACController::class, 'autofillKbi'])->name('so.autofill.kbi');
         Route::post('/so/import', [SACController::class, 'import'])->name('so.import');
+        Route::post('/kbi/store', [SACController::class, 'storeKbi'])->name('so.kbi.store');
         Route::get('/add',[SACController::class,'add'])->name('so.add');
         Route::post('/store',[SACController::class,'store'])->name('so.store');
         Route::delete('/delete/{id}',[SACController::class,'destroy'])->name('so.delete');

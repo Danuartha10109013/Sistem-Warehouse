@@ -57,7 +57,7 @@
                         <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
 
-                    <form action="{{ route('so.store') }}" method="POST">
+                    <form action="{{ route('so.kbi.store') }}" method="POST">
                         @csrf
 
                         <div class="modal-body">
@@ -174,7 +174,7 @@
 
 {{-- AUTOFILL KBI --}}
 <script>
-    const autofillUrl = "{{ route('so.autofill') }}";
+    const autofillUrl = "{{ route('so.autofill.kbi') }}";
 
     document.getElementById('attributeInputKBI').addEventListener('input', function () {
         let attr = this.value;
@@ -191,8 +191,21 @@
                     document.querySelector('#scanModalKBI input[name="lokasi"]').value = data.lokasi ?? '';
                     document.querySelector('#scanModalKBI input[name="namabarang"]').value = data.namabarang ?? '';
                     document.querySelector('#scanModalKBI textarea[name="keterangan"]').value = data.keterangan ?? '';
-                    warning.style.display = "block";
-                    if (submitBtn) submitBtn.disabled = true;
+
+                    const selisih = Number(data.selisih ?? 0);
+                    const sudahLengkap =
+                        data.scanner &&
+                        (data.weight_scan ?? null) !== null &&
+                        (data.waktu_scan ?? null) !== null &&
+                        selisih === 0;
+
+                    if (sudahLengkap) {
+                        warning.style.display = "block";
+                        if (submitBtn) submitBtn.disabled = true;
+                    } else {
+                        warning.style.display = "none";
+                        if (submitBtn) submitBtn.disabled = false;
+                    }
                 } else {
                     warning.style.display = "none";
                     if (submitBtn) submitBtn.disabled = false;
@@ -228,10 +241,20 @@
             {{ $data->whereNull('scanner')->count() }}
         </span>
         <span id="totalSudah" class="text-success" style="display:none;">
-            {{ $data->whereNotNull('scanner')->count() }}
+            {{ $data->filter(function ($d) {
+                if (!$d->scanner) return false;
+                $delv = (float) ($d->delv_weight ?? 0);
+                $scan = (float) ($d->weight_scan ?? 0);
+                return $delv === $scan;
+            })->count() }}
         </span>
         <span id="totalSelisih" class="text-warning" style="display:none;">
-            {{ $data->filter(fn($d) => $d->scanner && (float)($d->berat ?? 0) != (float)($d->qty_scan ?? 0))->count() }}
+            {{ $data->filter(function ($d) {
+                if (!$d->scanner) return false;
+                $delv = (float) ($d->delv_weight ?? 0);
+                $scan = (float) ($d->weight_scan ?? 0);
+                return $delv !== $scan;
+            })->count() }}
         </span>
     </div>
 
@@ -245,7 +268,8 @@
                         <th class="sortable">NO COIL</th>
                         <th class="sortable">Berat</th>
                         <th class="sortable">Lokasi</th>
-                        <th class="sortable">Layout</th>
+                        <!-- <th class="sortable">Layout</th> -->
+                        <th class="sortable">Ukuran</th>
                         <th class="col-scan sortable">Scanner</th>
                         <th class="col-scan sortable">Berat SO</th>
                         <th class="col-scan sortable">Selisih SO</th>
@@ -256,19 +280,23 @@
                 <tbody>
                     @foreach ($data as $d)
                     @php
-                        $isSelisih = $d->scanner && (float)($d->berat ?? 0) != (float)($d->qty_scan ?? 0);
+                        $hasScan  = !is_null($d->scanner);
+                        $delv     = (float)($d->delv_weight ?? 0);
+                        $scan     = (float)($d->weight_scan ?? 0);
+                        $isSelisih = $hasScan && $delv !== $scan;
+                        $isSudah   = $hasScan && !$isSelisih;
                     @endphp
-                    <tr class="{{ $d->scanner ? 'row-sudah' : 'row-belum' }} {{ $isSelisih ? 'row-selisih' : '' }}">
+                    <tr class="{{ $isSudah ? 'row-sudah' : '' }} {{ !$hasScan ? 'row-belum' : '' }} {{ $isSelisih ? 'row-selisih' : '' }}">
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $d->date }}</td>
                         <td>{{ $d->coil_no }}</td>
                         <td>{{ $d->delv_weight }}</td>
                         <td>{{ $d->storagebin_kbi }}</td>
-                        <td>{{ $d->storagebin_hasil ?? $d->storagebin ?? '-' }}</td>
+                        <td>{{ $d->thicknes }}</td>
                         <td class="col-scan">{{ $d->scanner ?? '-' }}</td>
-                        <td class="col-scan">{{ $d->scanner ? $d->qty_scan : '-' }}</td>
+                        <td class="col-scan">{{ $d->scanner ? $d->weight_scan : '-' }}</td>
                         <td class="col-scan">
-                            {{ $d->scanner ? ($d->berat - $d->qty_scan) : '-' }}
+                            {{ $d->scanner ? ($d->delv_weight - $d->weight_scan) : '-' }}
                         </td>
                         <td>{!! nl2br(e($d->keterangan)) !!}</td>
                     </tr>

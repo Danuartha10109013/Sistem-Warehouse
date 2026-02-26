@@ -72,7 +72,16 @@
 
                                 <p class="text-muted small">
                                     * File wajib format <strong>.xlsx</strong> atau <strong>.xls</strong><br>
-                                    <a href="{{asset('templateso.xls')}}"> Download Template</a>
+                                    <!-- <a href="{{asset('templateso.xls')}}"> Download Template</a> -->
+                                    @if(request()->routeIs('so.kbi'))
+    <a href="{{ asset('templatekbi.xls') }}" class="btn btn-success">
+        <i class="mdi mdi-download"></i> Download Template KBI
+    </a>
+@else
+    <a href="{{ asset('templateso.xls') }}" class="btn btn-primary">
+        <i class="mdi mdi-download"></i> Download Template
+    </a>
+@endif
                                 </p>
 
                             </div>
