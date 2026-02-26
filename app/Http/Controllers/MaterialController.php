@@ -27,7 +27,7 @@ class MaterialController extends Controller
     public function index_crc(Request $request) {
         $searchTerm = $request->input('search');
         $sort = $request->get('sort', 'id'); // Default sort by 'id'
-        $direction = $request->get('direction', 'asc'); // Default direction 'asc'
+        $direction = $request->get('direction', 'desc'); // Default direction 'asc'
         $start = $request->get('start', null);
         $end = $request->get('end', null);
         // Fetch data with search and sorting applied
@@ -83,6 +83,7 @@ class MaterialController extends Controller
             'shift_leader' => 'required|string',
             'date' => 'required|date',
             'supplier' => 'required|array',
+            'metode_unloading' => 'required|string',
             'ket_awal' => 'nullable|string',
             'cuaca' => 'nullable|string',
             'sesuai' => 'nullable|string',
@@ -102,6 +103,7 @@ class MaterialController extends Controller
             'foto7' => 'nullable|array',
             'ket_radiasi' => 'nullable',
             'radiasi' => 'required',
+            'note_keseluruhan' => 'nullable|string',
             'time' => 'required',
             'time_last' => 'required',
         ]);
@@ -111,6 +113,7 @@ class MaterialController extends Controller
             'shift_leader' => $request->input('shift_leader'),
             'date' => $request->input('date'),
             'supplier' => json_encode($request->input('supplier')), // Convert array to JSON
+            'metode_unloading' => $request->input('metode_unloading'),
             'ket_awal' => $request->input('ket_awal'),
             'cuaca' => $request->input('cuaca'),
             'keterangan' => $request->input('keterangan'),
@@ -133,6 +136,7 @@ class MaterialController extends Controller
             'perganjalan' => $request->input('perganjalan'),
             'time' => $request->input('time'),
             'time_last' => $request->input('time_last'),
+            'note_keseluruhan' => $request->input('note_keseluruhan'),
         ];
 
         $crc = CrcM::create($data);

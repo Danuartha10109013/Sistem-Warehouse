@@ -3,7 +3,7 @@
 namespace App\Imports;
 
 use App\Models\SAC;
-use App\Models\KBI;
+use App\Models\SO_KBI;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -37,7 +37,7 @@ class SACImport implements ToModel, WithHeadingRow
 
         } elseif ($this->kategori === "KBI") {
 
-            return new KBI([
+            return new SO_KBI([
                 'date'          => isset($row['date'])
                                    ? Date::excelToDateTimeObject($row['date'])
                                    : null,
@@ -47,7 +47,8 @@ class SACImport implements ToModel, WithHeadingRow
                 'delv_weight'    => $row['delv_weight'] ?? null,
                 'thick'         => $row['thick'] ?? null,
                 'width_batch'   => $row['width_batch'] ?? null,
-                'thicknes'   => $row['thick'] + " X " + $row['width_batch'],
+                'thicknes' => $row['thick'] . " X " . $row['width_batch'],
+                // 'thicknes'   => $row['thick'] + " X " + $row['width_batch'],
                 'storagebin_kbi'   => $row['storagebin_kbi'] ?? null,
                 'status'   => 'belum scan',
             ]);

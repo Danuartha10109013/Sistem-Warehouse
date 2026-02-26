@@ -11,7 +11,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
-                text: '{{ session('success') }}',
+                text: @json(session('success')),
                 showConfirmButton: false,
                 timer: 1700
             })
@@ -23,7 +23,7 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                html: `{!! implode('<br>', $errors->all()) !!}`,
+                html: @json(implode('<br>', $errors->all())),
             })
         </script>
         @endif
@@ -197,6 +197,12 @@
                     warning.style.display = "none";
                     if (submitBtn) submitBtn.disabled = false;
                 }
+            })
+            .catch(() => {
+                const warning = document.getElementById("scannerWarningKBI");
+                const submitBtn = document.getElementById("submitBtnKBI");
+                if (warning) warning.style.display = "none";
+                if (submitBtn) submitBtn.disabled = false;
             });
     });
 </script>
@@ -255,9 +261,9 @@
                     <tr class="{{ $d->scanner ? 'row-sudah' : 'row-belum' }} {{ $isSelisih ? 'row-selisih' : '' }}">
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $d->date }}</td>
-                        <td>{{ $d->kpc }}</td>
-                        <td>{{ $d->berat }}</td>
-                        <td>{{ $d->lokasi }}</td>
+                        <td>{{ $d->coil_no }}</td>
+                        <td>{{ $d->delv_weight }}</td>
+                        <td>{{ $d->storagebin_kbi }}</td>
                         <td>{{ $d->storagebin_hasil ?? $d->storagebin ?? '-' }}</td>
                         <td class="col-scan">{{ $d->scanner ?? '-' }}</td>
                         <td class="col-scan">{{ $d->scanner ? $d->qty_scan : '-' }}</td>
@@ -275,90 +281,81 @@
 
 <!-- JAVASCRIPT SWITCH MODE -->
 <script>
-function aktifkanModeBelum() {
-    document.getElementById("btnBelum").classList.remove("btn-outline-danger");
-    document.getElementById("btnBelum").classList.add("btn-danger");
-    document.getElementById("btnSudah").classList.remove("btn-success");
-    document.getElementById("btnSudah").classList.add("btn-outline-success");
-    document.getElementById("btnSelisih").classList.remove("btn-warning");
-    document.getElementById("btnSelisih").classList.add("btn-outline-warning");
-    document.querySelectorAll(".col-scan").forEach(col => col.style.display = "none");
-    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "table-row");
-    document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "none");
-    const totalBelum = document.getElementById("totalBelum");
-    const totalSudah = document.getElementById("totalSudah");
-    const totalSelisih = document.getElementById("totalSelisih");
-    if (totalBelum && totalSudah && totalSelisih) {
-        totalBelum.style.display = "inline";
-        totalSudah.style.display = "none";
-        totalSelisih.style.display = "none";
+    function aktifkanModeBelum() {
+        document.getElementById("btnBelum").classList.remove("btn-outline-danger");
+        document.getElementById("btnBelum").classList.add("btn-danger");
+        document.getElementById("btnSudah").classList.remove("btn-success");
+        document.getElementById("btnSudah").classList.add("btn-outline-success");
+        document.getElementById("btnSelisih").classList.remove("btn-warning");
+        document.getElementById("btnSelisih").classList.add("btn-outline-warning");
+        document.querySelectorAll(".col-scan").forEach(col => col.style.display = "none");
+        document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
+        document.querySelectorAll(".row-belum").forEach(r => r.style.display = "table-row");
+        document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "none");
+        const totalBelum = document.getElementById("totalBelum");
+        const totalSudah = document.getElementById("totalSudah");
+        const totalSelisih = document.getElementById("totalSelisih");
+        if (totalBelum && totalSudah && totalSelisih) {
+            totalBelum.style.display = "inline";
+            totalSudah.style.display = "none";
+            totalSelisih.style.display = "none";
+        }
     }
-}
 
-window.addEventListener("load", aktifkanModeBelum);
-
-document.getElementById("btnBelum").addEventListener("click", function () {
-    this.classList.remove("btn-outline-danger");
-    this.classList.add("btn-danger");
-    document.getElementById("btnSudah").classList.remove("btn-success");
-    document.getElementById("btnSudah").classList.add("btn-outline-success");
-    document.getElementById("btnSelisih").classList.remove("btn-warning");
-    document.getElementById("btnSelisih").classList.add("btn-outline-warning");
-    document.querySelectorAll(".col-scan").forEach(col => col.style.display = "none");
-    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "table-row");
-    document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "none");
-    const totalBelum = document.getElementById("totalBelum");
-    const totalSudah = document.getElementById("totalSudah");
-    const totalSelisih = document.getElementById("totalSelisih");
-    if (totalBelum && totalSudah && totalSelisih) {
-        totalBelum.style.display = "inline";
-        totalSudah.style.display = "none";
-        totalSelisih.style.display = "none";
+    function aktifkanModeSudah() {
+        document.getElementById("btnSudah").classList.remove("btn-outline-success");
+        document.getElementById("btnSudah").classList.add("btn-success");
+        document.getElementById("btnBelum").classList.remove("btn-danger");
+        document.getElementById("btnBelum").classList.add("btn-outline-danger");
+        document.getElementById("btnSelisih").classList.remove("btn-warning");
+        document.getElementById("btnSelisih").classList.add("btn-outline-warning");
+        document.querySelectorAll(".col-scan").forEach(col => col.style.display = "");
+        document.querySelectorAll(".row-belum").forEach(r => r.style.display = "none");
+        document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "table-row");
+        const totalBelum = document.getElementById("totalBelum");
+        const totalSudah = document.getElementById("totalSudah");
+        const totalSelisih = document.getElementById("totalSelisih");
+        if (totalBelum && totalSudah && totalSelisih) {
+            totalBelum.style.display = "none";
+            totalSudah.style.display = "inline";
+            totalSelisih.style.display = "none";
+        }
     }
-});
 
-document.getElementById("btnSudah").addEventListener("click", function () {
-    this.classList.remove("btn-outline-success");
-    this.classList.add("btn-success");
-    document.getElementById("btnBelum").classList.remove("btn-danger");
-    document.getElementById("btnBelum").classList.add("btn-outline-danger");
-    document.getElementById("btnSelisih").classList.remove("btn-warning");
-    document.getElementById("btnSelisih").classList.add("btn-outline-warning");
-    document.querySelectorAll(".col-scan").forEach(col => col.style.display = "");
-    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "table-row");
-    const totalBelum = document.getElementById("totalBelum");
-    const totalSudah = document.getElementById("totalSudah");
-    const totalSelisih = document.getElementById("totalSelisih");
-    if (totalBelum && totalSudah && totalSelisih) {
-        totalBelum.style.display = "none";
-        totalSudah.style.display = "inline";
-        totalSelisih.style.display = "none";
+    function aktifkanModeSelisih() {
+        document.getElementById("btnSelisih").classList.remove("btn-outline-warning");
+        document.getElementById("btnSelisih").classList.add("btn-warning");
+        document.getElementById("btnBelum").classList.remove("btn-danger");
+        document.getElementById("btnBelum").classList.add("btn-outline-danger");
+        document.getElementById("btnSudah").classList.remove("btn-success");
+        document.getElementById("btnSudah").classList.add("btn-outline-success");
+        document.querySelectorAll(".col-scan").forEach(col => col.style.display = "");
+        document.querySelectorAll(".row-belum").forEach(r => r.style.display = "none");
+        document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
+        document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "table-row");
+        const totalBelum = document.getElementById("totalBelum");
+        const totalSudah = document.getElementById("totalSudah");
+        const totalSelisih = document.getElementById("totalSelisih");
+        if (totalBelum && totalSudah && totalSelisih) {
+            totalBelum.style.display = "none";
+            totalSudah.style.display = "none";
+            totalSelisih.style.display = "inline";
+        }
     }
-});
 
-document.getElementById("btnSelisih").addEventListener("click", function () {
-    this.classList.remove("btn-outline-warning");
-    this.classList.add("btn-warning");
-    document.getElementById("btnBelum").classList.remove("btn-danger");
-    document.getElementById("btnBelum").classList.add("btn-outline-danger");
-    document.getElementById("btnSudah").classList.remove("btn-success");
-    document.getElementById("btnSudah").classList.add("btn-outline-success");
-    document.querySelectorAll(".col-scan").forEach(col => col.style.display = "");
-    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "table-row");
-    const totalBelum = document.getElementById("totalBelum");
-    const totalSudah = document.getElementById("totalSudah");
-    const totalSelisih = document.getElementById("totalSelisih");
-    if (totalBelum && totalSudah && totalSelisih) {
-        totalBelum.style.display = "none";
-        totalSudah.style.display = "none";
-        totalSelisih.style.display = "inline";
-    }
-});
+    window.addEventListener("load", aktifkanModeBelum);
+
+    document.getElementById("btnBelum").addEventListener("click", function () {
+        aktifkanModeBelum();
+    });
+
+    document.getElementById("btnSudah").addEventListener("click", function () {
+        aktifkanModeSudah();
+    });
+
+    document.getElementById("btnSelisih").addEventListener("click", function () {
+        aktifkanModeSelisih();
+    });
 </script>
 
 </div>

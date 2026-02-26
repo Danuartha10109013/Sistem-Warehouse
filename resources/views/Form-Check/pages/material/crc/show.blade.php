@@ -177,6 +177,10 @@
                             <label>Jumlah</label>
                             <input type="text" class="form-control" value="{{ $submission->ket_awal ?? '-' }}" readonly>
                         </div>
+                        <div class="form-group">
+                            <label>Metode Unloading</label>
+                            <input type="text" class="form-control" value="{{ $submission->metode_unloading ?? '-' }}" readonly>
+                        </div>
 
                         <div class="form-group">
                             <label>Cuaca</label>
@@ -459,6 +463,16 @@
                         <div class="form-group">
                             <label><strong>Ban Di Ganjal</strong></label>
                             <input type="text" class="form-control" value="{{ $submission->perganjalan ?? '-' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label><strong>Keterangan Ban Di Ganjal</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->ket_perganjalan ?? '-' }}" readonly>
+                        </div>
+
+                                <hr>
+                        <div class="form-group">
+                            <label><strong>Note Keseluruhan</strong></label>
+                            <input type="text" class="form-control" value="{{ $submission->note_keseluruhan ?? '-' }}" readonly>
                         </div>
 
                     </div>

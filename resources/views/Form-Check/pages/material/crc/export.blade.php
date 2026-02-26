@@ -22,6 +22,7 @@
                 <th>Nomor Dokumen</th>
                 <th>Supplier</th>
                 <th>Jumlah</th>
+                <th>Metode Unloading</th>
                 <th>Cuaca</th>
                 <th>Keterangan</th>
                 <th>Barang Sesuai Surat Jalan</th>
@@ -39,6 +40,8 @@
                 <th>Menggunakan Side wall</th>
                 <th>Keterangan</th>
                 <th>Ban Di Ganjal</th>
+                <th>Keterangan Ban Di Ganjal</th>
+                <th>Note Keseluruhan</th>
             </tr>
         </thead>
         <tbody>
@@ -73,6 +76,7 @@
                     <td>{{$d->shift_leader}}</td>
                     <td>{{$d->supplier}}</td>
                     <td>{{$d->ket_awal}}</td>
+                    <td>{{$d->metode_unloading}}</td>
                     <td>{{$d->cuaca}}</td>
                     <td>{{$d->keterangan}}</td>
                     <td>{{$d->sesuai}}</td>
@@ -90,6 +94,8 @@
                     <td>{{$d->wall}}</td>
                     <td>{{$d->keterangan7}}</td>
                     <td>{{$d->perganjalan}}</td>
+                    <td>{{$d->ket_perganjalan}}</td>
+                    <td>{{$d->note_keseluruhan}}</td>
                 </tr>
             @endforeach
         </tbody>

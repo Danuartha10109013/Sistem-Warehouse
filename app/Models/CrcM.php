@@ -17,10 +17,11 @@ class CrcM extends Model
         'shift_leader',
         'date',
         'supplier',
+        'metode_unloading',
         'ket_awal',
         'cuaca',
         'keterangan',
-        'sesuai',
+        'sesuai',   
         'keterangan1',
         'baik',
         'keterangan2',
@@ -39,6 +40,7 @@ class CrcM extends Model
         'ket_radiasi',
         'time',
         'time_last',
+        'note_keseluruhan',
     ];
 
     // You can add relationships here if necessary, for example:

@@ -115,6 +115,17 @@
                 <h4 class="card-title">From Daily Checklist Kedatangan Material  FM.WH.02.01</h4>
                 <p class="card-description">Form checklist ini dibuat untuk memastikan kondisi material yang datang dalam kondisi baik (tanpa cacat) sesuai dengan spesifikasi yang telah di tentukan sebelumnya. <br>
                     <br>Serta untuk melihat kesesuaian material yang ada pada surat jalan dengan kondisi fisiknya.</p>
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Terjadi kesalahan.</strong> Mohon periksa kembali isian form Anda.
+                            <ul class="mt-2 mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     @if (Auth::user()->role == 0)
                     <form action="{{route('Form-Check.admin.crc.create')}}" method="POST" enctype="multipart/form-data">
                     @else
@@ -155,6 +166,69 @@
                             <label for="exampleInputPassword1">KETERANGAN</label>
                             <input type="text" class="form-control" name="ket_radiasi" id="exampleInputPassword1" placeholder="(Gunakan titik bukan koma)">
                         </div>
+                        <div class="mb-4 metode-unloading-group">
+    <label class="form-label fw-bold">
+        Metode Unloading <span class="text-danger">*</span>
+    </label>
+
+    <div class="row g-3 mt-1">
+
+        <!-- Forklift -->
+        <div class="col-md-6">
+            <input type="radio" class="btn-check" name="metode_unloading" 
+                   id="forklift" value="Forklift" required>
+            <label class="card unloading-card border-2 shadow-sm h-100 text-center p-4"
+                   for="forklift">
+                <div class="mb-2">
+                    <i class="mdi mdi-forklift display-5 text-primary"></i>
+                </div>
+                <h5 class="mb-1">Forklift</h5>
+                <small class="text-muted">Unloading menggunakan forklift</small>
+            </label>
+        </div>
+
+        <!-- Crane -->
+        <div class="col-md-6">
+            <input type="radio" class="btn-check" name="metode_unloading" 
+                   id="crane" value="Crane" required>
+            <label class="card unloading-card border-2 shadow-sm h-100 text-center p-4"
+                   for="crane">
+                <div class="mb-2">
+                    <i class="mdi mdi-crane display-5 text-success"></i>
+                </div>
+                <h5 class="mb-1">Crane</h5>
+                <small class="text-muted">Unloading menggunakan crane</small>
+            </label>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .metode-unloading-group .btn-check {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .metode-unloading-group .unloading-card {
+        cursor: pointer;
+        transition: 0.2s ease-in-out;
+        border-color: #dee2e6;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .metode-unloading-group .unloading-card:hover {
+        transform: scale(1.02);
+    }
+
+    .metode-unloading-group .btn-check:checked + .unloading-card {
+        border-color: #0d6efd !important;
+        background-color: #f0f8ff !important;
+        box-shadow: 0 0 0 0.2rem rgba(0, 22, 54, 0.25);
+        transform: scale(1.02);
+    }
+</style>
                 </div>
                 <hr class="mt-2">
                     <div class="form-group">
@@ -505,6 +579,10 @@
 
 
 
+                      <div class="form-group mb-3">
+                          <label for="noteKeseluruhan">Note Keseluruhan</label>
+                          <textarea class="form-control" name="note_keseluruhan" id="noteKeseluruhan" rows="3" placeholder="Masukkan keterangan umum/keseluruhan terkait pengecekan dan kondisi material"></textarea>
+                      </div>
                       <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
                       <button class="btn btn-light">Cancel</button>
 

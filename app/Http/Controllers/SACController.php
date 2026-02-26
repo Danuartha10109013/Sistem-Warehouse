@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Imports\SACImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\SAC;
+use App\Models\SO_KBI;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -177,8 +178,7 @@ class SACController extends Controller
             return redirect()->route('login')->with('error', 'Silahkan Login terlebih dahulu');
         }
 
-        $data = SAC::where('date', '>=', Carbon::now()->subMonth())
-            ->where('jenis', 'KRAKATAU BAJA INDUSTRI')
+        $data = SO_KBI::where('date', '>=', Carbon::now()->subMonth())
             ->orderBy('created_at', 'desc')
             ->get();
 

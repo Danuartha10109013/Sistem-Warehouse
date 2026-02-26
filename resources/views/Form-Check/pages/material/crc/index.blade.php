@@ -61,6 +61,12 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Recent Response</h4>
+                @if(session('succes') || session('success'))
+                  <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('succes') ?? session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                @endif
                 <div class="table-responsive">
                   <table class="table">
                     <thead>
