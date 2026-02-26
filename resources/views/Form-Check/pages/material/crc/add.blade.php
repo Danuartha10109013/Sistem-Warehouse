@@ -580,7 +580,7 @@
 
 
                       <div class="form-group mb-3">
-                          <label for="noteKeseluruhan">Note Keseluruhan</label>
+                          <label for="noteKeseluruhan">Note</label>
                           <textarea class="form-control" name="note_keseluruhan" id="noteKeseluruhan" rows="3" placeholder="Masukkan keterangan umum/keseluruhan terkait pengecekan dan kondisi material"></textarea>
                       </div>
                       <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
