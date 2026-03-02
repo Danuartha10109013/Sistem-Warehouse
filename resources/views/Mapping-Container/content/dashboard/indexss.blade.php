@@ -65,6 +65,7 @@
               {{-- <th style="color: black" class="text-truncate">No PO</th> --}}
               {{-- <th style="color: black" class="text-truncate">No Seal</th> --}}
               <th style="color: black" class="text-truncate">No Mobil</th>
+              <th style="color: black" class="text-truncate">Urutan</th>
               <th style="color: black" class="text-center">Action</th>
             </tr>
           </thead>
@@ -78,6 +79,7 @@
               {{-- <td style="color: black" class="text-truncate">{{$c->no_po}}</td> --}}
               {{-- <td style="color: black" class="text-truncate">{{$c->no_seal}}</td> --}}
               <td style="color: black" class="text-truncate">{{$c->no_mobil}}</td>
+              <td style="color: black" class="text-truncate">{{$c->container}}</td>
               <td class="text-center">
                 @if ($c->tare == null || $c->no_container == null || $c->tgl_gs == null || $c->no_mobil == null || $c->kepada == null)
                 <a href="{{route('Mapping.admin.create-shipment',$c->no_gs)}}" class="btn btn-secondary">Lengkapi Data</a>

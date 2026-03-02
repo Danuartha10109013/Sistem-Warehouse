@@ -76,6 +76,7 @@ class DashboardController extends Controller
                 'no_seal' => 'nullable|string',
                 'no_mobil' => 'nullable|string',
                 'forwarding' => 'nullable|string',
+                'container' => 'nullable|string',
                 'kepada' => 'nullable|string',
                 'alamat_pengirim' => 'nullable|string',
                 'alamat_tujuan' => 'nullable|string',
@@ -103,6 +104,7 @@ class DashboardController extends Controller
             'no_seal' => 'nullable|string',
             'no_mobil' => 'nullable|string',
             'forwarding' => 'nullable|string',
+            'container' => 'nullable|string',
             'kepada' => 'nullable|string',
             'alamat_pengirim' => 'nullable|string',
             'alamat_tujuan' => 'nullable|string',
@@ -121,6 +123,7 @@ class DashboardController extends Controller
         $shipment->no_seal = $request->no_seal;
         $shipment->no_mobil = $request->no_mobil;
         $shipment->forwarding = $request->forwarding;
+        $shipment->container = $request->container;
         $shipment->kepada = $request->kepada;
         $shipment->alamat_pengirim = $request->alamat_pengirim;
         $shipment->alamat_tujuan = $request->alamat_tujuan;

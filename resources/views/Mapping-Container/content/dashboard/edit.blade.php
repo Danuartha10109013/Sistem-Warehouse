@@ -69,6 +69,16 @@
                    required>
         </div>
 
+        <!-- Container -->
+        <div class="mb-3">
+            <label class="form-label"><b>Container</b></label>
+            <input type="text"
+                   class="form-control"
+                   name="container"
+                   value="{{ old('container', $data->container) }}"
+                   required>
+        </div>
+
         <!-- Customer -->
         <div class="mb-3">
             <label class="form-label"><b>Customer</b></label>

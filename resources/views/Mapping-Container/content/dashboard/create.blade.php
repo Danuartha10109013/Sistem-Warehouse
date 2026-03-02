@@ -48,6 +48,11 @@
             <input type="text" class="form-control" id="Kepada" placeholder="Input Kepada" name="kepada" value="{{ old('kepada') }}" required>
         </div>
 
+        <div class="mb-3">
+            <label for="container" class="form-label"><b>Container</b></label>
+            <input type="text" class="form-control" id="container" placeholder="Input Container" name="container" value="{{ old('container') }}" required>
+        </div>
+
         <button type="submit" class="btn btn-primary">Simpan</button>
     </form>
 </div>

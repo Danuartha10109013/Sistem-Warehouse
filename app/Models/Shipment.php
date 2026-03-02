@@ -23,6 +23,7 @@ class Shipment extends Model
         'no_seal',
         'no_mobil',
         'forwarding',
+        'container',
         'kepada',
         'alamat_pengirim',
         'alamat_tujuan',

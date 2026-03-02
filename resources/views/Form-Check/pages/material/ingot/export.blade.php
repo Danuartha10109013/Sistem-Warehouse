@@ -13,6 +13,11 @@
             <tr>
                 <th>TimeStamp</th>
                 <th>Movement Date</th>
+                <th>Awal Bongkar</th>
+                <th>Akhir Bongkar</th>
+                <th>Total Time (Menit)</th>
+                <th>Radiasi</th>
+                <th>Ket Radiasi</th>
                 <th>Responden</th>
                 <th>No Dokumen</th>
                 <th>Supplier</th>
@@ -32,6 +37,27 @@
             <tr>
                 <td>{{ $d->created_at }}</td>
                 <td>{{ $d->date }}</td>
+                <td>{{ $d->time_awal_bongkar }}</td>
+                <td>{{ $d->time_akhir_bongkar }}</td>
+                <td>
+                    @php
+                        $totalTime = null;
+                        if ($d->time_awal_bongkar && $d->time_akhir_bongkar) {
+                            $start = \DateTime::createFromFormat('H:i:s', $d->time_awal_bongkar) ?: \DateTime::createFromFormat('H:i', $d->time_awal_bongkar);
+                            $end = \DateTime::createFromFormat('H:i:s', $d->time_akhir_bongkar) ?: \DateTime::createFromFormat('H:i', $d->time_akhir_bongkar);
+                            if ($start && $end) {
+                                if ($end < $start) $end->modify('+1 day');
+                                $totalTime = (int)(($end->getTimestamp() - $start->getTimestamp()) / 60);
+                            }
+                        }
+                    @endphp
+                    {{ $totalTime !== null ? $totalTime : '-' }}
+                </td>
+                <td>{{ $d->radiasi }}</td>
+                <td>{{ $d->ket_radiasi }}</td>
+                    
+
+                <td>{{ $d->time_awal_bongkar }}</td>
                 <td>
                     @php
                         $name = \App\Models\User::where('id',$d->user_id)->value('name');
