@@ -71,7 +71,7 @@
 
         <!-- Container -->
         <div class="mb-3">
-            <label class="form-label"><b>Container</b></label>
+            <label class="form-label"><b>Urutan Container</b></label>
             <input type="text"
                    class="form-control"
                    name="container"

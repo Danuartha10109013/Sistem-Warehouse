@@ -49,7 +49,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="container" class="form-label"><b>Container</b></label>
+            <label for="container" class="form-label"><b>Urutan Container</b></label>
             <input type="text" class="form-control" id="container" placeholder="Input Container" name="container" value="{{ old('container') }}" required>
         </div>
 
