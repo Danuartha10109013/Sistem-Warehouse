@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <title>FM.WH.02.02 - CEKLIST KEDATANGAN RAW MATERIAL</title>
 <style>
-  @page { 
-    size: A4; 
+  @page {
+    size: A4;
     margin: 20mm;
   }
   body {
@@ -17,7 +17,7 @@
     padding: 0;
     position: relative;
   }
-  
+
   /* Watermark STOP SUAP - Background transparan di tengah dokumen */
   .stop-suap-watermark {
     position: fixed;
@@ -34,7 +34,7 @@
     z-index: 1;
     pointer-events: none;
   }
-  
+
   @media print {
     .stop-suap-watermark {
       position: absolute;
@@ -50,7 +50,7 @@
       color-adjust: exact;
     }
   }
-  
+
   .page {
     width: 210mm;
     min-height: 297mm;
@@ -134,19 +134,19 @@
     font-size: 11px;
     margin-top: 10px;
   }
-  
+
   /* Memastikan semua konten di atas watermark */
   header, table, .notes, .section-title, .signature-block {
     position: relative;
     z-index: 3;
     background: transparent;
   }
-  
+
   /* Memastikan teks tetap jelas dan terbaca */
   header, table th, table td, .notes, .section-title, .signature {
     color: #000;
   }
-  
+
   table {
     background-color: transparent;
   }
@@ -242,7 +242,7 @@
       @endif
     </tr>
     <tr>
-      <td style="border: none">Awal Muat</td>
+      <td style="border: none">Awal Bongkar</td>
       @if($submission->time)
       <td width="25%" style="border: none">:
         <span style="text-decoration: underline;font-weight: bold">
@@ -252,7 +252,7 @@
       @else
       <td width="25%" style="border: none">: ______________________</td>
       @endif
-      <td style="border: none">Akhir Muat</td>
+      <td style="border: none">Akhir Bongkar</td>
       @if($submission->time_last)
       <td width="25%" style="border: none">:
         <span style="text-decoration: underline;font-weight: bold">
