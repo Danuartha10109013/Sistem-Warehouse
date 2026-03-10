@@ -1,6 +1,6 @@
 @extends('so.main')
 @section('title')
-     SO BAHAN BAKU
+     SO BB BJ BJS
 @endsection
 @section('content')
 
@@ -32,7 +32,9 @@
     <!-- Page Title -->
     <div class="row mb-4 mt-4">
         <div class="col-12 text-center">
-            <h3 class="m-0 fw-bold text-dark">STOCK OPNAME BAHAN BAKU</h3>
+            <h3 class="m-0 fw-bold text-dark">
+                STOCK OPNAME BB BJ BJS
+            </h3>
         </div>
     </div>
     <!-- Action Buttons + Search -->
@@ -126,7 +128,20 @@
                 <label class="fw-bold mb-2 d-block">Layout / Storagebin</label>
                 <div class="row g-2 align-items-center">
                     <div class="col-md-3">
-                        <input type="text" class="form-control rounded-pill" id="layoutPrefix" value="WH-L08-BB" readonly>
+                        <select id="layoutPrefix" class="form-select rounded-pill">
+                            <!-- <option value="-" disabled selected>Pilih Layout</option> -->
+                            <option value="WH-L08">WH-L08</option>
+                            <option value="WH-L08-SP">WH-L08-SP</option>
+                            <option value="WH-L08-SP TRANSIT 1">WH-L08-SP TRANSIT 1</option>
+                            <option value="WH-L03">WH-L03</option>
+                            <option value="WH-L03-BB TRANSIT F">WH-L03-BB TRANSIT F</option>
+                            <option value="WH-L03-BB RESIN SISA">WH-L03-BB RESIN SISA</option>
+                            <option value="WH-L03-BB INGOT POT">WH-L03-BB INGOT POT</option>
+                            <option value="WH-L03-BB CRC SISA/SKIP">WH-L03-BB CRC SISA/SKIP</option>
+                            <option value="WH-L03B TRANSIT">WH-L03B TRANSIT</option>
+                            <option value="WH-TATASENTOSA">WH-TATASENTOSA</option>
+                            <option value="WH-TATASENTOSA-BJ TRANSIT 1">WH-TATASENTOSA-BJ TRANSIT 1</option>
+                        </select>
                     </div>
                     <div class="col-md-2">
                         <input type="text" class="form-control rounded-pill" id="layoutCol1" placeholder="Kolom 1 (contoh: A)">
@@ -298,6 +313,7 @@
                 const layoutInput = document.getElementById("layoutValue");
                 const updateLayoutFromStoragebin = window.__updateLayoutFromStoragebin;
                 const buildLayout = window.__buildLayout;
+                const qtyInput = document.querySelector('input[name="qty"]');
 
                 if (data.status === true) {
 
@@ -306,6 +322,14 @@
                     document.querySelector('input[name="namabarang"]').value = data.namabarang ?? '';
 
                     document.querySelector('textarea[name="keterangan"]').value = '';
+
+                    // Batasi qty input agar tidak melebihi sisa qty
+                    const totalQty = typeof data.qty === 'number' ? data.qty : parseFloat(data.qty ?? 0);
+                    const qtyScan = typeof data.qty_scan === 'number' ? data.qty_scan : parseFloat(data.qty_scan ?? 0);
+                    let maxAllowed = totalQty - qtyScan;
+                    if (!Number.isFinite(maxAllowed)) maxAllowed = 0;
+                    if (maxAllowed < 0) maxAllowed = 0;
+                    if (qtyInput) qtyInput.max = String(maxAllowed);
 
                     if (data.storagebin) {
                         if (typeof updateLayoutFromStoragebin === 'function') {
@@ -355,6 +379,7 @@
                     warning.style.display = "none";
                     submitBtn.disabled = false;
                     submitBtn.style.opacity = "1";
+                    if (qtyInput) qtyInput.removeAttribute('max');
                 }
             })
             .catch(err => console.error("Autofill error:", err));
@@ -362,12 +387,54 @@
 
 </script>
 
+<script>
+    // Validasi sisi client: cegah input qty > max (sisa) dan tampilkan warning
+    document.addEventListener('DOMContentLoaded', () => {
+        const qtyInput = document.querySelector('input[name="qty"]');
+        const warning = document.getElementById("scannerWarning");
+        const submitBtn = document.getElementById("submitBtn");
 
-        <div class="col-12 col-md-3">
-            <!-- Export -->
-        <button id="exportExcel" class="btn btn-success mb-3">
-           <i class="fa fa-download"></i> Export to Excel
-        </button>
+        if (!qtyInput) return;
+
+        qtyInput.addEventListener('input', () => {
+            const maxAttr = qtyInput.getAttribute('max');
+            if (!maxAttr) return; // max hanya aktif jika data ditemukan dari autofill
+
+            const max = parseFloat(maxAttr);
+            const val = parseFloat(qtyInput.value || '0');
+            if (!Number.isFinite(max) || !Number.isFinite(val)) return;
+
+            if (val > max) {
+                qtyInput.value = String(max);
+                if (warning) {
+                    warning.textContent = `Qty melebihi sisa yang boleh di-scan (${max}).`;
+                    warning.style.display = "block";
+                }
+            }
+
+            if (submitBtn) {
+                // jika max 0, otomatis disable
+                if (max <= 0) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = "0.4";
+                    submitBtn.style.cursor = "not-allowed";
+                }
+            }
+        });
+    });
+</script>
+
+
+        <div class="col-12 col-md-3 d-flex gap-2 align-items-start">
+            <!-- Export (yang tampil) -->
+            <button id="exportExcel" class="btn btn-success mb-3">
+                <i class="fa fa-download"></i> Export 
+            </button>
+
+            <!-- Export (semua data) -->
+            <button id="exportExcelAll" class="btn btn-outline-success mb-3">
+                <i class="fa fa-download"></i> Export All
+            </button>
         </div>
 
         {{-- export excel --}}
@@ -376,7 +443,7 @@
                 let table = document.getElementById("dataTable");
                 let tableHTML = table.outerHTML.replace(/ /g, '%20');
 
-                let filename = "SO_BAHAN_BAKU_" + new Date().toISOString().slice(0,10) + ".xls";
+                let filename = "SO_{{ str_replace(' ', '_', $jenis ?? 'BAHAN BAKU') }}_" + new Date().toISOString().slice(0,10) + ".xls";
 
                 let excelContent = `
                     <html xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -403,6 +470,60 @@
                 a.click();
 
                 URL.revokeObjectURL(url);
+            });
+        </script>
+
+        <script>
+            function buildExcelContentFromTable(tableEl) {
+                return `
+                    <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                        xmlns:x="urn:schemas-microsoft-com:office:excel"
+                        xmlns="http://www.w3.org/TR/REC-html40">
+                    <head>
+                        <meta charset="UTF-8">
+                    </head>
+                    <body>
+                        ${tableEl.outerHTML}
+                    </body>
+                    </html>
+                `;
+            }
+
+            function downloadExcel(filename, excelContent) {
+                let blob = new Blob([excelContent], { type: "application/vnd.ms-excel" });
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            document.getElementById("exportExcelAll").addEventListener("click", function () {
+                const table = document.getElementById("dataTable");
+                if (!table) return;
+
+                // clone tabel, lalu paksa semua baris & kolom tampil (abaikan filter/search)
+                const clone = table.cloneNode(true);
+
+                // tampilkan semua kolom scan
+                clone.querySelectorAll(".col-scan").forEach(el => {
+                    el.style.display = "";
+                });
+
+                // tampilkan semua row (jika ada yang di-hide dengan display:none)
+                clone.querySelectorAll("tbody tr").forEach(tr => {
+                    tr.style.display = "table-row";
+                });
+
+                // juga bersihkan style display di parent cell/header jika ada
+                clone.querySelectorAll("[style]").forEach(el => {
+                    if (el.style && el.style.display === "none") el.style.display = "";
+                });
+
+                const filename = "SO_{{ str_replace(' ', '_', $jenis ?? 'BAHAN BAKU') }}_SEMUA_" + new Date().toISOString().slice(0,10) + ".xls";
+                const excelContent = buildExcelContentFromTable(clone);
+                downloadExcel(filename, excelContent);
             });
         </script>
 
@@ -544,6 +665,7 @@
                         <th class="col-scan sortable">Berat SO</th>
                         <th class="col-scan sortable">Selisih SO</th>
                         <th class="col-scan sortable">Keterangan</th>
+                        <th class="sortable">Action</th>
                     </tr>
                 </thead>
 
@@ -569,13 +691,198 @@
                             {{ $d->scanner ? ($d->berat - $d->qty_scan) : '-' }}
                         </td>
                         <td class="col-scan">{!! nl2br(e($d->keterangan)) !!}</td>
+                        <td>
+                            @if(!$d->kpc)
+
+                            <button class="btn btn-primary w-100 rounded-pill py-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#scanModalManual{{ $d->id }}">
+                                <i class="fa fa-qrcode me-2"></i>
+                            </button>
+
+                            <div class="modal fade" id="scanModalManual{{ $d->id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+
+                            <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title">Scan Manual</h5>
+                            <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <form action="{{ route('so.storemanual') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="id" value="{{ $d->id }}">
+
+                            <div class="modal-body">
+                            <div class="row g-3">
+
+                            <div class="col-md-6">
+                            <label class="fw-bold mb-1">Qty</label>
+                            <input type="number"
+                            name="qty"
+                            class="form-control rounded-pill px-3 py-2"
+                            value="{{ $d->berat }}"
+                            required>
+                            </div>
+
+                            <div class="col-md-6">
+                            <label class="fw-bold mb-1">Lokasi</label>
+                            <input type="text"
+                            name="lokasi"
+                            class="form-control rounded-pill px-3 py-2"
+                            value="{{ $d->lokasi }}"
+                            required>
+                            </div>
+
+                            <div class="col-md-12">
+                            <label class="fw-bold mb-1">Nama Barang</label>
+                            <input type="text"
+                            name="namabarang"
+                            class="form-control rounded-pill px-3 py-2"
+                            value="{{ $d->namabarang }}"
+                            required>
+                            </div>
+
+                            <div class="col-md-12">
+                            <label class="fw-bold mb-1">Keterangan</label>
+                            <textarea name="keterangan"
+                            class="form-control px-3 py-2 rounded"
+                            rows="3"
+                            placeholder="Keterangan"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                            <label class="fw-bold mb-2 d-block">Layout / Storagebin</label>
+
+                            <div class="row g-2 align-items-center">
+
+                            <div class="col-md-3">
+                            <select id="layoutPrefixs{{ $d->id }}" class="form-select rounded-pill">
+                            <option value="WH-L08-">WH-L08-</option>
+                            <option value="WH-L03-">WH-L03-</option>
+                            <option value="WH-L03B-">WH-L03B-</option>
+                            <option value="WH-TATASENTOSA">WH-TATASENTOSA</option>
+                            </select>
+                            </div>
+
+                            <div class="col-md-2">
+                            <input type="text" class="form-control rounded-pill" id="layoutCol1{{ $d->id }}">
+                            </div>
+
+                            <div class="col-md-2">
+                            <input type="text" class="form-control rounded-pill" id="layoutCol2{{ $d->id }}">
+                            </div>
+
+                            <div class="col-md-2">
+                            <input type="text" class="form-control rounded-pill" id="layoutCol3{{ $d->id }}">
+                            </div>
+
+                            <div class="col-md-3">
+                            <input type="text" class="form-control rounded-pill" id="layoutCol4{{ $d->id }}">
+                            </div>
+
+                            </div>
+
+                            <div class="layout-result" id="layoutPreviews{{ $d->id }}">-</div>
+                            <input type="hidden" name="layout" id="layoutValues{{ $d->id }}">
+
+                            </div>
+
+                            </div>
+                            </div>
+
+                            <div class="modal-footer">
+                            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary rounded-pill">Simpan</button>
+                            </div>
+
+                            </form>
+                            </div>
+                            </div>
+                            </div>
+
+                            <script>
+
+                            document.addEventListener("DOMContentLoaded", function(){
+
+                            let prefix = document.getElementById("layoutPrefixs{{ $d->id }}")
+                            let c1 = document.getElementById("layoutCol1{{ $d->id }}")
+                            let c2 = document.getElementById("layoutCol2{{ $d->id }}")
+                            let c3 = document.getElementById("layoutCol3{{ $d->id }}")
+                            let c4 = document.getElementById("layoutCol4{{ $d->id }}")
+
+                            let preview = document.getElementById("layoutPreviews{{ $d->id }}")
+                            let hidden = document.getElementById("layoutValues{{ $d->id }}")
+
+                            function generateLayout(){
+
+                            if(!prefix.value){
+                            preview.innerText = "-"
+                            hidden.value = ""
+                            return
+                            }
+
+                            let p1 = c1.value || ""
+                            let p2 = c2.value || ""
+                            let p3 = c3.value || ""
+                            let p4 = c4.value || ""
+
+                            let result = prefix.value + p1 + "(" + p1 + "-" + p2 + "-" + p3 + "-" + p4 + ")"
+
+                            preview.innerText = result
+                            hidden.value = result
+
+                            }
+
+                            prefix.addEventListener("change", generateLayout)
+                            c1.addEventListener("keyup", generateLayout)
+                            c2.addEventListener("keyup", generateLayout)
+                            c3.addEventListener("keyup", generateLayout)
+                            c4.addEventListener("keyup", generateLayout)
+
+                            let layout = @json($d->storagebin ?? '')
+
+                            if(layout){
+
+                            let prefixMatch = layout.match(/^(WH-[A-Z0-9]+-)/)
+
+                            if(prefixMatch){
+                            prefix.value = prefixMatch[1]
+                            }
+
+                            let bracketMatch = layout.match(/\((.*?)\)/)
+
+                            if(bracketMatch){
+
+                            let parts = bracketMatch[1].split('-')
+
+                            c1.value = parts[0] ?? ''
+                            c2.value = parts[1] ?? ''
+                            c3.value = parts[2] ?? ''
+                            c4.value = parts[3] ?? ''
+
+                            }
+
+                            preview.innerText = layout
+                            hidden.value = layout
+
+                            }
+
+                            })
+
+                            </script>
+
+                            @endif
+                            </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
             </div>
         </div>
-    </div>
+</div>
+
+
 
 <!-- JAVASCRIPT SWITCH MODE -->
 <script>

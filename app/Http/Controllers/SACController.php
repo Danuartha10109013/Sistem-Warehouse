@@ -110,59 +110,166 @@ class SACController extends Controller
 }
 
 
-   public function store(Request $request){
-    $kpc = $request->attribute;
 
-    $id = SAC::where('kpc', $kpc)->value('id');
-    if($id){
-        $data = SAC::find($id);
+public function store(Request $request){
+ $kpc = $request->attribute;
+
+ $id = SAC::where('kpc', $kpc)->value('id');
+ if($id){
+     $data = SAC::find($id);
+     $existingQty = (int) ($data->qty_scan ?? 0);
+     $newQty = (int) $request->qty;
+
+     // Validasi: qty scan tidak boleh melebihi qty/berat awal
+     $totalQty = (int) ($data->berat ?? 0);
+     $sisa = $totalQty - $existingQty;
+     if ($sisa < 0) $sisa = 0;
+
+     if ($newQty > $sisa) {
+         return redirect()
+             ->back()
+             ->withInput()
+             ->withErrors([
+                 'qty' => "Qty scan melebihi Qty. Sisa yang boleh di-scan: {$sisa}.",
+             ]);
+     }
+
+     $data->lokasi_scan = $request->lokasi;
+     // jumlahkan qty scan lama + baru
+     $data->qty_scan = $existingQty + $newQty;
+
+     // susun riwayat scan dalam format terstruktur:
+     // 1. Nama -> Qty : X | SB : Y
+     $user = Auth::user()->name;
+     $baseText = $data->keterangan ?? '';
+
+     // pecah keterangan lama ke dalam array baris (setiap baris = 1 scan)
+     $lines = array_filter(preg_split("/\r\n|\n|\r/", $baseText));
+     $scanNumber = count($lines) + 1;
+
+     // siapkan info storagebin untuk ditampilkan
+     $originalSB = $data->storagebin ?? null;
+     $resultSB = $request->layout;
+     $sbDisplay = $resultSB ?: ($originalSB ?: '-');
+
+     // bentuk 1 baris keterangan untuk scan saat ini
+     $line = "{$scanNumber}. {$user} -> Qty : {$newQty} | SB : {$sbDisplay}";
+     if ($request->keterangan) {
+         $line .= " | Catatan : " . $request->keterangan;
+     }
+
+     // gabungkan dengan riwayat lama (jika ada)
+     $lines[] = $line;
+     $data->keterangan = implode("\n", $lines);
+
+     $data->storagebin_hasil = $request->layout;
+     $data->date_scan = \Carbon\Carbon::now();
+     $data->scanner = Auth::user()->name;
+     $data->save();
+
+     return redirect()->back()->with('success', 'Scan Telah berhasil');
+
+ }else{
+     $baru = new SAC();
+     $baru->kpc = $kpc;
+     $baru->barcode = $kpc;
+     $baru->lokasi = $request->lokasi;
+
+     $baru->berat = (int) $request->qty;
+     $baru->qty_scan = (int) $request->qty;
+
+     $baru->lokasi_scan = $request->lokasi;
+     $baru->warehouse = 'WH';
+     $baru->namabarang = $request->namabarang;
+     $baru->jenis = $request->jenis ?? 'manual';
+     // baris pertama riwayat scan
+     $sbDisplayBaru = $request->layout ?: '-';
+     $line = "1. " . Auth::user()->name . " -> Qty : " . (int) $request->qty . " | SB : " . $sbDisplayBaru;
+     if ($request->keterangan) {
+         $line .= " | Catatan : " . $request->keterangan;
+     }
+     $baru->keterangan = $line;
+     $baru->storagebin_hasil = $request->layout;
+
+     $baru->date = \Carbon\Carbon::now();
+     $baru->scanner = Auth::user()->name;
+     $baru->date_scan = \Carbon\Carbon::now();
+
+     $baru->save();
+
+     return redirect()->back()->with('success', 'Data Manual Telah ditambahkan');
+
+ }
+
+}
+
+public function storemanual(Request $request){
+    $kpc = $request->id;
+   
+    // $id = SAC::find($kpc);
+    if($kpc){
+        $data = SAC::find($kpc);
         $existingQty = (int) ($data->qty_scan ?? 0);
         $newQty = (int) $request->qty;
-
+   
+        // Validasi: qty scan tidak boleh melebihi qty/berat awal
+        $totalQty = (int) ($data->berat ?? 0);
+        $sisa = $totalQty - $existingQty;
+        if ($sisa < 0) $sisa = 0;
+   
+        if ($newQty > $sisa) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors([
+                    'qty' => "Qty scan melebihi Qty. Sisa yang boleh di-scan: {$sisa}.",
+                ]);
+        }
+   
         $data->lokasi_scan = $request->lokasi;
         // jumlahkan qty scan lama + baru
         $data->qty_scan = $existingQty + $newQty;
-
+   
         // susun riwayat scan dalam format terstruktur:
         // 1. Nama -> Qty : X | SB : Y
         $user = Auth::user()->name;
         $baseText = $data->keterangan ?? '';
-
+   
         // pecah keterangan lama ke dalam array baris (setiap baris = 1 scan)
         $lines = array_filter(preg_split("/\r\n|\n|\r/", $baseText));
         $scanNumber = count($lines) + 1;
-
+   
         // siapkan info storagebin untuk ditampilkan
         $originalSB = $data->storagebin ?? null;
         $resultSB = $request->layout;
         $sbDisplay = $resultSB ?: ($originalSB ?: '-');
-
+   
         // bentuk 1 baris keterangan untuk scan saat ini
         $line = "{$scanNumber}. {$user} -> Qty : {$newQty} | SB : {$sbDisplay}";
         if ($request->keterangan) {
             $line .= " | Catatan : " . $request->keterangan;
         }
-
+   
         // gabungkan dengan riwayat lama (jika ada)
         $lines[] = $line;
         $data->keterangan = implode("\n", $lines);
-
+   
         $data->storagebin_hasil = $request->layout;
         $data->date_scan = \Carbon\Carbon::now();
         $data->scanner = Auth::user()->name;
         $data->save();
-
+   
         return redirect()->back()->with('success', 'Scan Telah berhasil');
-
+   
     }else{
         $baru = new SAC();
         $baru->kpc = $kpc;
         $baru->barcode = $kpc;
         $baru->lokasi = $request->lokasi;
-
+   
         $baru->berat = (int) $request->qty;
         $baru->qty_scan = (int) $request->qty;
-
+   
         $baru->lokasi_scan = $request->lokasi;
         $baru->warehouse = 'WH';
         $baru->namabarang = $request->namabarang;
@@ -175,19 +282,18 @@ class SACController extends Controller
         }
         $baru->keterangan = $line;
         $baru->storagebin_hasil = $request->layout;
-
+   
         $baru->date = \Carbon\Carbon::now();
         $baru->scanner = Auth::user()->name;
         $baru->date_scan = \Carbon\Carbon::now();
-
+   
         $baru->save();
-
+   
         return redirect()->back()->with('success', 'Data Manual Telah ditambahkan');
-
+   
     }
-
+   
 }
-
     /**
      * Simpan hasil scan / input manual khusus SO KBI.
      */
@@ -276,12 +382,14 @@ class SACController extends Controller
         }
 
         $data = SAC::where('date', '>=', Carbon::now()->subMonth())
-            ->where('jenis', 'BAHAN BAKU')
+            ->where('jenis', 'BB - BJ - BJS - SP')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $jenis = 'BAHAN BAKU';
-        return view('so.bahan_baku', compact('data', 'jenis'));
+        $jenis = 'BB - BJ - BJS - SP';
+        $kodeJenis = 'BB - BJ - BJS - SP';
+
+        return view('so.bahan_baku', compact('data', 'jenis', 'kodeJenis'));
     }
 
     public function barangJadi ()
@@ -296,7 +404,9 @@ class SACController extends Controller
             ->get();
 
         $jenis = 'BARANG JADI';
-        return view('so.barang_jadi', compact('data', 'jenis'));
+        $kodeJenis = 'BJ';
+
+        return view('so.bahan_baku', compact('data', 'jenis', 'kodeJenis'));
     }
 
     public function barangJadiSliting ()
@@ -311,7 +421,9 @@ class SACController extends Controller
             ->get();
 
         $jenis = 'BARANG JADI SLITING';
-        return view('so.barang_jadi_sliting', compact('data', 'jenis'));
+        $kodeJenis = 'BJS';
+
+        return view('so.bahan_baku', compact('data', 'jenis', 'kodeJenis'));
     }
 
     public function electric ()

@@ -60,12 +60,12 @@
                                     <select name="kategori" class="form-select" required>
                                         <option value="" disabled selected>-- Pilih Kategori --</option>
                                             <option value="BB - BJ - BJS - SP">BB - BJ - BJS - SP</option>
-                                            <option value="Electric">Electric</option>
-                                            <option value="Mechanic">Mechanic</option>
-                                            <option value="Proyek">Proyek</option>
-                                            <option value="Safety">Safety</option>
-                                            <option value="Utility">tility</option>
-                                            <option value="General Storage">General Storage</option>
+                                            <option value="Electric" disabled>Electric</option>
+                                            <option value="Mechanic" disabled>Mechanic</option>
+                                            <option value="Proyek" disabled>Proyek</option>
+                                            <option value="Safety" disabled>Safety</option>
+                                            <option value="Utility" disabled>Utility</option>
+                                            <option value="General Storage" disabled>General Storage</option>
                                             <option value="KBI">KBI</option>
                                     </select>
                                 </div>
@@ -74,14 +74,14 @@
                                     * File wajib format <strong>.xlsx</strong> atau <strong>.xls</strong><br>
                                     <!-- <a href="{{asset('templateso.xls')}}"> Download Template</a> -->
                                     @if(request()->routeIs('so.kbi'))
-    <a href="{{ asset('templatekbi.xls') }}" class="btn btn-success">
-        <i class="mdi mdi-download"></i> Download Template KBI
-    </a>
-@else
-    <a href="{{ asset('templateso.xls') }}" class="btn btn-primary">
-        <i class="mdi mdi-download"></i> Download Template
-    </a>
-@endif
+                                        <a href="{{ asset('templatekbi.xls') }}" class="btn btn-success">
+                                            <i class="mdi mdi-download"></i> Download Template KBI
+                                        </a>
+                                    @else
+                                        <a href="{{ asset('templateso.xls') }}" class="btn btn-primary">
+                                            <i class="mdi mdi-download"></i> Download Template
+                                        </a>
+                                    @endif
                                 </p>
 
                             </div>
@@ -97,11 +97,11 @@
                 </div>
             </div>
         <!-- Spinner Start -->
-        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <!-- <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
-        </div>
+        </div> -->
         <!-- Spinner End -->
 
 

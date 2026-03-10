@@ -15,37 +15,27 @@
 
     <div class="row g-3 justify-content-center">
 
-        <!-- BB - BJ - BJS (PRIMARY) -->
+        <!-- BB - BJ - BJS (satu tampilan) -->
         <div class="col-12 col-lg-8">
-            <div class="card bg-success text-white shadow-sm border-0">
-                <button class="btn text-white p-4"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#bbCollapse">
+            <a href="{{ route('so.bahan_baku') }}" class="text-decoration-none">
+                <div class="card bg-success text-white shadow-sm border-0 text-center p-4">
                     <div class="d-flex flex-column align-items-center">
                         <i class="fa-solid fa-warehouse fs-1 mb-2"></i>
-                        <strong>BB - BJ - BJS - SP</strong>
-                    </div>
-                </button>
-            </div>
-
-            <div id="bbCollapse" class="collapse mt-2">
-                <div class="card border-0 shadow-sm">
-                    <div class="list-group list-group-flush">
-                        <a href="{{ route('so.bahan_baku') }}" class="list-group-item">
-                            <i class="fa-solid fa-industry me-2 text-success"></i> Bahan Baku
-                        </a>
-                        <a href="{{ route('so.barang_jadi') }}" class="list-group-item">
-                            <i class="fa-solid fa-box me-2 text-success"></i> Barang Jadi
-                        </a>
-                        <a href="{{ route('so.barang_jadi_sliting') }}" class="list-group-item">
-                            <i class="fa-solid fa-box me-2 text-success"></i> Barang Jadi Sliting
-                        </a>
-                        <a href="{{ route('so.sparepart') }}" class="list-group-item">
-                            <i class="fa-solid fa-gears me-2 text-success"></i> Sparepart
-                        </a>
+                        <strong>BB - BJ - BJS</strong>
+                        <small class="text-light-50">Satu tampilan stock opname</small>
                     </div>
                 </div>
-            </div>
+            </a>
+        </div>
+
+        <!-- SPAREPART (tetap terpisah) -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <a href="{{ route('so.sparepart') }}" class="text-decoration-none">
+                <div class="card bg-success text-white text-center p-4 shadow-sm border-0 h-100">
+                    <i class="fa-solid fa-gears fs-1 mb-2"></i>
+                    <strong>SPAREPART</strong>
+                </div>
+            </a>
         </div>
 
         <!-- ELECTRIC -->

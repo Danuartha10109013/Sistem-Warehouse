@@ -155,6 +155,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::post('/kbi/store', [SACController::class, 'storeKbi'])->name('so.kbi.store');
         Route::get('/add',[SACController::class,'add'])->name('so.add');
         Route::post('/store',[SACController::class,'store'])->name('so.store');
+        Route::post('/storemanual',[SACController::class,'storemanual'])->name('so.storemanual');
         Route::delete('/delete/{id}',[SACController::class,'destroy'])->name('so.delete');
         Route::get('/edit/{id}',[SACController::class,'edit'])->name('so.edit');
         Route::put('/update/{id}',[SACController::class,'update'])->name('so.update');
