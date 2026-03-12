@@ -758,11 +758,18 @@
 
                             <div class="col-md-3">
                             <select id="layoutPrefixs{{ $d->id }}" class="form-select rounded-pill">
-                            <option value="WH-L08-">WH-L08-</option>
-                            <option value="WH-L03-">WH-L03-</option>
-                            <option value="WH-L03B-">WH-L03B-</option>
+                            <option value="WH-L08">WH-L08</option>
+                            <option value="WH-L08-SP">WH-L08-SP</option>
+                            <option value="WH-L08-SP TRANSIT 1">WH-L08-SP TRANSIT 1</option>
+                            <option value="WH-L03">WH-L03</option>
+                            <option value="WH-L03-BB TRANSIT F">WH-L03-BB TRANSIT F</option>
+                            <option value="WH-L03-BB RESIN SISA">WH-L03-BB RESIN SISA</option>
+                            <option value="WH-L03-BB INGOT POT">WH-L03-BB INGOT POT</option>
+                            <option value="WH-L03-BB CRC SISA/SKIP">WH-L03-BB CRC SISA/SKIP</option>
+                            <option value="WH-L03B TRANSIT">WH-L03B TRANSIT</option>
                             <option value="WH-TATASENTOSA">WH-TATASENTOSA</option>
-                            </select>
+                            <option value="WH-TATASENTOSA-BJ TRANSIT 1">WH-TATASENTOSA-BJ TRANSIT 1</option>
+                        </select>
                             </div>
 
                             <div class="col-md-2">
