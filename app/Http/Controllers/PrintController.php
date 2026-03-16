@@ -61,15 +61,10 @@ public function downloadPDF($id)
     $ids=Pengecekan::where('no_gs',$id)->value('id');
     $sign = Pengecekan::find($ids);
 
-    // Agar hasil PDF sama seperti halaman print:
-    // - izinkan load asset via URL (bootstrap CDN, asset() images)
-    // - pakai parser HTML5 untuk layout yang lebih konsisten
-    $pdf = Pdf::setOptions([
-        'isRemoteEnabled' => true,
-        'isHtml5ParserEnabled' => true,
-    ])->loadView('Mapping-Container.content.pengecekan.print', compact('data','coil','sign','id'));
-
-    $pdf->setPaper('legal', 'portrait');
+    // Generate PDF dari view yang sama dengan halaman print
+    // (gunakan konfigurasi default agar tidak memberatkan/proses terlalu lama)
+    $pdf = Pdf::loadView('Mapping-Container.content.pengecekan.print', compact('data','coil','sign','id'))
+              ->setPaper('legal', 'portrait');
 
     // Unduh file PDF
     return $pdf->download('Mapping_Muat_Ceklist_Kontainer.pdf');
