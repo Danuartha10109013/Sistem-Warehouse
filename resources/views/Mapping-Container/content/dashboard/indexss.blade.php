@@ -125,7 +125,7 @@
                     $pengecekanRow = \App\Models\Pengecekan::where('no_gs', $c->no_gs)->first();
                   @endphp
                   @if($pengecekanRow && $pengecekanRow->isComplete())
-                    <a href="{{route('Mapping.admin.prints-map-download',$c->no_gs)}}" class="action-icon text-danger" title="Download PDF">
+                    <a href="{{route('Mapping.admin.prints-map',$c->no_gs)}}" class="action-icon text-danger" title="Print">
                       <i class="bi bi-printer"></i>
                     </a>
                   @endif
