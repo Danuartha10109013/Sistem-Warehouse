@@ -169,6 +169,10 @@
                             <td>{{$d->dinding}}</td>
                         </tr>
                         <tr>
+                            <th>Rangka Kontainer</th>
+                            <td>{{$d->rangka}}</td>
+                        </tr>
+                        <tr>
                             <th>Pengunci Kontainer</th>
                             <td>{{$d->pengunci_kontainer}}</td>
                         </tr>
@@ -203,6 +207,10 @@
                         <tr>
                             <th>Fumigasi</th>
                             <td>{{$d->fumigasi}}</td>
+                        </tr>
+                        <tr>
+                            <th>Radiasi</th>
+                            <td>{{$d->radiasi}}</td>
                         </tr>
                     </table>
                 </div>
