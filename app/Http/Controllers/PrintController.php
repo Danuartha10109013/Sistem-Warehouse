@@ -63,7 +63,13 @@ public function downloadPDF($id)
 
     // Generate PDF dari view yang sama dengan halaman print
     // (gunakan konfigurasi default agar tidak memberatkan/proses terlalu lama)
-    $pdf = Pdf::loadView('Mapping-Container.content.pengecekan.print', compact('data','coil','sign','id'))
+    $isPdf = true;
+    $pdf = Pdf::setOptions([
+                // pastikan dompdf hanya load file lokal dari folder public (lebih stabil)
+                'isRemoteEnabled' => false,
+                'chroot' => public_path(),
+            ])
+            ->loadView('Mapping-Container.content.pengecekan.print', compact('data','coil','sign','id','isPdf'))
               ->setPaper('legal', 'portrait');
 
     // Unduh file PDF

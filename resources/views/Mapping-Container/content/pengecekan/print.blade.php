@@ -2,9 +2,24 @@
 <html>
 <head>
     <title>{{$id}}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    @php
+        $isPdf = $isPdf ?? false;
+        $pdfPublicPath = function (string $relativePath) use ($isPdf) {
+            if (!$isPdf) return asset($relativePath);
+            return public_path($relativePath);
+        };
+        $pdfPublicFromAsset = function (?string $assetPath) use ($isPdf) {
+            if (!$assetPath) return '';
+            if (!$isPdf) return asset($assetPath);
+            return public_path($assetPath);
+        };
+    @endphp
+
+    @if(!$isPdf)
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    @endif
     <style>
         @media print {
             @page {
@@ -114,7 +129,7 @@
         </style>
         
         <div class="header">
-            <img style="width: 10%" src="{{asset('img/Logo_TML.png')}}" alt="Logo">
+            <img style="width: 10%" src="{{ $pdfPublicPath('img/Logo_TML.png') }}" alt="Logo">
             <div><center>
 
                 <h3 style="font-size: 20px;margin-left: 80px"><strong>MAPPING MUAT & CEKLIST KONTAINER & TRAILLER</strong></h3>
@@ -336,7 +351,7 @@
                             @if($c->a1)
                                <p class="mt-1"><b> {{ $c->a1 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->a1_eye.'.png')}}" alt="{{$c->a1_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->a1_eye.'.png') }}" alt="{{$c->a1_eye}}">
                             @else
                             {{ $c->a1 }}
                             @endif
@@ -346,7 +361,7 @@
                             @if($c->b1)
                                <p class="mt-2"><b> {{ $c->b1 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->b1_eye.'.png')}}" alt="{{$c->b1_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->b1_eye.'.png') }}" alt="{{$c->b1_eye}}">
                             @else
                             {{ $c->b1 }}
                             @endif
@@ -356,7 +371,7 @@
                             @if($c->c1)
                                <p class="mt-2"><b> {{ $c->c1 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->c1_eye.'.png')}}" alt="{{$c->c1_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->c1_eye.'.png') }}" alt="{{$c->c1_eye}}">
                             @else
                             {{ $c->c1 }}
                             @endif
@@ -369,7 +384,7 @@
                             @if($c->a2)
                                <p class="mt-2"><b> {{ $c->a2 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->a2_eye.'.png')}}" alt="{{$c->a2_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->a2_eye.'.png') }}" alt="{{$c->a2_eye}}">
                             @else
                             {{ $c->a2 }}
                             @endif
@@ -379,7 +394,7 @@
                             @if($c->b2)
                                <p class="mt-2"><b> {{ $c->b2 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->b2_eye.'.png')}}" alt="{{$c->b2_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->b2_eye.'.png') }}" alt="{{$c->b2_eye}}">
                             @else
                             {{ $c->b2 }}
                             @endif
@@ -388,7 +403,7 @@
                             @if($c->c2)
                                <p class="mt-2"><b> {{ $c->c2 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->c2_eye.'.png')}}" alt="{{$c->c2_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->c2_eye.'.png') }}" alt="{{$c->c2_eye}}">
                             @else
                             {{ $c->c2 }}
                             @endif
@@ -399,7 +414,7 @@
                             @if($c->a3)
                                <p class="mt-2"><b> {{ $c->a3 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->a3_eye.'.png')}}" alt="{{$c->a3_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->a3_eye.'.png') }}" alt="{{$c->a3_eye}}">
                             @else
                             {{ $c->a3 }}
                             @endif
@@ -409,7 +424,7 @@
                             @if($c->b3)
                                <p class="mt-2"><b> {{ $c->b3 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->b3_eye.'.png')}}" alt="{{$c->b3_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->b3_eye.'.png') }}" alt="{{$c->b3_eye}}">
                             @else
                             {{ $c->b3 }}
                             @endif
@@ -418,7 +433,7 @@
                             @if($c->c3)
                                <p class="mt-2"><b> {{ $c->c3 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->c3_eye.'.png')}}" alt="{{$c->c3_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->c3_eye.'.png') }}" alt="{{$c->c3_eye}}">
                             @else
                             {{ $c->c3 }}
                             @endif
@@ -429,7 +444,7 @@
                             @if($c->a4)
                                <p class="mt-2"><b> {{ $c->a4 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->a4_eye.'.png')}}" alt="{{$c->a4_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->a4_eye.'.png') }}" alt="{{$c->a4_eye}}">
                             @else
                             {{ $c->a4 }}
                             @endif
@@ -439,7 +454,7 @@
                             @if($c->b4)
                                <p class="mt-2"><b> {{ $c->b4 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->b4_eye.'.png')}}" alt="{{$c->b4_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->b4_eye.'.png') }}" alt="{{$c->b4_eye}}">
                             @else
                             {{ $c->b4 }}
                             @endif
@@ -448,7 +463,7 @@
                             @if($c->c4)
                                <p class="mt-2"><b> {{ $c->c4 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->c4_eye.'.png')}}" alt="{{$c->c4_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->c4_eye.'.png') }}" alt="{{$c->c4_eye}}">
                             @else
                             {{ $c->c4 }}
                             @endif
@@ -459,7 +474,7 @@
                             @if($c->a5)
                                <p class="mt-2"><b> {{ $c->a5 }} </b></p>
                               
-                               <img width="40%" src="{{asset('img/'.$c->a5_eye.'.png')}}" alt="{{$c->a5_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->a5_eye.'.png') }}" alt="{{$c->a5_eye}}">
                             @else
                             {{ $c->a5 }}
                             @endif
@@ -469,7 +484,7 @@
                             @if($c->b5)
                                <p class="mt-2"><b> {{ $c->b5 }} </b></p>
                                
-                               <img width="40%" src="{{asset('img/'.$c->b5_eye.'.png')}}" alt="{{$c->b5_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->b5_eye.'.png') }}" alt="{{$c->b5_eye}}">
                             @else
                             {{ $c->b5 }}
                             @endif
@@ -478,7 +493,7 @@
                             @if($c->c5)
                                <p class="mt-2"><b> {{ $c->c5 }} </b></p>
                               
-                               <img width="40%" src="{{asset('img/'.$c->c5_eye.'.png')}}" alt="{{$c->c5_eye}}">
+                               <img width="40%" src="{{ $pdfPublicPath('img/'.$c->c5_eye.'.png') }}" alt="{{$c->c5_eye}}">
                             @else
                             {{ $c->c5 }}
                             @endif
@@ -500,11 +515,11 @@
                         </tr>
                         <tr>
                             <td style="border: none; padding: 10px; text-align: center; vertical-align: middle; display: flex; justify-content: center; align-items: center;">
-                                <img width="50%" src="{{asset($sign->signature)}}" alt="" style="max-width: 100%; height: auto;margin-left: 5em">
+                                <img width="50%" src="{{ $pdfPublicFromAsset($sign->signature) }}" alt="" style="max-width: 100%; height: auto;margin-left: 5em">
                             </td>
                             <td style="border: none; padding: 10px; text-align: center;"></td>
                             <td style="border: none; padding: 10px; text-align: center; vertical-align: middle; display: flex; justify-content: center; align-items: center;">
-                                <img width="50%" src="{{asset($sign->signature1)}}" alt="" style="max-width: 100%; height: auto;margin-left: 5em">
+                                <img width="50%" src="{{ $pdfPublicFromAsset($sign->signature1) }}" alt="" style="max-width: 100%; height: auto;margin-left: 5em">
                             </td>
                         </tr>
                         <tr>
