@@ -11,6 +11,26 @@
 @endsection
 @section('content')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+  .action-icons {
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .action-icon {
+    padding: 0;
+    border: 0;
+    background: transparent !important;
+    line-height: 1;
+    font-size: 1.15rem;
+    text-decoration: none;
+  }
+  .action-icon:focus {
+    box-shadow: none !important;
+  }
+</style>
 <div class="container-xxl">
     <h3 class="title text-center">DATA SHIPMENT</h3>
     <div class="mb-3 d-flex justify-content-between align-items-center">
@@ -61,6 +81,7 @@
             <tr>
               <th style="color: black" class="text-truncate">No</th>
               <th style="color: black" class="text-truncate">No GS</th>
+              <th style="color: black" class="text-truncate">No Container</th>
               <th style="color: black" class="text-truncate">Tanggal GS</th>
               {{-- <th style="color: black" class="text-truncate">No PO</th> --}}
               {{-- <th style="color: black" class="text-truncate">No Seal</th> --}}
@@ -75,23 +96,44 @@
             <tr>
               <td style="color: black">{{$loop->iteration}}</td>
               <td style="color: black">{{$c->no_gs}}</td>
+              <td style="color: black" class="text-truncate">{{$c->no_container}}</td>
               <td style="color: black" class="text-truncate">{{$c->tgl_gs}}</td>
               {{-- <td style="color: black" class="text-truncate">{{$c->no_po}}</td> --}}
               {{-- <td style="color: black" class="text-truncate">{{$c->no_seal}}</td> --}}
               <td style="color: black" class="text-truncate">{{$c->no_mobil}}</td>
               <td style="color: black" class="text-truncate">{{$c->container}}</td>
               <td class="text-center">
-                @if ($c->tare == null || $c->no_container == null || $c->tgl_gs == null || $c->no_mobil == null || $c->kepada == null)
-                <a href="{{route('Mapping.admin.create-shipment',$c->no_gs)}}" class="btn btn-secondary">Lengkapi Data</a>
-                @elseif ($c->tare !== null || $c->no_container !== null || $c->tgl_gs !== null || $c->no_mobil !== null || $c->kepada !== null)
-                <a href="{{route('Mapping.admin.edit-shipment',$c->no_gs)}}" class="btn btn-warning"><i class="fa fa-edit"></i> Edit</a>
-                @endif
-                <a href="{{route('Mapping.admin.coiling',$c->no_gs)}}" class="btn btn-success">Koil</a>
-                <a href="{{route('Mapping.admin.show-shipment',$c->id)}}" class="btn btn-primary"><i class="ri-eye-line"></i> Mapping</a>
-                <!-- Tombol Delete -->
-                <button class="btn btn-danger btn-delete" data-url="{{ route('Mapping.admin.delete-shipment', $c->no_gs) }}">
-                  <i class="ri-delete-bin-2-line"></i>
-                </button>
+                <div class="action-icons">
+                  @if ($c->tare == null || $c->no_container == null || $c->tgl_gs == null || $c->no_mobil == null || $c->kepada == null)
+                    <a href="{{route('Mapping.admin.create-shipment',$c->no_gs)}}" class="action-icon text-secondary" title="Lengkapi Data">
+                      <i class="bi bi-exclamation-circle"></i>
+                    </a>
+                  @elseif ($c->tare !== null || $c->no_container !== null || $c->tgl_gs !== null || $c->no_mobil !== null || $c->kepada !== null)
+                    <a href="{{route('Mapping.admin.edit-shipment',$c->no_gs)}}" class="action-icon text-warning" title="Edit">
+                      <i class="bi bi-pencil-square"></i>
+                    </a>
+                  @endif
+
+                  <a href="{{route('Mapping.admin.coiling',$c->no_gs)}}" class="action-icon text-success" title="Koil">
+                    <i class="bi bi-box-seam"></i>
+                  </a>
+                  <a href="{{route('Mapping.admin.show-shipment',$c->id)}}" class="action-icon text-primary" title="Mapping">
+                    <i class="bi bi-eye"></i>
+                  </a>
+
+                  @php
+                    $pengecekanRow = \App\Models\Pengecekan::where('no_gs', $c->no_gs)->first();
+                  @endphp
+                  @if($pengecekanRow && $pengecekanRow->isComplete())
+                    <a href="{{route('Mapping.admin.prints-map-download',$c->no_gs)}}" class="action-icon text-danger" title="Download PDF">
+                      <i class="bi bi-printer"></i>
+                    </a>
+                  @endif
+
+                  <button type="button" class="action-icon text-danger btn-delete" title="Hapus" data-url="{{ route('Mapping.admin.delete-shipment', $c->no_gs) }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
                 <script>
                   document.addEventListener('DOMContentLoaded', function () {
                       document.querySelectorAll('.btn-delete').forEach(function (button) {

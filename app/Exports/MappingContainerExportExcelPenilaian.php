@@ -36,6 +36,8 @@ class MappingContainerExportExcelPenilaian implements FromCollection, WithHeadin
                 'Lantai' => $pengecekan ? $pengecekan->lantai : null,
                 'Dinding' => $pengecekan ? $pengecekan->dinding : null,
                 'Kondisi Ban' => $pengecekan ? $pengecekan->kondisi_ban : null,
+                'Rangka' => $pengecekan ? $pengecekan->rangka : null,
+                'Radiasi' => $pengecekan ? $pengecekan->radiasi : null,
                 'Pengunci Kontainer' => $pengecekan ? $pengecekan->pengunci_kontainer : null,
             ]);
         }
@@ -54,6 +56,8 @@ class MappingContainerExportExcelPenilaian implements FromCollection, WithHeadin
             'Lantai',
             'Dinding',
             'Kondisi Ban',
+            'Rangka',
+            'Radiasi',
             'Pengunci Kontainer',
         ];
     }

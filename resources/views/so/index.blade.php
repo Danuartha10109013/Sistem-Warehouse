@@ -458,17 +458,43 @@
             </div>
         </div>
 
-        {{-- SORTING --}}
+        {{-- SORTING + SEARCH --}}
        <script>
-            // ========== SEARCH ==========
-            document.getElementById("tableSearch").addEventListener("keyup", function () {
-                let input = this.value.toLowerCase();
-                let rows = document.querySelectorAll("#dataTable tbody tr");
+            // mode aktif: 'belum' | 'sudah' | 'selisih'
+            let currentMode = 'belum';
+
+            function applySearchAndMode() {
+                const input = document.getElementById("tableSearch").value.toLowerCase();
+                const rows = document.querySelectorAll("#dataTable tbody tr");
 
                 rows.forEach(row => {
-                    row.style.display = row.textContent.toLowerCase().includes(input) ? "" : "none";
+                    const textMatch = row.textContent.toLowerCase().includes(input);
+
+                    // tentukan mode baris dari class
+                    let rowMode = 'belum';
+                    if (row.classList.contains('row-selisih')) {
+                        rowMode = 'selisih';
+                    } else if (row.classList.contains('row-sudah')) {
+                        rowMode = 'sudah';
+                    }
+
+                    // apakah baris ini termasuk dalam mode yang sedang aktif?
+                    let modeMatch = true;
+                    if (currentMode === 'belum') {
+                        modeMatch = (rowMode === 'belum');
+                    } else if (currentMode === 'sudah') {
+                        // sudah scan termasuk baris selisih
+                        modeMatch = (rowMode === 'sudah' || rowMode === 'selisih');
+                    } else if (currentMode === 'selisih') {
+                        modeMatch = (rowMode === 'selisih');
+                    }
+
+                    row.style.display = (textMatch && modeMatch) ? "table-row" : "none";
                 });
-            });
+            }
+
+            // ========== SEARCH ==========
+            document.getElementById("tableSearch").addEventListener("keyup", applySearchAndMode);
 
             // ========== SORT ==========
             document.addEventListener("DOMContentLoaded", function () {
@@ -594,6 +620,7 @@
 <script>
 // FUNGSI UNTUK MENGAKTIFKAN MODE BELUM
 function aktifkanModeBelum() {
+    currentMode = 'belum';
     // button style
     document.getElementById("btnBelum").classList.remove("btn-outline-danger");
     document.getElementById("btnBelum").classList.add("btn-danger");
@@ -605,11 +632,6 @@ function aktifkanModeBelum() {
     // hide scan columns
     document.querySelectorAll(".col-scan").forEach(col => col.style.display = "none");
 
-    // show only rows not scanned
-    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "table-row");
-    document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "none");
-
     // update total badge (belum scan)
     const totalBelum = document.getElementById("totalBelum");
     const totalSudah = document.getElementById("totalSudah");
@@ -619,6 +641,7 @@ function aktifkanModeBelum() {
         totalSudah.style.display = "none";
         totalSelisih.style.display = "none";
     }
+    applySearchAndMode();
 }
 
 // klik manual
@@ -629,6 +652,7 @@ window.addEventListener("load", aktifkanModeBelum);
 </script>
 <script>
 document.getElementById("btnBelum").addEventListener("click", function () {
+    currentMode = 'belum';
     // button style
     this.classList.remove("btn-outline-danger");
     this.classList.add("btn-danger");
@@ -640,11 +664,6 @@ document.getElementById("btnBelum").addEventListener("click", function () {
     // hide scan columns
     document.querySelectorAll(".col-scan").forEach(col => col.style.display = "none");
 
-    // show only rows not scanned
-    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "table-row");
-    document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "none");
-
     // update total badge (belum scan)
     const totalBelum = document.getElementById("totalBelum");
     const totalSudah = document.getElementById("totalSudah");
@@ -654,9 +673,11 @@ document.getElementById("btnBelum").addEventListener("click", function () {
         totalSudah.style.display = "none";
         totalSelisih.style.display = "none";
     }
+    applySearchAndMode();
 });
 
 document.getElementById("btnSudah").addEventListener("click", function () {
+    currentMode = 'sudah';
     // button style
     this.classList.remove("btn-outline-success");
     this.classList.add("btn-success");
@@ -668,10 +689,6 @@ document.getElementById("btnSudah").addEventListener("click", function () {
     // show scan columns
     document.querySelectorAll(".col-scan").forEach(col => col.style.display = "");
 
-    // show only scanned rows (sudah scan, termasuk yang selisih)
-    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "table-row");
-
     // update total badge (sudah scan)
     const totalBelum = document.getElementById("totalBelum");
     const totalSudah = document.getElementById("totalSudah");
@@ -681,9 +698,11 @@ document.getElementById("btnSudah").addEventListener("click", function () {
         totalSudah.style.display = "inline";
         totalSelisih.style.display = "none";
     }
+    applySearchAndMode();
 });
 
 document.getElementById("btnSelisih").addEventListener("click", function () {
+    currentMode = 'selisih';
     // button style
     this.classList.remove("btn-outline-warning");
     this.classList.add("btn-warning");
@@ -695,11 +714,6 @@ document.getElementById("btnSelisih").addEventListener("click", function () {
     // show scan columns
     document.querySelectorAll(".col-scan").forEach(col => col.style.display = "");
 
-    // show only rows with selisih (sudah scan tapi berat != qty_scan)
-    document.querySelectorAll(".row-belum").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-sudah").forEach(r => r.style.display = "none");
-    document.querySelectorAll(".row-selisih").forEach(r => r.style.display = "table-row");
-
     // update total badge (selisih)
     const totalBelum = document.getElementById("totalBelum");
     const totalSudah = document.getElementById("totalSudah");
@@ -709,6 +723,7 @@ document.getElementById("btnSelisih").addEventListener("click", function () {
         totalSudah.style.display = "none";
         totalSelisih.style.display = "inline";
     }
+    applySearchAndMode();
 });
 </script>
 

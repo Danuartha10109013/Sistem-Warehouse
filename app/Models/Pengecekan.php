@@ -30,6 +30,8 @@ class Pengecekan extends Model
             'cuaca',
             'kondisi_ban',
             'kondisi_lantai',
+            'rangka',
+            'radiasi',
             'rantai_webbing',
             'tonase',
             'terpal',
@@ -46,16 +48,52 @@ class Pengecekan extends Model
             'signature1',
         ];
     
-    // Pada Model P dan M
-public function isComplete()
-{
-    // Asumsikan $this->attribute adalah array atribut yang ingin dicek
-    foreach ($this->attributes as $attribute) {
-        if (is_null($attribute) || $attribute === '') {
-            return false;
+    // Digunakan di form pengecekan untuk menentukan
+    // apakah tombol "Cetak" boleh dimunculkan
+    public function isComplete(): bool
+    {
+        $requiredFields = [
+            'awal_muat',
+            'awal_muat1',
+            'tgl_gs',
+            'kota_negara',
+            'customer',
+            'lantai',
+            'dinding',
+            'pengunci_kontainer',
+            'sapu',
+            'vacum',
+            'disemprot',
+            'choke',
+            'stopper',
+            'sling',
+            'silica_gel',
+            'fumigasi',
+            'selesai_muat',
+            'cuaca',
+            'kondisi_ban',
+            'kondisi_lantai',
+            'rangka',
+            'radiasi',
+            'rantai_webbing',
+            'tonase',
+            'terpal',
+            'no_mobil',
+            'no_container',
+            'tonase_tare',
+            'checker',
+            'signature',
+            'signature1',
+        ];
+
+        foreach ($requiredFields as $field) {
+            $value = $this->{$field} ?? null;
+            if ($value === null || $value === '') {
+                return false;
+            }
         }
+
+        return true;
     }
-    return true;
-}
 
 }

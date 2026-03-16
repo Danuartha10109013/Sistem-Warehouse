@@ -53,6 +53,8 @@ class MappingController extends Controller
         'cuaca' => 'nullable|string',
         'kondisi_ban' => 'nullable|string',
         'kondisi_lantai' => 'nullable|string',
+        'rangka' => 'nullable|in:bagus,jelek',
+        'radiasi' => 'nullable|string|max:255',
         'rantai_webbing' => 'nullable|string',
         'tonase' => 'nullable|string',
         'tare' => 'nullable|string',

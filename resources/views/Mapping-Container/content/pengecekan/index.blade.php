@@ -171,8 +171,21 @@
                                 </div>
                             @enderror
                         </div>
-
                         <div class="input-group">
+                            <span class="input-group-text" id="basic-addon41">Rangka Kontainer</span>
+                            <select class="form-select @error('rangka') is-invalid @enderror" name="rangka" aria-label="Floor Rating">
+                                <option value="" {{ old('rangka', $p->rangka) == '' ? 'selected' : '' }}>-- Pilih Kondisi rangka --</option>
+                                <option value="bagus" {{ old('rangka', $p->rangka) == 'bagus' ? 'selected' : '' }}>Bagus</option>
+                                <option value="jelek" {{ old('rangka', $p->rangka) == 'jelek' ? 'selected' : '' }}>Jelek</option>
+                            </select>
+                            @error('rangka')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="input-group mb-3">
                             <span class="input-group-text" id="basic-addon41">Pengunci Kontainer</span>
                             <select class="form-select @error('pengunci_kontainer') is-invalid @enderror" name="pengunci_kontainer" aria-label="Pengunci Kontainer">
                                 <option value="" {{ old('pengunci_kontainer', $p->pengunci_kontainer) == '' ? 'selected' : '' }} >-- Pilih Tipe Pengunci --</option>
@@ -320,6 +333,23 @@
                                 <option value="belum" {{ old('fumigasi',$p->fumigasi) == 'belum' ? 'selected' : '' }}>Belum</option>
                             </select>
                             @error('fumigasi')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text" id="basic-addon41">Radiasi</span>
+                            <input
+                                type="text"
+                                class="form-control @error('radiasi') is-invalid @enderror"
+                                name="radiasi"
+                                placeholder="Masukan Radiasi"
+                                aria-label="Radiasi"
+                                aria-describedby="basic-addon41"
+                                value="{{$p->radiasi }}" />
+                            @error('radiasi')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>

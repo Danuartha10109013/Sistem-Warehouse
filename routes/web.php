@@ -407,7 +407,10 @@ Route::middleware([AutoLogout::class])->group(function () {
                 // Route::get('/print/{id}', [PrintController::class, 'print'])->name('print');
                 Route::get('/print/{id}', [PrintController::class, 'view_pdf'])->name('print');
                 Route::get('/print/{id}', [PrintController::class, 'downloadPDF'])->name('print.pdf');
+                // Halaman print (seperti semula)
                 Route::get('/prints/{id}', [PrintController::class, 'print'])->name('prints-map');
+                // Download PDF langsung (untuk tombol download)
+                Route::get('/prints/{id}/download', [PrintController::class, 'downloadPDF'])->name('prints-map-download');
                 Route::get('/prints-truck/{id}', [PrintController::class, 'printtruck'])->name('prints');
             });
             // Input Data Excelx
@@ -444,7 +447,10 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::post('/store/{no_gs}', [MappingController::class, 'store'])->name('store-data');
                 // Route::get('/print/{id}', [PrintController::class, 'print'])->name('print');
                 Route::get('/print/{id}', [PrintController::class, 'view_pdf'])->name('print');
+                // Halaman print (seperti semula)
                 Route::get('/prints/{id}', [PrintController::class, 'print'])->name('prints-map');
+                // Download PDF langsung (untuk tombol download)
+                Route::get('/prints/{id}/download', [PrintController::class, 'downloadPDF'])->name('prints-map-download');
                 Route::get('/prints-truck/{id}', [PrintController::class, 'printtruck'])->name('prints');
             });
             // Input Data Excelx

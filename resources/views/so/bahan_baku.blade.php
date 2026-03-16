@@ -810,7 +810,7 @@
 
                             <script>
 
-                            document.addEventListener("DOMContentLoaded", function(){
+                            (function(){
 
                             let prefix = document.getElementById("layoutPrefixs{{ $d->id }}")
                             let c1 = document.getElementById("layoutCol1{{ $d->id }}")
@@ -875,7 +875,34 @@
 
                             }
 
-                            })
+                            // Reset field ketika modal DIBUKA,
+                            // supaya input manual sebelumnya tidak ikut muncul lagi
+                            const modalEl = document.getElementById("scanModalManual{{ $d->id }}");
+                            if (modalEl) {
+                                modalEl.addEventListener("shown.bs.modal", function () {
+                                    const form = modalEl.querySelector("form");
+
+                                    if (form) {
+                                        // kembalikan ke nilai default dari Blade (data awal row)
+                                        form.reset();
+                                    }
+
+                                    // Kosongkan layout manual
+                                    c1.value = '';
+                                    c2.value = '';
+                                    c3.value = '';
+                                    c4.value = '';
+                                    preview.innerText = '-';
+                                    hidden.value = '';
+
+                                    // Reset pilihan prefix ke opsi pertama
+                                    if (prefix && prefix.options.length > 0) {
+                                        prefix.selectedIndex = 0;
+                                    }
+                                });
+                            }
+
+                            })();
 
                             </script>
 
