@@ -34,6 +34,7 @@ use App\Http\Controllers\TraillerController;
 use App\Http\Controllers\PackingController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SACController;
+use App\Http\Controllers\FomController;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -131,6 +132,37 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route ::get('/edit/{id}',[StockController::class,'edit'])->name('stock.edit');
         Route ::put('/update/{id}',[StockController::class,'update'])->name('stock.update');
         Route ::delete('/delete/{id}',[StockController::class,'destroy'])->name('stock.delete');
+    });
+
+    Route::prefix('fomcheck')->group(function () {
+        Route::get('/', [FomController::class, 'index'])->name('fomcheck');
+
+        Route::prefix('crc')->name('fomcheck.crc.')->group(function () {
+            Route::get('/add', [FomController::class, 'add_crc'])->name('add');
+            Route::post('/create', [FomController::class, 'create_crc'])->name('create');
+            Route::get('/export', [FomController::class, 'crc_export'])->name('export');
+            Route::get('/print/{id}', [FomController::class, 'print_crc'])->name('print');
+            Route::get('/show/{id}', [FomController::class, 'show_crc'])->name('show');
+            Route::delete('/destroy/{id}', [FomController::class, 'destroy_crc'])->name('destroy');
+        });
+
+        Route::prefix('ingot')->name('fomcheck.ingot.')->group(function () {
+            Route::get('/add', [FomController::class, 'add_ingot'])->name('add');
+            Route::post('/create', [FomController::class, 'create_ingot'])->name('create');
+            Route::get('/export', [FomController::class, 'ingot_export'])->name('export');
+            Route::get('/print/{id}', [FomController::class, 'print_ingot'])->name('print');
+            Route::get('/show/{id}', [FomController::class, 'show_ingot'])->name('show');
+            Route::delete('/destroy/{id}', [FomController::class, 'destroy_ingot'])->name('destroy');
+        });
+
+        Route::prefix('resin')->name('fomcheck.resin.')->group(function () {
+            Route::get('/add', [FomController::class, 'add_resin'])->name('add');
+            Route::post('/create', [FomController::class, 'create_resin'])->name('create');
+            Route::get('/export', [FomController::class, 'resin_export'])->name('export');
+            Route::get('/print/{id}', [FomController::class, 'print_resin'])->name('print');
+            Route::get('/show/{id}', [FomController::class, 'show_resin'])->name('show');
+            Route::delete('/destroy/{id}', [FomController::class, 'destroy_resin'])->name('destroy');
+        });
     });
 
     Route::prefix('so-sac')->group(function () {

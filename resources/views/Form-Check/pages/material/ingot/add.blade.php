@@ -1,4 +1,4 @@
-@extends('Form-Check.layout.main')
+@extends(($embed ?? false) ? 'fomcheck.embed' : 'Form-Check.layout.main')
 @section('title')
     Form Submission Material CRC
   @if(Auth::user()->role == 0)
@@ -115,13 +115,18 @@
                 <h4 class="card-title">From Daily Checklist Kedatangan Material  FM.WH.02.01</h4>
                 <p class="card-description">Form checklist ini dibuat untuk memastikan kondisi material yang datang dalam kondisi baik (tanpa cacat) sesuai dengan spesifikasi yang telah di tentukan sebelumnya. <br>
                     <br>Serta untuk melihat kesesuaian material yang ada pada surat jalan dengan kondisi fisiknya.</p>
-                    @if (Auth::user()->role == 0)
+                    @if(isset($storeRoute))
+                    <form action="{{ $storeRoute }}" method="POST" enctype="multipart/form-data">
+                    @elseif (Auth::user()->role == 0)
                     <form action="{{route('Form-Check.admin.ingot.create')}}" method="POST" enctype="multipart/form-data">
                     @else
                         <form action="{{route('Form-Check.pegawai.ingot.create')}}" method="POST" enctype="multipart/form-data">
-                        @endif
+                    @endif
                         @method('POST')
                 @csrf
+                @if($embed ?? false)
+                <input type="hidden" name="embed" value="1">
+                @endif
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="exampleInputUsername1">PENERIMA<small style="color: red;">*</small></label>
@@ -151,13 +156,97 @@
                         <input type="time" name="time_akhir_bongkar" class="form-control" id="akhirBongkar" placeholder="Masukan keterangan jika ada">
                       </div>
                       <div class="form-group">
-                        <label for="exampleInputUsername1">Pengecekan Radiasi<small style="color: red;">*</small></label>
-                        <input type="decimal" class="form-control" name="radiasi" id="exampleInputUsername1" placeholder="Cth : 1.9" required>
-                      </div>
-                      <div class="form-group">
-                            <label for="exampleInputPassword1">KETERANGAN</label>
-                            <input type="text" class="form-control" name="ket_radiasi" id="exampleInputPassword1" placeholder="(Gunakan titik bukan koma)">
-                        </div>
+
+    <!-- Checkbox -->
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="checkRadiasi" checked>
+        <label class="form-check-label" for="checkRadiasi">
+            Isi Pengecekan Radiasi
+        </label>
+    </div>
+
+    <!-- Input Radiasi -->
+    <label for="radiasiIngot">
+        Pengecekan Radiasi
+        <small style="color: red;">*</small>
+    </label>
+
+    <input 
+        type="text"
+        class="form-control bg-light"
+        name="radiasi"
+        id="radiasiIngot"
+        placeholder="Cth : 1.9"
+        required
+    >
+</div>
+
+<!-- Keterangan -->
+<div class="form-group">
+    <label for="ketRadiasi">KETERANGAN</label>
+
+    <input 
+        type="text"
+        class="form-control"
+        name="ket_radiasi"
+        id="ketRadiasi"
+        placeholder="(Gunakan titik bukan koma)"
+    >
+</div>
+
+<script>
+    const checkRadiasi = document.getElementById('checkRadiasi');
+    const radiasiIngot = document.getElementById('radiasiIngot');
+    const ketRadiasi = document.getElementById('ketRadiasi');
+
+    function toggleRadiasi() {
+
+        if (checkRadiasi.checked) {
+
+            // Wajib isi
+            radiasiIngot.required = true;
+            radiasiIngot.readOnly = false;
+
+            if (radiasiIngot.value === '-') {
+                radiasiIngot.value = '';
+            }
+
+            ketRadiasi.readOnly = false;
+
+            if (ketRadiasi.value === '-') {
+                ketRadiasi.value = '';
+            }
+
+        } else {
+
+            // Auto isi "-"
+            radiasiIngot.required = false;
+            radiasiIngot.value = '-';
+            radiasiIngot.readOnly = true;
+
+            ketRadiasi.value = '-';
+            ketRadiasi.readOnly = true;
+        }
+    }
+
+    // Event checkbox
+    checkRadiasi.addEventListener('change', toggleRadiasi);
+
+    // Jalankan pertama kali
+    toggleRadiasi();
+
+    // Sebelum submit form
+    document.querySelector('form').addEventListener('submit', function() {
+
+        // Jika checkbox tidak dicentang
+        if (!checkRadiasi.checked) {
+            radiasiIngot.required = false;
+            radiasiIngot.value = '-';
+
+            ketRadiasi.value = '-';
+        }
+    });
+</script>
                 </div>
                 <hr class="mt-2">
 
@@ -231,7 +320,7 @@
                                 }
 
                                 // Reset daftar tampilan
-                                fileList1.innerHTML = '';
+                                fileList.innerHTML = '';
 
                                 // Menampilkan semua file yang ada di array
                                 for (var i = 0; i < selectedFiles.length; i++) {
@@ -323,7 +412,7 @@
                     </div>
 
                         <div class="form-group">
-                            JUMLAH SESUAI SURAT JALAN<small style="color: red;">*</small>
+                            JUMLAH SESUAI SURAT JALAN / PACKING LIST<small style="color: red;">*</small>
                             <br class="mb-3">
                                 <label><input class="mt-3" type="radio" name="jumlahin" value="Sesuai"> Sesuai</label><br>
                                 <label><input type="radio" name="jumlahin" value="Tidak Sesuai"> Tidak Sesuai</label><br>
@@ -365,7 +454,10 @@
 
 
                       <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
-                      <button class="btn btn-light">Cancel</button>
+                      <button type="button" class="btn btn-light"
+                              @if($embed ?? false) onclick="window.parent.postMessage({type:'fomcheck-close'}, '*')" @endif>
+                          Batal
+                      </button>
 
             </form>
             </div>

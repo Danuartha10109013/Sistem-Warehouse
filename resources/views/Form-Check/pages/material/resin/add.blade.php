@@ -1,6 +1,6 @@
-@extends('Form-Check.layout.main')
+@extends(($embed ?? false) ? 'fomcheck.embed' : 'Form-Check.layout.main')
 @section('title')
-    Form Submission Material CRC
+    Form Submission Material RESIN
   @if(Auth::user()->role == 0)
     Admin
   @elseif(Auth::user()->role == 1)
@@ -115,13 +115,29 @@
                 <h4 class="card-title">From Daily Checklist Kedatangan Material  FM.WH.02.01</h4>
                 <p class="card-description">Form checklist ini dibuat untuk memastikan kondisi material yang datang dalam kondisi baik (tanpa cacat) sesuai dengan spesifikasi yang telah di tentukan sebelumnya. <br>
                     <br>Serta untuk melihat kesesuaian material yang ada pada surat jalan dengan kondisi fisiknya.</p>
-                    @if (Auth::user()->role == 0)
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Terjadi kesalahan.</strong> Mohon periksa kembali isian form Anda.
+                            <ul class="mt-2 mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @if(isset($storeRoute))
+                    <form action="{{ $storeRoute }}" method="POST" enctype="multipart/form-data">
+                    @elseif (Auth::user()->role == 0)
                     <form action="{{route('Form-Check.admin.resin.create')}}" method="POST" enctype="multipart/form-data">
                     @else
                     <form action="{{route('Form-Check.pegawai.resin.create')}}" method="POST" enctype="multipart/form-data">
                     @endif
                 @method('POST')
                 @csrf
+                @if($embed ?? false)
+                <input type="hidden" name="embed" value="1">
+                @endif
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="exampleInputUsername1">PENERIMA<small style="color: red;">*</small></label>
@@ -144,11 +160,11 @@
                       </div>
                       <div class="form-group">
                         <label for="exampleInputUsername1">Pengecekan Radiasi<small style="color: red;">*</small></label>
-                        <input type="decimal" class="form-control" name="radiasi" id="exampleInputUsername1" placeholder="Cth : 1.9">
+                        <input type="text" class="form-control bg-light" name="radiasi" id="radiasiResin" value="{{ old('radiasi', '-') }}" readonly required>
                       </div>
                       <div class="form-group">
                             <label for="exampleInputPassword1">KETERANGAN</label>
-                            <input type="text" class="form-control" name="ket_radiasi" id="exampleInputPassword1" placeholder="(Gunakan titik bukan koma)">
+                            <input type="text" class="form-control" name="ket_radiasi" id="exampleInputPassword1" placeholder="(Gunakan titik bukan koma)" value="{{ old('ket_radiasi', '-') }}" readonly required>
                         </div>
                 </div>
                 <hr class="mt-2">
@@ -170,7 +186,7 @@
                             <div class="form-group">
                                 JENIS <small style="color: red;">*</small><br class="mb-3">
                                 <label><input class="mt-3" type="radio" name="jenis" value="RESIN"> RESIN</label><br>
-                                <label><input type="radio" name="jenis" value="ALKALI"> Zinc Ingot</label><br>
+                                <label><input type="radio" name="jenis" value="ALKALI"> ALKALI</label><br>
                                 <label><input type="radio" id="otjenis"> Other: </label>
                                        <input type="text" name="jenis" id="otText" disabled><br>
                             </div>
@@ -218,7 +234,7 @@
                                 }
 
                                 // Reset daftar tampilan
-                                fileList1.innerHTML = '';
+                                fileList.innerHTML = '';
 
                                 // Menampilkan semua file yang ada di array
                                 for (var i = 0; i < selectedFiles.length; i++) {
@@ -254,11 +270,11 @@
                                 }
 
                                 // Reset daftar tampilan
-                                fileList1.innerHTML = '';
+                                fileList.innerHTML = '';
 
                                 // Menampilkan semua file yang ada di array
                                 for (var i = 0; i < selectedFiles1.length; i++) {
-                                    fileList1.innerHTML += '<p>' + (i+1) + '. ' + selectedFiles1[i].name + '</p>';
+                                    fileList.innerHTML += '<p>' + (i+1) + '. ' + selectedFiles1[i].name + '</p>';
                                 }
                             });
                         </script>
@@ -277,7 +293,7 @@
                             KERING / BASAH <small style="color: red;">*</small><br class="mb-3">
                             <label><input class="mt-3" type="radio" name="kering" value="Kering/Tidak kena air"> Kering/Tidak kena air</label><br>
                             <label><input type="radio" name="kering" value="Basah/Terdapat bercak bekas terkena air"> Basah/Terdapat bercak bekas terkena air</label><br>
-                    </div>
+                        </div>
                     <div class="mb-3">
                         <label for="fotoUpload3">FOTO <br></label>
                         <input type="file" class="" name="foto3[]" id="fotoUpload3" multiple>
@@ -379,7 +395,7 @@
 
                         <div class="form-group">
                             <label for="exampleInputPassword1">KETERANGAN</label>
-                            <input type="text" class="form-control" name="keterangan5" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
+                            <input type="text" class="form-control" name="keterangan6" id="keteranganDrum" placeholder="Masukan keterangan jika ada">
                         </div>
 
                     </div>
@@ -388,7 +404,10 @@
 
 
                       <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
-                      <button class="btn btn-light">Cancel</button>
+                      <button type="button" class="btn btn-light"
+                              @if($embed ?? false) onclick="window.parent.postMessage({type:'fomcheck-close'}, '*')" @endif>
+                          Batal
+                      </button>
 
             </form>
             </div>

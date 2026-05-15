@@ -262,16 +262,67 @@
     </tr>
   </thead>
     <tbody>
-      <tr><td align="center">1</td><td>Tujuan Surat Jalan</td><td style="vertical-align: middle; " align="center">{{$submission->jalan == 'Sesuai' ? '√' : ''}}</td><td style="vertical-align: middle; " align="center">{{$submission->jalan != 'Sesuai' ? '√' : ''}}</td><td>{{$submission->keterangan}}</td></tr>
-      <tr><td align="center">2</td><td>Barang Sesuai Surat Jalan</td><td style="vertical-align: middle; " align="center">{{$submission->sesuai == 'sesuai' ? '√' : ''}}</td><td style="vertical-align: middle; " align="center">{{$submission->sesuai != 'sesuai' ? '√' : ''}}</td><td>{{$submission->keterangan1}}</td></tr>
-      <tr><td align="center">3</td><td>Kondisi Kemasan Bagus</td><td style="vertical-align: middle; " align="center">√</td><td></td><td></td></tr>
-      <tr><td align="center">4</td><td>Kering / tidak kena air</td><td style="vertical-align: middle; " align="center">{{$submission->kering == 'Kering/Tidak kena air' ? '√' : ''}}</td><td style="vertical-align: middle; " align="center">{{$submission->kering != 'Kering/Tidak kena air' ? '√' : ''}}</td><td>{{$submission->keterangan3}}</td></tr>
-      <tr><td align="center">5</td><td>Kondisi pengikat (Straping) kencang</td><td style="vertical-align: middle; " align="center">√</td><td></td><td></td></tr>
-      <tr><td align="center">6</td><td>Jumlah sesuai surat jalan</td><td style="vertical-align: middle; " align="center">{{$submission->jumlahin == 'Sesuai' ? '√' : ''}}</td><td style="vertical-align: middle; " align="center">{{$submission->jumlahin != 'Sesuai' ? '√' : ''}}</td><td>{{$submission->keterangan5}}</td></tr>
-      <tr><td align="center">7</td><td>Drum tidak penyok / bocor (Resin - Alkali)</td><td style="vertical-align: middle; " align="center">√</td><td></td><td></td></tr>
-      <tr><td align="center">8</td><td>Rantai dialas karet Ban luar</td><td style="vertical-align: middle; " align="center">√</td><td></td><td></td></tr>
-      <tr><td align="center">9</td><td>Menggunakan Side Wall</td><td style="vertical-align: middle; " align="center">√</td><td></td><td></td></tr>
-      <tr><td align="center">10</td><td>Pengecekan Radiasi</td><td style="vertical-align: middle; " align="center">{{$submission->radiasi <= 2 ? '√' : ''}}</td><td style="vertical-align: middle; " align="center">{{$submission->radiasi > 2 ? '√' : ''}}</td><td style="color: {{$submission->radiasi > 2 ? 'red' : ''}}">{{'Radiasi : '.$submission->radiasi." Sivert | "}} {{$submission->ket_radiasi}}</td></tr>
+      @php
+          $dash = fn () => ['-', '-'];
+
+          $markYesNo = function (?string $value) use ($dash) {
+              if ($value === null || trim($value) === '') {
+                  return $dash();
+              }
+              $v = trim($value);
+              if (strcasecmp($v, 'Sesuai') === 0 || strcasecmp($v, 'sesuai') === 0) {
+                  return ['√', ''];
+              }
+              if (strcasecmp($v, 'Tidak Sesuai') === 0 || strcasecmp($v, 'tidak sesuai') === 0) {
+                  return ['', '√'];
+              }
+              return $dash();
+          };
+
+          $markKering = function (?string $value) use ($dash) {
+              if ($value === null || trim($value) === '') {
+                  return $dash();
+              }
+              if ($value === 'Kering/Tidak kena air') {
+                  return ['√', ''];
+              }
+              if ($value === 'Basah/Terdapat bercak bekas terkena air') {
+                  return ['', '√'];
+              }
+              return $dash();
+          };
+
+          $radiasiVal = $submission->radiasi;
+          if ($radiasiVal === null || trim((string) $radiasiVal) === '' || trim((string) $radiasiVal) === '-') {
+              $radiasiCheck = ['-', '-'];
+              $radiasiKet = 'Radiasi : - | ' . ($submission->ket_radiasi ?? '');
+              $radiasiColor = '';
+          } elseif (is_numeric($radiasiVal)) {
+              $radiasiOk = (float) $radiasiVal <= 2;
+              $radiasiCheck = [$radiasiOk ? '√' : '', $radiasiOk ? '' : '√'];
+              $radiasiKet = 'Radiasi : ' . $radiasiVal . ' Sivert | ' . ($submission->ket_radiasi ?? '');
+              $radiasiColor = $radiasiOk ? '' : 'red';
+          } else {
+              $radiasiCheck = $dash();
+              $radiasiKet = 'Radiasi : ' . $radiasiVal . ' | ' . ($submission->ket_radiasi ?? '');
+              $radiasiColor = '';
+          }
+
+          [$jalanOk, $jalanNo] = $markYesNo($submission->jalan ?? null);
+          [$sesuaiOk, $sesuaiNo] = $markYesNo($submission->sesuai ?? null);
+          [$keringOk, $keringNo] = $markKering($submission->kering ?? null);
+          [$jumlahOk, $jumlahNo] = $markYesNo($submission->jumlahin ?? null);
+      @endphp
+      <tr><td align="center">1</td><td>Tujuan Surat Jalan</td><td style="vertical-align: middle;" align="center">{{ $jalanOk }}</td><td style="vertical-align: middle;" align="center">{{ $jalanNo }}</td><td></td></tr>
+      <tr><td align="center">2</td><td>Barang Sesuai Surat Jalan</td><td style="vertical-align: middle;" align="center">{{ $sesuaiOk }}</td><td style="vertical-align: middle;" align="center">{{ $sesuaiNo }}</td><td>{{ $submission->keterangan1 ?? '' }}</td></tr>
+      <tr><td align="center">3</td><td>Kondisi Kemasan Bagus</td><td style="vertical-align: middle;" align="center">-</td><td style="vertical-align: middle;" align="center">-</td><td></td></tr>
+      <tr><td align="center">4</td><td>Kering / tidak kena air</td><td style="vertical-align: middle;" align="center">{{ $keringOk }}</td><td style="vertical-align: middle;" align="center">{{ $keringNo }}</td><td>{{ $submission->keterangan3 ?? '' }}</td></tr>
+      <tr><td align="center">5</td><td>Kondisi pengikat (Straping) kencang</td><td style="vertical-align: middle;" align="center">-</td><td style="vertical-align: middle;" align="center">-</td><td></td></tr>
+      <tr><td align="center">6</td><td>Jumlah sesuai surat jalan / packing list</td><td style="vertical-align: middle;" align="center">{{ $jumlahOk }}</td><td style="vertical-align: middle;" align="center">{{ $jumlahNo }}</td><td>{{ $submission->keterangan5 ?? '' }}</td></tr>
+      <tr><td align="center">7</td><td>Drum tidak penyok / bocor (Resin - Alkali)</td><td style="vertical-align: middle;" align="center">-</td><td style="vertical-align: middle;" align="center">-</td><td></td></tr>
+      <tr><td align="center">8</td><td>Rantai dialas karet Ban luar</td><td style="vertical-align: middle;" align="center">-</td><td style="vertical-align: middle;" align="center">-</td><td></td></tr>
+      <tr><td align="center">9</td><td>Menggunakan Side Wall</td><td style="vertical-align: middle;" align="center">-</td><td style="vertical-align: middle;" align="center">-</td><td></td></tr>
+      <tr><td align="center">10</td><td>Pengecekan Radiasi</td><td style="vertical-align: middle;" align="center">{{ $radiasiCheck[0] }}</td><td style="vertical-align: middle;" align="center">{{ $radiasiCheck[1] }}</td><td @if($radiasiColor) style="color: {{ $radiasiColor }}" @endif>{{ $radiasiKet }}</td></tr>
     </tbody>
   </table>
 
@@ -302,9 +353,9 @@
 
 </div>
 </body>
-<script>
+<!-- <script>
         window.onload = function() {
             window.print();
         };
-    </script>
+    </script> -->
 </html>

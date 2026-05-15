@@ -48,7 +48,7 @@
     <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2">
         <li>
             <a class="dropdown-item d-flex align-items-center rounded-3 mb-1 py-2"
-               href="{{ route('Mapping.admin.export-shipment') }}">
+               href="{{ route('Mapping.admin.export-shipment', request()->only(['start', 'end', 'search'])) }}">
                 <i class="bi bi-clock-history text-primary me-2"></i>
                 <span>Export Time</span>
             </a>
@@ -56,7 +56,7 @@
 
         <li>
             <a class="dropdown-item d-flex align-items-center rounded-3 py-2"
-               href="{{ route('Mapping.admin.export-penilaian') }}">
+               href="{{ route('Mapping.admin.export-penilaian', request()->only(['start', 'end', 'search'])) }}">
                 <i class="bi bi-clipboard-data text-success me-2"></i>
                 <span>Export Penilaian</span>
             </a>

@@ -84,8 +84,9 @@ class MaterialController extends Controller
             'date' => 'required|date',
             'supplier' => 'required|array',
             'metode_unloading' => 'required|string',
-            'ket_awal' => 'nullable|string',
+            'ket_awal' => 'required|string',
             'cuaca' => 'nullable|string',
+            'jalan' => 'required|string',
             'sesuai' => 'nullable|string',
             'baik' => 'nullable|string',
             'kering' => 'nullable|string',
@@ -102,7 +103,7 @@ class MaterialController extends Controller
             'foto6' => 'nullable|array',
             'foto7' => 'nullable|array',
             'ket_radiasi' => 'nullable',
-            'radiasi' => 'required',
+            'radiasi' => 'nullable',
             'note_keseluruhan' => 'nullable|string',
             'time' => 'required',
             'time_last' => 'required',
@@ -116,6 +117,7 @@ class MaterialController extends Controller
             'metode_unloading' => $request->input('metode_unloading'),
             'ket_awal' => $request->input('ket_awal'),
             'cuaca' => $request->input('cuaca'),
+            'jalan' => $request->input('jalan'),
             'keterangan' => $request->input('keterangan'),
             'sesuai' => $request->input('sesuai'),
             'keterangan1' => $request->input('keterangan1'),
@@ -434,6 +436,7 @@ class MaterialController extends Controller
             'time_akhir_bongkar' => 'nullable|date_format:H:i',
             'supplier' => 'required|array',
             'jenis' => 'nullable|string',
+            'jalan' => 'required|string',
 
             'radiasi' => 'required',
             'ket_radiasi' => 'nullable|string',
@@ -455,7 +458,7 @@ class MaterialController extends Controller
             'keterangan5' => 'nullable|string',
 
             'drum' => 'nullable|string',
-            'foto5' => 'nullable|array',
+            'foto6' => 'nullable|array',
             'keterangan6' => 'nullable|string',
 
         ]);
@@ -469,6 +472,7 @@ class MaterialController extends Controller
             'time_akhir_bongkar' => $request->input('time_akhir_bongkar'),
             'supplier' => json_encode($request->input('supplier')), // Convert array to JSON
             'jenis' => $request->input('jenis'),
+            'jalan' => $request->input('jalan'),
 
             'cuaca' => $request->input('cuaca'),
             'keterangan' => $request->input('keterangan'),

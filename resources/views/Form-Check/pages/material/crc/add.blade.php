@@ -1,4 +1,4 @@
-@extends('Form-Check.layout.main')
+@extends(($embed ?? false) ? 'fomcheck.embed' : 'Form-Check.layout.main')
 @section('title')
     Form Submission Material CRC
   @if(Auth::user()->role == 0)
@@ -126,13 +126,18 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-                    @if (Auth::user()->role == 0)
+                    @if(isset($storeRoute))
+                    <form action="{{ $storeRoute }}" method="POST" enctype="multipart/form-data">
+                    @elseif (Auth::user()->role == 0)
                     <form action="{{route('Form-Check.admin.crc.create')}}" method="POST" enctype="multipart/form-data">
                     @else
                         <form action="{{route('Form-Check.pegawai.crc.create')}}" method="POST" enctype="multipart/form-data">
                     @endif
                         @method('POST')
                 @csrf
+                @if($embed ?? false)
+                <input type="hidden" name="embed" value="1">
+                @endif
                 <div class="col-md-12">
                     <div class="form-group">
 
@@ -159,14 +164,67 @@
                         <input type="time" name="time_last" class="form-control" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
                       </div>
                       <div class="form-group">
-                        <label for="exampleInputUsername1">Pengecekan Radiasi<small style="color: red;">*</small></label>
-                        <input type="decimal" class="form-control" name="radiasi" id="exampleInputUsername1" placeholder="Cth : 1.9" required>
+    <!-- Checkbox -->
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="checkRadiasi"
+               @checked(old('radiasi', '-') !== '-' && old('radiasi') !== '')>
+        <label class="form-check-label" for="checkRadiasi">
+            Isi Pengecekan Radiasi
+        </label>
+    </div>
+
+    <!-- Input Radiasi -->
+    <label for="radiasiCrc">Pengecekan Radiasi</label>
+    <input type="text" class="form-control" name="radiasi" id="radiasiCrc"
+           value="{{ old('radiasi', '-') }}" placeholder="Cth : 1.9">
+    <label for="ketRadiasi" class="mt-2">KETERANGAN</label>
+    <input type="text" class="form-control" name="ket_radiasi" id="ketRadiasi"
+           value="{{ old('ket_radiasi', '-') }}" placeholder="(Gunakan titik bukan koma)">
                       </div>
-                      <div class="form-group">
-                            <label for="exampleInputPassword1">KETERANGAN</label>
-                            <input type="text" class="form-control" name="ket_radiasi" id="exampleInputPassword1" placeholder="(Gunakan titik bukan koma)">
-                        </div>
-                        <div class="mb-4 metode-unloading-group">
+
+<script>
+(function () {
+    const checkRadiasi = document.getElementById('checkRadiasi');
+    const radiasiCrc = document.getElementById('radiasiCrc');
+    const ketRadiasi = document.getElementById('ketRadiasi');
+    const form = document.querySelector('form[enctype="multipart/form-data"]');
+
+    function setDashMode() {
+        radiasiCrc.required = false;
+        radiasiCrc.readOnly = true;
+        radiasiCrc.classList.add('bg-light');
+        radiasiCrc.value = '-';
+        ketRadiasi.readOnly = true;
+        ketRadiasi.classList.add('bg-light');
+        ketRadiasi.value = '-';
+    }
+
+    function setInputMode() {
+        radiasiCrc.required = true;
+        radiasiCrc.readOnly = false;
+        radiasiCrc.classList.remove('bg-light');
+        if (radiasiCrc.value === '-') radiasiCrc.value = '';
+        ketRadiasi.readOnly = false;
+        ketRadiasi.classList.remove('bg-light');
+        if (ketRadiasi.value === '-') ketRadiasi.value = '';
+    }
+
+    function toggleRadiasi() {
+        if (checkRadiasi.checked) setInputMode();
+        else setDashMode();
+    }
+
+    checkRadiasi.addEventListener('change', toggleRadiasi);
+    toggleRadiasi();
+
+    if (form) {
+        form.addEventListener('submit', function () {
+            if (!checkRadiasi.checked) setDashMode();
+        });
+    }
+})();
+</script>
+<div class="mb-4 metode-unloading-group">
     <label class="form-label fw-bold">
         Metode Unloading <span class="text-danger">*</span>
     </label>
@@ -229,7 +287,6 @@
         transform: scale(1.02);
     }
 </style>
-                </div>
                 <hr class="mt-2">
                     <div class="form-group">
                         <label for="exampleInputPassword1">
@@ -267,16 +324,13 @@
                 <div class="row">
                     <div class="col-md-6">
 
-
                         <div class="form-group">
-                            <label for="jumlahDropdown">Jumlah<small style="color: red;">*</small></label>
-                            <select class="form-control" name="ket_awal" id="jumlahDropdown">
-                                <option value="" selected disabled>--Pilih jumlah--</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
+                            <label for="jumlahDropdown">Jumlah <small style="color: red;">*</small></label>
+                            <select class="form-control" name="ket_awal" id="jumlahDropdown" required>
+                                <option value="" disabled @selected(!old('ket_awal'))>--Pilih jumlah--</option>
+                                @foreach(['1','2','3','4','5'] as $n)
+                                <option value="{{ $n }}" @selected(old('ket_awal') == $n)>{{ $n }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <hr>
@@ -286,6 +340,11 @@
                             <label><input class="mt-3" type="radio" name="cuaca" value="Cerah"> Cerah</label><br>
                             <label><input type="radio" name="cuaca" value="Berawan"> Berawan</label><br>
                             <label><input type="radio" name="cuaca" value="Hujan"> Hujan</label><br>
+                        </div>
+                        <div class="form-group">
+                            TUJUAN SURAT JALAN <small style="color: red;">*</small><br class="mb-3">
+                            <label><input class="mt-3" type="radio" name="jalan" value="Sesuai" @checked(old('jalan') === 'Sesuai')> Sesuai</label><br>
+                            <label><input type="radio" name="jalan" value="Tidak Sesuai" @checked(old('jalan') === 'Tidak Sesuai')> Tidak Sesuai</label><br>
                         </div>
                         <div class="mb-3">
                             <label for="fotoUpload">FOTO <small style="color: red;">*</small><br></label>
@@ -584,7 +643,10 @@
                           <textarea class="form-control" name="note_keseluruhan" id="noteKeseluruhan" rows="3" placeholder="Masukkan keterangan umum/keseluruhan terkait pengecekan dan kondisi material"></textarea>
                       </div>
                       <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
-                      <button class="btn btn-light">Cancel</button>
+                      <button type="button" class="btn btn-light"
+                              @if($embed ?? false) onclick="window.parent.postMessage({type:'fomcheck-close'}, '*')" @endif>
+                          Batal
+                      </button>
 
             </form>
             </div>

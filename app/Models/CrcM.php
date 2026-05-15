@@ -20,6 +20,7 @@ class CrcM extends Model
         'metode_unloading',
         'ket_awal',
         'cuaca',
+        'jalan',
         'keterangan',
         'sesuai',   
         'keterangan1',

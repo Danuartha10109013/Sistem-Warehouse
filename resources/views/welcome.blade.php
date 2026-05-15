@@ -336,7 +336,7 @@ $akses = json_decode(Auth::user()->type);
 $menuItems = [
     "SP"  => ["title" => "Ship Mark", "icon" => "mdi-shipping-pallet", "route" => Auth::user()->role == 0 ? route('Ship-Mark.admin.dashboard') : route('Ship-Mark.pegawai.dashboard')],
     "MP"  => ["title" => "Mapping", "icon" => "mdi-map-marker-path", "route" => Auth::user()->role == 0 ? route('Mapping.admin.shipment') : route('Mapping.pegawai.shipment')],
-    "FC"  => ["title" => "Form Check", "icon" => "mdi-checkbox-marked-outline", "route" => Auth::user()->role == 0 ? route('Form-Check.admin.dashboard') : route('Form-Check.pegawai.dashboard')],
+    "FC"  => ["title" => "Form Check", "icon" => "mdi-checkbox-marked-outline", "route" => Auth::user()->role == 0 ? route('fomcheck') : route('fomcheck')],
     "OP"  => ["title" => "Open Packing", "icon" => "mdi-package-variant-closed-check", "route" => Auth::user()->role == 0 ? route('Open-Packing.admin.dashboard') : route('Open-Packing.pegawai.dashboard')],
     "PL"  => ["title" => "Packing List", "icon" => "mdi-format-list-checks", "route" => route('Packing-List.admin.dashboard')],
     "CK"  => ["title" => "Checklist Kendaraan", "icon" => "mdi-car", "route" => Auth::user()->role == 0 ? route('Kendaraan.admin.dashboard') : route('Kendaraan.pegawai.dashboard')],

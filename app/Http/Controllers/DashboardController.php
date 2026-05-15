@@ -146,15 +146,30 @@ class DashboardController extends Controller
         return redirect()->back()->with('success','Shipment has been deleted');
     }
 
-    public function export()
+    public function export(Request $request)
     {
         $date = now()->format('d-m-Y');
-        return Excel::download(new MappingContainerExportExcel, 'Mapping-Container-Time-' . $date . '.xlsx');
+        return Excel::download(
+            new MappingContainerExportExcel(
+                $request->input('start'),
+                $request->input('end'),
+                $request->input('search')
+            ),
+            'Mapping-Container-Time-' . $date . '.xlsx'
+        );
     }
-    public function exporting()
+
+    public function exporting(Request $request)
     {
         $date = now()->format('d-m-Y');
-        return Excel::download(new MappingContainerExportExcelPenilaian, 'Mapping-Container-Penilaian-' . $date . '.xlsx');
+        return Excel::download(
+            new MappingContainerExportExcelPenilaian(
+                $request->input('start'),
+                $request->input('end'),
+                $request->input('search')
+            ),
+            'Mapping-Container-Penilaian-' . $date . '.xlsx'
+        );
     }
 
 

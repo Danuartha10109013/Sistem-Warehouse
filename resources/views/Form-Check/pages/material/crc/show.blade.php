@@ -1,4 +1,4 @@
-@extends('Form-Check.layout.main')
+@extends(($embed ?? false) ? 'fomcheck.embed' : 'Form-Check.layout.main')
 @section('title', 'Detail Submission Material CRC')
 @section('content')
 <style>
@@ -185,6 +185,11 @@
                         <div class="form-group">
                             <label>Cuaca</label>
                             <input type="text" class="form-control" value="{{ $submission->cuaca ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tujuan Surat Jalan</label>
+                            <input type="text" class="form-control" value="{{ $submission->jalan ?? '-' }}" readonly>
                         </div>
 
                         <div class="form-group">

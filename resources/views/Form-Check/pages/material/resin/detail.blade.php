@@ -1,4 +1,4 @@
-@extends('Form-Check.layout.main')
+@extends(($embed ?? false) ? 'fomcheck.embed' : 'Form-Check.layout.main')
 
 @section('title', 'Detail Submission Material RESIN')
 

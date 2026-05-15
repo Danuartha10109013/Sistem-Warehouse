@@ -19,10 +19,35 @@ class MappingContainerExportExcelPenilaian implements FromCollection, WithHeadin
 {
     use Exportable;
 
+    protected ?string $start;
+    protected ?string $end;
+    protected ?string $search;
+
+    public function __construct(?string $start = null, ?string $end = null, ?string $search = null)
+    {
+        $this->start = $start;
+        $this->end = $end;
+        $this->search = $search;
+    }
+
+    protected function getShipments()
+    {
+        $query = Shipment::query();
+
+        if ($this->search) {
+            $query->where('no_gs', 'like', '%' . $this->search . '%');
+        }
+
+        if ($this->start && $this->end) {
+            $query->whereBetween('created_at', [$this->start, $this->end]);
+        }
+
+        return $query->latest()->get();
+    }
+
     public function collection()
     {
-        // Get all shipments with related pengecekan data
-        $shipments = Shipment::all();
+        $shipments = $this->getShipments();
         $data = collect();
 
         foreach ($shipments as $index => $shipment) {
