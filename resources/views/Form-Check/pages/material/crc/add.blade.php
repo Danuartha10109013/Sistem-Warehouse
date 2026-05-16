@@ -707,6 +707,7 @@
                           <label for="noteKeseluruhan">Note</label>
                           <textarea class="form-control" name="note_keseluruhan" id="noteKeseluruhan" rows="3" placeholder="Masukkan keterangan umum/keseluruhan terkait pengecekan dan kondisi material">{{ old('note_keseluruhan', $isEdit ? ($submission->note_keseluruhan ?? '') : '') }}</textarea>
                       </div>
+                    
                       <button type="submit" class="btn btn-primary me-2">{{ $isEdit ? 'Simpan perubahan' : 'Submit' }}</button>
                       <button type="button" class="btn btn-light"
                               @if($embed ?? false) onclick="window.parent.postMessage({type:'fomcheck-close'}, '*')" @endif>
