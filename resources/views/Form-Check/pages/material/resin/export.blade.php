@@ -19,6 +19,7 @@
                 <th>Tanggal Surat Jalan</th>
                 <th>Pengirim / Supplier</th>
                 <th>Jenis</th>
+                <th>Jumlah (FM.WH.02.02)</th>
                 <th>Cuaca</th>
                 <th>Keterangan</th>
                 <th>Barang Sesuai Surat Jalan</th>
@@ -45,6 +46,7 @@
                 <td>{{$d->date}}</td>
                 <td>{{$d->supplier}}</td>
                 <td>{{$d->jenis}}</td>
+                <td>{{$d->jumlah}}</td>
                 <td>{{$d->cuaca}}</td>
                 <td>{{$d->keterangan}}</td>
                 <td>{{$d->sesuai}}</td>

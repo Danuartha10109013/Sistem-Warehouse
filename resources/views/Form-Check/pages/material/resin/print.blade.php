@@ -212,10 +212,13 @@
       <td width="25%" style="border: none">: ______________________</td>
       @endif
       <td style="border: none">Jumlah</td>
-      @if($submission->jumlahin)
+      @php
+          $jumlahCetak = trim((string) ($submission->jumlah ?? ''));
+      @endphp
+      @if($jumlahCetak !== '')
       <td width="25%" style="border: none">:
         <span style="text-decoration: underline;font-weight: bold">
-            {{$submission->jumlahin}}
+            {{ $jumlahCetak }}
         </span>
       </td>
       @else
@@ -316,7 +319,7 @@
       @endphp
       <tr><td align="center">1</td><td>Tujuan Surat Jalan</td><td style="vertical-align: middle;" align="center">{{ $jalanOk }}</td><td style="vertical-align: middle;" align="center">{{ $jalanNo }}</td><td></td></tr>
       <tr><td align="center">2</td><td>Barang Sesuai Surat Jalan</td><td style="vertical-align: middle;" align="center">{{ $sesuaiOk }}</td><td style="vertical-align: middle;" align="center">{{ $sesuaiNo }}</td><td>{{ $submission->keterangan1 ?? '' }}</td></tr>
-      <tr><td align="center">3</td><td>Kondisi Kemasan Bagus</td><td style="vertical-align: middle;" align="center">-</td><td style="vertical-align: middle;" align="center">-</td><td></td></tr>
+      <tr><td align="center">3</td><td>Kondisi Kemasan Bagus (CRC)</td><td style="vertical-align: middle;" align="center">-</td><td style="vertical-align: middle;" align="center">-</td><td></td></tr>
       <tr><td align="center">4</td><td>Kering / tidak kena air</td><td style="vertical-align: middle;" align="center">{{ $keringOk }}</td><td style="vertical-align: middle;" align="center">{{ $keringNo }}</td><td>{{ $submission->keterangan3 ?? '' }}</td></tr>
       <tr><td align="center">5</td><td>Kondisi pengikat (Straping) kencang</td><td style="vertical-align: middle;" align="center">-</td><td style="vertical-align: middle;" align="center">-</td><td></td></tr>
       <tr><td align="center">6</td><td>Jumlah sesuai surat jalan</td><td style="vertical-align: middle;" align="center">{{ $jumlahOk }}</td><td style="vertical-align: middle;" align="center">{{ $jumlahNo }}</td><td>{{ $submission->keterangan5 ?? '' }}</td></tr>

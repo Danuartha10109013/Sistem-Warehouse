@@ -193,6 +193,14 @@
                                                 data-title="Detail {{ $typeLabels[$type] }}">
                                             Detail
                                         </button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary btn-open-modal"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#formModal"
+                                                data-url="{{ route('fomcheck.'.$type.'.edit', ['id' => $d->id, 'embed' => 1]) }}"
+                                                data-title="Edit {{ $typeLabels[$type] }}">
+                                            Edit
+                                        </button>
                                         @if($isAdmin)
                                         <a href="{{ route($printRoute, $d->id) }}" class="btn btn-sm btn-success">Print</a>
                                         <button type="button"

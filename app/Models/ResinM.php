@@ -18,6 +18,7 @@ class ResinM extends Model
         'time_akhir_bongkar',
         'supplier',
         'jenis',
+        'jumlah',
         'jalan',
         'cuaca',
         'keterangan',

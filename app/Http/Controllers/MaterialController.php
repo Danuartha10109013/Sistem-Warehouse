@@ -259,6 +259,7 @@ class MaterialController extends Controller
             'time_akhir_bongkar' => 'nullable|date_format:H:i',
             'supplier' => 'required|array',
             'jenis' => 'nullable|string',
+            'jumlah' => 'required|string|max:191',
 
             'cuaca' => 'nullable|string',
             'foto' => 'nullable|array',
@@ -291,6 +292,7 @@ class MaterialController extends Controller
             'time_akhir_bongkar' => $request->input('time_akhir_bongkar'),
             'supplier' => json_encode($request->input('supplier')), // Convert array to JSON
             'jenis' => $request->input('jenis'),
+            'jumlah' => $request->input('jumlah'),
 
             'cuaca' => $request->input('cuaca'),
             'keterangan' => $request->input('keterangan'),
@@ -436,6 +438,7 @@ class MaterialController extends Controller
             'time_akhir_bongkar' => 'nullable|date_format:H:i',
             'supplier' => 'required|array',
             'jenis' => 'nullable|string',
+            'jumlah' => 'required|string|max:191',
             'jalan' => 'required|string',
 
             'radiasi' => 'required',
@@ -472,6 +475,7 @@ class MaterialController extends Controller
             'time_akhir_bongkar' => $request->input('time_akhir_bongkar'),
             'supplier' => json_encode($request->input('supplier')), // Convert array to JSON
             'jenis' => $request->input('jenis'),
+            'jumlah' => $request->input('jumlah'),
             'jalan' => $request->input('jalan'),
 
             'cuaca' => $request->input('cuaca'),

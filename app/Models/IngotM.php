@@ -20,6 +20,7 @@ class IngotM extends Model
         'time_akhir_bongkar',
         'supplier',
         'jenis',
+        'jumlah',
         'cuaca',
         'keterangan',
         'sesuai',

@@ -10,6 +10,40 @@
   @endif
 @endsection
 @section('content')
+@php
+    $submission = $submission ?? null;
+    $isEdit = filled($submission);
+    $dateDefault = '';
+    if ($isEdit && !empty($submission->date)) {
+        try {
+            $dateDefault = \Carbon\Carbon::parse($submission->date)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            $dateDefault = is_string($submission->date) ? $submission->date : '';
+        }
+    }
+    $supplierVals = old('supplier', $isEdit ? (json_decode($submission->supplier, true) ?? []) : []);
+    if (!is_array($supplierVals)) {
+        $supplierVals = [$supplierVals];
+    }
+    $ingotSupplierPick = $supplierVals[0] ?? '';
+    $ingotSupplierKnown = ['Glencore', 'Trafigura', 'Rio Tinto', 'Russal', 'Korean Zinc', 'JD Resources', 'Baotou'];
+    $ingotSupplierOther = ($ingotSupplierPick !== '' && !in_array($ingotSupplierPick, $ingotSupplierKnown, true)) ? $ingotSupplierPick : '';
+    $jenisVal = old('jenis', $isEdit ? ($submission->jenis ?? '') : '');
+    $jenisKnown = ['Alumunium Ingot', 'Zinc Ingot'];
+    $jenisOther = ($jenisVal !== '' && !in_array($jenisVal, $jenisKnown, true)) ? $jenisVal : '';
+    $timeForInput = function (string $field) use ($isEdit, $submission) {
+        $fallback = $isEdit ? (data_get($submission, $field) ?? '') : '';
+        $raw = old($field, $fallback);
+        if ($raw === null || $raw === '') {
+            return '';
+        }
+        try {
+            return \Carbon\Carbon::parse($raw)->format('H:i');
+        } catch (\Throwable $e) {
+            return '';
+        }
+    };
+@endphp
 <style>
     /* Fixed background STOP SUAP yang selalu terlihat saat scroll - Di atas item-item form */
     .stop-suap-background {
@@ -98,7 +132,7 @@
         <h3 class="page-title">
           <span class="page-title-icon bg-gradient-primary text-white me-2">
             <i class="mdi mdi-home"></i>
-          </span> Add Submission Material INGOT
+          </span> {{ $isEdit ? 'Edit' : 'Add' }} Submission Material INGOT
         </h3>
         <nav aria-label="breadcrumb">
           <ul class="breadcrumb">
@@ -115,138 +149,77 @@
                 <h4 class="card-title">From Daily Checklist Kedatangan Material  FM.WH.02.01</h4>
                 <p class="card-description">Form checklist ini dibuat untuk memastikan kondisi material yang datang dalam kondisi baik (tanpa cacat) sesuai dengan spesifikasi yang telah di tentukan sebelumnya. <br>
                     <br>Serta untuk melihat kesesuaian material yang ada pada surat jalan dengan kondisi fisiknya.</p>
-                    @if(isset($storeRoute))
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Terjadi kesalahan.</strong> Mohon periksa kembali isian form Anda.
+                            <ul class="mt-2 mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @isset($updateRoute)
+                    <form action="{{ $updateRoute }}" method="POST" enctype="multipart/form-data">
+                    @elseif(isset($storeRoute))
                     <form action="{{ $storeRoute }}" method="POST" enctype="multipart/form-data">
                     @elseif (Auth::user()->role == 0)
                     <form action="{{route('Form-Check.admin.ingot.create')}}" method="POST" enctype="multipart/form-data">
                     @else
                         <form action="{{route('Form-Check.pegawai.ingot.create')}}" method="POST" enctype="multipart/form-data">
                     @endif
-                        @method('POST')
                 @csrf
+                @isset($updateRoute)
+                @method('PUT')
+                @endisset
                 @if($embed ?? false)
                 <input type="hidden" name="embed" value="1">
                 @endif
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="exampleInputUsername1">PENERIMA<small style="color: red;">*</small></label>
-                        <input type="text" name="user_id" value="{{ Auth::user()->id }}" hidden>
-                        <input type="text" class="form-control" id="exampleInputUsername1" value="{{ Auth::user()->name }}" readonly>
+                        <input type="text" name="user_id" value="{{ old('user_id', $isEdit ? $submission->user_id : Auth::user()->id) }}" hidden>
+                        <input type="text" class="form-control" id="exampleInputUsername1" value="{{ $respondenName ?? Auth::user()->name }}" readonly>
                       </div>
                     <div class="form-group">
                         <label for="exampleInputUsername1">NOMOR DOKUMEN<small style="color: red;">*</small></label>
-                        <input type="text" class="form-control" name="shift_leader" id="exampleInputUsername1" required>
+                        <input type="text" class="form-control" name="shift_leader" id="exampleInputUsername1" value="{{ old('shift_leader', $isEdit ? ($submission->shift_leader ?? '') : '') }}" required>
                       </div>
 
 
                     <div class="form-group">
                         <label for="exampleInputEmail1">TANGGAL SURAT JALAN<small style="color: red;">*</small></label>
-                        <input type="Date" class="form-control" name="date" id="exampleInputEmail1" >
+                        <input type="Date" class="form-control" name="date" id="exampleInputEmail1" value="{{ old('date', $dateDefault) }}" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="inputJumlahIngot">Jumlah <small style="color: red;">*</small></label>
+                        <input type="text" class="form-control" name="jumlah" id="inputJumlahIngot"
+                               value="{{ old('jumlah', $isEdit ? ($submission->jumlah ?? '') : '') }}"
+                               placeholder="Contoh: 17 Pcs"
+                               maxlength="191" required>
+                        <!-- <small class="text-muted d-block mt-1">Terpisah dari checklist &quot;Jumlah sesuai surat jalan&quot; di bawah.</small> -->
                       </div>
                       <div class="form-group">
                         <label for="jamChecklist">Jam Checklist<small style="color: red;">*</small></label>
-                        <input type="time" name="time" class="form-control" id="jamChecklist" placeholder="Masukan keterangan jika ada">
+                        <input type="time" name="time" class="form-control" id="jamChecklist" placeholder="Masukan keterangan jika ada" value="{{ $timeForInput('time') }}" required>
                       </div>
                       <div class="form-group">
                         <label for="awalBongkar">Awal Bongkar<small style="color: red;">*</small></label>
-                        <input type="time" name="time_awal_bongkar" class="form-control" id="awalBongkar" placeholder="Masukan keterangan jika ada">
+                        <input type="time" name="time_awal_bongkar" class="form-control" id="awalBongkar" placeholder="Masukan keterangan jika ada" value="{{ $timeForInput('time_awal_bongkar') }}">
                       </div>
                       <div class="form-group">
                         <label for="akhirBongkar">Akhir Bongkar<small style="color: red;">*</small></label>
-                        <input type="time" name="time_akhir_bongkar" class="form-control" id="akhirBongkar" placeholder="Masukan keterangan jika ada">
+                        <input type="time" name="time_akhir_bongkar" class="form-control" id="akhirBongkar" placeholder="Masukan keterangan jika ada" value="{{ $timeForInput('time_akhir_bongkar') }}">
                       </div>
                       <div class="form-group">
-
-    <!-- Checkbox -->
-    <div class="form-check mb-2">
-        <input class="form-check-input" type="checkbox" id="checkRadiasi" checked>
-        <label class="form-check-label" for="checkRadiasi">
-            Isi Pengecekan Radiasi
-        </label>
-    </div>
-
-    <!-- Input Radiasi -->
-    <label for="radiasiIngot">
-        Pengecekan Radiasi
-        <small style="color: red;">*</small>
-    </label>
-
-    <input 
-        type="text"
-        class="form-control bg-light"
-        name="radiasi"
-        id="radiasiIngot"
-        placeholder="Cth : 1.9"
-        required
-    >
-</div>
-
-<!-- Keterangan -->
-<div class="form-group">
-    <label for="ketRadiasi">KETERANGAN</label>
-
-    <input 
-        type="text"
-        class="form-control"
-        name="ket_radiasi"
-        id="ketRadiasi"
-        placeholder="(Gunakan titik bukan koma)"
-    >
-</div>
-
-<script>
-    const checkRadiasi = document.getElementById('checkRadiasi');
-    const radiasiIngot = document.getElementById('radiasiIngot');
-    const ketRadiasi = document.getElementById('ketRadiasi');
-
-    function toggleRadiasi() {
-
-        if (checkRadiasi.checked) {
-
-            // Wajib isi
-            radiasiIngot.required = true;
-            radiasiIngot.readOnly = false;
-
-            if (radiasiIngot.value === '-') {
-                radiasiIngot.value = '';
-            }
-
-            ketRadiasi.readOnly = false;
-
-            if (ketRadiasi.value === '-') {
-                ketRadiasi.value = '';
-            }
-
-        } else {
-
-            // Auto isi "-"
-            radiasiIngot.required = false;
-            radiasiIngot.value = '-';
-            radiasiIngot.readOnly = true;
-
-            ketRadiasi.value = '-';
-            ketRadiasi.readOnly = true;
-        }
-    }
-
-    // Event checkbox
-    checkRadiasi.addEventListener('change', toggleRadiasi);
-
-    // Jalankan pertama kali
-    toggleRadiasi();
-
-    // Sebelum submit form
-    document.querySelector('form').addEventListener('submit', function() {
-
-        // Jika checkbox tidak dicentang
-        if (!checkRadiasi.checked) {
-            radiasiIngot.required = false;
-            radiasiIngot.value = '-';
-
-            ketRadiasi.value = '-';
-        }
-    });
-</script>
+                        <label for="exampleInputUsername1">Pengecekan Radiasi<small style="color: red;">*</small></label>
+                        <input type="text" class="form-control bg-light" name="radiasi" id="radiasiIngot" placeholder="Cth : 1.9" value="{{ old('radiasi', $isEdit ? ($submission->radiasi ?? '') : '') }}" required>
+                      </div>
+                      <div class="form-group">
+                            <label for="exampleInputPassword1">KETERANGAN</label>
+                            <input type="text" class="form-control" name="ket_radiasi" id="exampleInputPassword1" placeholder="(Gunakan titik bukan koma)" value="{{ old('ket_radiasi', $isEdit ? ($submission->ket_radiasi ?? '') : '') }}">
+                        </div>
                 </div>
                 <hr class="mt-2">
 
@@ -258,23 +231,23 @@
                 <div class="row mt-3">
 
                         <div class="col-md-6">
-                            <label><input type="radio" name="supplier[]" value="Glencore"> Glencore</label><br>
-                            <label><input type="radio" name="supplier[]" value="Trafigura"> Trafigura</label><br>
-                            <label><input type="radio" name="supplier[]" value="Rio Tinto"> Rio Tinto</label><br>
-                            <label><input type="radio" name="supplier[]" value="Russal"> Russal</label><br>
-                            <label><input type="radio" name="supplier[]" value="Korean Zinc"> Korean Zinc</label><br>
-                            <label><input type="radio" name="supplier[]" value="JD Resources"> JD Resources</label><br>
-                            <label><input type="radio" name="supplier[]" value="Baotou"> Baotou</label><br>
-                            <label><input type="radio" id="otherCheckbox"> Other: </label>
-                            <input type="text" name="supplier[]" id="otherText" disabled><br>
+                            <label><input type="radio" name="supplier[]" value="Glencore" @checked(!$ingotSupplierOther && $ingotSupplierPick === 'Glencore')> Glencore</label><br>
+                            <label><input type="radio" name="supplier[]" value="Trafigura" @checked(!$ingotSupplierOther && $ingotSupplierPick === 'Trafigura')> Trafigura</label><br>
+                            <label><input type="radio" name="supplier[]" value="Rio Tinto" @checked(!$ingotSupplierOther && $ingotSupplierPick === 'Rio Tinto')> Rio Tinto</label><br>
+                            <label><input type="radio" name="supplier[]" value="Russal" @checked(!$ingotSupplierOther && $ingotSupplierPick === 'Russal')> Russal</label><br>
+                            <label><input type="radio" name="supplier[]" value="Korean Zinc" @checked(!$ingotSupplierOther && $ingotSupplierPick === 'Korean Zinc')> Korean Zinc</label><br>
+                            <label><input type="radio" name="supplier[]" value="JD Resources" @checked(!$ingotSupplierOther && $ingotSupplierPick === 'JD Resources')> JD Resources</label><br>
+                            <label><input type="radio" name="supplier[]" value="Baotou" @checked(!$ingotSupplierOther && $ingotSupplierPick === 'Baotou')> Baotou</label><br>
+                            <label><input type="radio" id="otherCheckbox" @checked($ingotSupplierOther !== '')> Other: </label>
+                            <input type="text" name="supplier[]" id="otherText" value="{{ $ingotSupplierOther }}" @disabled($ingotSupplierOther === '')><br>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 JENIS <small style="color: red;">*</small><br class="mb-3">
-                                <label><input class="mt-3" type="radio" name="jenis" value="Alumunium Ingot"> Alumunium Ingot</label><br>
-                                <label><input type="radio" name="jenis" value="Zinc Ingot"> Zinc Ingot</label><br>
-                                <label><input type="radio" id="otjenis"> Other: </label>
-                                       <input type="text" name="jenis" id="otText" disabled><br>
+                                <label><input class="mt-3" type="radio" name="jenis" value="Alumunium Ingot" @checked(!$jenisOther && $jenisVal === 'Alumunium Ingot')> Alumunium Ingot</label><br>
+                                <label><input type="radio" name="jenis" value="Zinc Ingot" @checked(!$jenisOther && $jenisVal === 'Zinc Ingot')> Zinc Ingot</label><br>
+                                <label><input type="radio" id="otjenis" @checked($jenisOther !== '')> Other: </label>
+                                       <input type="text" name="jenis" id="otText" value="{{ $jenisOther }}" @disabled($jenisOther === '')><br>
                             </div>
                         </div>
 
@@ -289,19 +262,27 @@
                         var otherText = document.getElementById('otText');
                         otherText.disabled = !this.checked;
                     });
+                    (function () {
+                        var oc = document.getElementById('otherCheckbox');
+                        var ot = document.getElementById('otherText');
+                        if (oc && ot && oc.checked) ot.disabled = false;
+                        var oj = document.getElementById('otjenis');
+                        var otx = document.getElementById('otText');
+                        if (oj && otx && oj.checked) otx.disabled = false;
+                    })();
                 </script>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             CUACA <small style="color: red;">*</small><br class="mb-3">
-                            <label><input class="mt-3" type="radio" name="cuaca" value="Cerah"> Cerah</label><br>
-                            <label><input type="radio" name="cuaca" value="Berawan"> Berawan</label><br>
-                            <label><input type="radio" name="cuaca" value="Hujan"> Hujan</label><br>
+                            <label><input class="mt-3" type="radio" name="cuaca" value="Cerah" @checked(old('cuaca', $isEdit ? ($submission->cuaca ?? '') : '') === 'Cerah')> Cerah</label><br>
+                            <label><input type="radio" name="cuaca" value="Berawan" @checked(old('cuaca', $isEdit ? ($submission->cuaca ?? '') : '') === 'Berawan')> Berawan</label><br>
+                            <label><input type="radio" name="cuaca" value="Hujan" @checked(old('cuaca', $isEdit ? ($submission->cuaca ?? '') : '') === 'Hujan')> Hujan</label><br>
                         </div>
                         <div class="form-group">
                             TUJUAN SURAT JALAN <small style="color: red;">*</small><br class="mb-3">
-                            <label><input class="mt-3" type="radio" name="jalan" value="Sesuai"> Sesuai</label><br>
-                            <label><input type="radio" name="jalan" value="Tidak Sesuai"> Tidak Sesuai</label><br>
+                            <label><input class="mt-3" type="radio" name="jalan" value="Sesuai" @checked(old('jalan', $isEdit ? ($submission->jalan ?? '') : '') === 'Sesuai')> Sesuai</label><br>
+                            <label><input type="radio" name="jalan" value="Tidak Sesuai" @checked(old('jalan', $isEdit ? ($submission->jalan ?? '') : '') === 'Tidak Sesuai')> Tidak Sesuai</label><br>
                         </div>
                         <div class="mb-3">
                             <label for="fotoUpload">FOTO <small style="color: red;">*</small><br></label>
@@ -331,13 +312,13 @@
 
                         <div class="form-group">
                             <label for="exampleInputPassword1">KETERANGAN</label>
-                            <input type="text" class="form-control" name="keterangan" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
+                            <input type="text" class="form-control" name="keterangan" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada" value="{{ old('keterangan', $isEdit ? ($submission->keterangan ?? '') : '') }}">
                         </div>
 
                         <div class="form-group">
                                 BARANG SESUAI SURAT JALAN <small style="color: red;">*</small><br class="mb-3">
-                                <label><input class="mt-3" type="radio" name="sesuai" value="sesuai"> Sesuai</label><br>
-                                <label><input type="radio" name="sesuai" value="tidak sesuai"> Tidak Sesuai</label><br>
+                                <label><input class="mt-3" type="radio" name="sesuai" value="sesuai" @checked(old('sesuai', $isEdit ? ($submission->sesuai ?? '') : '') === 'sesuai')> Sesuai</label><br>
+                                <label><input type="radio" name="sesuai" value="tidak sesuai" @checked(old('sesuai', $isEdit ? ($submission->sesuai ?? '') : '') === 'tidak sesuai')> Tidak Sesuai</label><br>
                         </div>
                         <div class="mb-3">
                             <label for="fotoUpload1">FOTO <br></label>
@@ -367,7 +348,7 @@
 
                         <div class="form-group">
                             <label for="exampleInputPassword1">KETERANGAN</label>
-                            <input type="text" class="form-control" name="keterangan1" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
+                            <input type="text" class="form-control" name="keterangan1" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada" value="{{ old('keterangan1', $isEdit ? ($submission->keterangan1 ?? '') : '') }}">
                         </div>
 
 
@@ -377,8 +358,8 @@
 
                         <div class="form-group">
                             KERING / BASAH <small style="color: red;">*</small><br class="mb-3">
-                            <label><input class="mt-3" type="radio" name="kering" value="Kering/Tidak kena air"> Kering/Tidak kena air</label><br>
-                            <label><input type="radio" name="kering" value="Basah/Terdapat bercak bekas terkena air"> Basah/Terdapat bercak bekas terkena air</label><br>
+                            <label><input class="mt-3" type="radio" name="kering" value="Kering/Tidak kena air" @checked(old('kering', $isEdit ? ($submission->kering ?? '') : '') === 'Kering/Tidak kena air')> Kering/Tidak kena air</label><br>
+                            <label><input type="radio" name="kering" value="Basah/Terdapat bercak bekas terkena air" @checked(old('kering', $isEdit ? ($submission->kering ?? '') : '') === 'Basah/Terdapat bercak bekas terkena air')> Basah/Terdapat bercak bekas terkena air</label><br>
                     </div>
                     <div class="mb-3">
                         <label for="fotoUpload3">FOTO <br></label>
@@ -408,14 +389,14 @@
 
                     <div class="form-group">
                         <label for="exampleInputPassword1">KETERANGAN</label>
-                        <input type="text" class="form-control" name="keterangan3" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
+                        <input type="text" class="form-control" name="keterangan3" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada" value="{{ old('keterangan3', $isEdit ? ($submission->keterangan3 ?? '') : '') }}">
                     </div>
 
                         <div class="form-group">
                             JUMLAH SESUAI SURAT JALAN / PACKING LIST<small style="color: red;">*</small>
                             <br class="mb-3">
-                                <label><input class="mt-3" type="radio" name="jumlahin" value="Sesuai"> Sesuai</label><br>
-                                <label><input type="radio" name="jumlahin" value="Tidak Sesuai"> Tidak Sesuai</label><br>
+                                <label><input class="mt-3" type="radio" name="jumlahin" value="Sesuai" @checked(old('jumlahin', $isEdit ? ($submission->jumlahin ?? '') : '') === 'Sesuai')> Sesuai</label><br>
+                                <label><input type="radio" name="jumlahin" value="Tidak Sesuai" @checked(old('jumlahin', $isEdit ? ($submission->jumlahin ?? '') : '') === 'Tidak Sesuai')> Tidak Sesuai</label><br>
                         </div>
                         <div class="mb-3">
                             <label for="fotoUpload5">FOTO <br></label>
@@ -445,7 +426,7 @@
 
                         <div class="form-group">
                             <label for="exampleInputPassword1">KETERANGAN</label>
-                            <input type="text" class="form-control" name="keterangan5" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada">
+                            <input type="text" class="form-control" name="keterangan5" id="exampleInputPassword1" placeholder="Masukan keterangan jika ada" value="{{ old('keterangan5', $isEdit ? ($submission->keterangan5 ?? '') : '') }}">
                         </div>
 
                     </div>
@@ -453,7 +434,7 @@
 
 
 
-                      <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
+                      <button type="submit" class="btn btn-primary me-2 mt-3">{{ $isEdit ? 'Simpan perubahan' : 'Submit' }}</button>
                       <button type="button" class="btn btn-light"
                               @if($embed ?? false) onclick="window.parent.postMessage({type:'fomcheck-close'}, '*')" @endif>
                           Batal

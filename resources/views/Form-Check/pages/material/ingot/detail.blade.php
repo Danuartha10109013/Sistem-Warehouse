@@ -169,6 +169,11 @@
                         </div>
 
                         <div class="form-group">
+                            <label>Jumlah (cetak FM.WH.02.02)</label>
+                            <input type="text" class="form-control" value="{{ $submission->jumlah ?? '-' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
                             <label>Cuaca</label>
                             <input type="text" class="form-control" value="{{ $submission->cuaca ?? '-' }}" readonly>
                         </div>

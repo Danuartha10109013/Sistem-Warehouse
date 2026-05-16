@@ -140,6 +140,8 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::prefix('crc')->name('fomcheck.crc.')->group(function () {
             Route::get('/add', [FomController::class, 'add_crc'])->name('add');
             Route::post('/create', [FomController::class, 'create_crc'])->name('create');
+            Route::get('/edit/{id}', [FomController::class, 'edit_crc'])->name('edit');
+            Route::put('/update/{id}', [FomController::class, 'update_crc'])->name('update');
             Route::get('/export', [FomController::class, 'crc_export'])->name('export');
             Route::get('/print/{id}', [FomController::class, 'print_crc'])->name('print');
             Route::get('/show/{id}', [FomController::class, 'show_crc'])->name('show');
@@ -149,6 +151,8 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::prefix('ingot')->name('fomcheck.ingot.')->group(function () {
             Route::get('/add', [FomController::class, 'add_ingot'])->name('add');
             Route::post('/create', [FomController::class, 'create_ingot'])->name('create');
+            Route::get('/edit/{id}', [FomController::class, 'edit_ingot'])->name('edit');
+            Route::put('/update/{id}', [FomController::class, 'update_ingot'])->name('update');
             Route::get('/export', [FomController::class, 'ingot_export'])->name('export');
             Route::get('/print/{id}', [FomController::class, 'print_ingot'])->name('print');
             Route::get('/show/{id}', [FomController::class, 'show_ingot'])->name('show');
@@ -158,6 +162,8 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::prefix('resin')->name('fomcheck.resin.')->group(function () {
             Route::get('/add', [FomController::class, 'add_resin'])->name('add');
             Route::post('/create', [FomController::class, 'create_resin'])->name('create');
+            Route::get('/edit/{id}', [FomController::class, 'edit_resin'])->name('edit');
+            Route::put('/update/{id}', [FomController::class, 'update_resin'])->name('update');
             Route::get('/export', [FomController::class, 'resin_export'])->name('export');
             Route::get('/print/{id}', [FomController::class, 'print_resin'])->name('print');
             Route::get('/show/{id}', [FomController::class, 'show_resin'])->name('show');

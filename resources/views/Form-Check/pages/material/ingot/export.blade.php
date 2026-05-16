@@ -22,6 +22,7 @@
                 <th>No Dokumen</th>
                 <th>Supplier</th>
                 <th>Jenis</th>
+                <th>Jumlah (FM.WH.02.02)</th>
                 <th>Cuaca</th>
                 <th>Tujuan Surat Jalan</th>
                 <th>Keterangan 1</th>
@@ -67,6 +68,7 @@
                 <td>{{ $d->shift_leader }}</td>
                 <td>{{ $d->supplier }}</td>
                 <td>{{ $d->jenis }}</td>
+                <td>{{ $d->jumlah }}</td>
                 <td>{{ $d->cuaca }}</td>
                 <td>{{ $d->jalan }}</td>
                 <td>{{ $d->keterangan }}</td>

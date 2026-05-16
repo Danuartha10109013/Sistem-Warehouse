@@ -1,9 +1,13 @@
 @php
     $navWelcome = request()->routeIs('welcome');
-    $navFomcheck = request()->routeIs('fomcheck*');
-    $navCRC = request()->routeIs('fomcheck.crc*');
-    $navINGOT = request()->routeIs('fomcheck.ingot*');
-    $navRESIN = request()->routeIs('fomcheck.resin*');
+
+    $navFomcheck = request()->routeIs('fomcheck');
+
+    $navCRC = request()->routeIs('fomcheck') && request('type') == 'crc';
+
+    $navINGOT = request()->routeIs('fomcheck') && request('type') == 'ingot';
+
+    $navRESIN = request()->routeIs('fomcheck') && request('type') == 'resin';
 @endphp
 <nav class="navbar navbar-expand-lg fixed-top navbar-light px-4 px-lg-5 py-3 py-lg-3">
     <a href="{{route('welcome')}}" class="navbar-brand p-0">
