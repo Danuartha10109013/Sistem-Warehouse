@@ -1,4 +1,4 @@
-@extends('so.main')
+@extends('fomcheck.main')
 @section('title')
      FORM CHECK
 @endsection

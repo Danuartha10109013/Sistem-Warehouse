@@ -29,6 +29,9 @@ class FomController extends Controller
 
     public function index(Request $request)
     {
+        if (!Auth::user()) {
+            return redirect()->route('login');
+        }
         $type = $request->get('type', 'crc');
         if (!in_array($type, self::MATERIAL_TYPES, true)) {
             $type = 'crc';
