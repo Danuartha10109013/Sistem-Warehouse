@@ -129,8 +129,9 @@
             <!-- Hero Header End -->
         </div>
         <!-- Navbar & Hero End -->
-
+        @stack('modals')
         @include('packing.layout.footer')
+        @stack('scripts')
         <!-- Footer Start -->
 
 
