@@ -178,7 +178,7 @@
                                 </td>
                                 @endif
                                 <td>{{ $users[$d->user_id] ?? '—' }}</td>
-                                <td>{{ $d->created_at?->format('d-m-Y H:i') ?? $d->date }}</td>
+                                <td>{{ $d->date?->format('d-m-Y H:i') ?? $d->created_at }}</td>
                                 @if($type === 'crc')
                                 <td>{{ $d->time ?? '—' }}</td>
                                 <td>{{ $d->time_last ?? '—' }}</td>
