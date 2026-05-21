@@ -178,7 +178,7 @@
                                 </td>
                                 @endif
                                 <td>{{ $users[$d->user_id] ?? '—' }}</td>
-                                <td>{{ $d->date?->format('d-m-Y') ?? $d->created_at }}</td>
+                                <td>{{ $d->date ? \Carbon\Carbon::parse($d->date)->format('d-m-Y') : $d->created_at }}</td>
                                 @if($type === 'crc')
                                 <td>{{ $d->time ?? '—' }}</td>
                                 <td>{{ $d->time_last ?? '—' }}</td>
