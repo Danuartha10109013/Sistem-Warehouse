@@ -374,6 +374,12 @@ $menuItems = [
             <div class="menu-title">Laporan Packing</div>
         </div>
     </a>
+    <a href="{{ route('idod') }}" class="menu-item">
+        <div>
+            <i class="mdi mdi-image-filter-tilt-shift"></i>
+            <div class="menu-title">Laporan ID OD</div>
+        </div>
+    </a>
     <a href="{{ route('opc') }}" class="menu-item">
         <div>
             <i class="mdi mdi-note"></i>

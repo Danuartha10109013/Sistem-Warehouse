@@ -35,6 +35,7 @@ use App\Http\Controllers\PackingController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SACController;
 use App\Http\Controllers\FomController;
+use App\Http\Controllers\IdOdController;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -132,6 +133,19 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route ::get('/edit/{id}',[StockController::class,'edit'])->name('stock.edit');
         Route ::put('/update/{id}',[StockController::class,'update'])->name('stock.update');
         Route ::delete('/delete/{id}',[StockController::class,'destroy'])->name('stock.delete');
+    });
+
+    Route::prefix('idod')->group(function () {
+        Route::get('/', [IdOdController::class, 'index'])->name('idod');
+        Route::get('/dashboard-data', [IdOdController::class, 'dashboardData'])->name('idod.dashboard-data');
+        Route::get('/add', [IdOdController::class, 'add_idod'])->name('idod.add');
+        Route::post('/create', [IdOdController::class, 'create_idod'])->name('idod.create');
+        Route::get('/edit/{id}', [IdOdController::class, 'edit_idod'])->name('idod.edit');
+        Route::put('/update/{id}', [IdOdController::class, 'update_idod'])->name('idod.update');
+        Route::get('/export', [IdOdController::class, 'idod_export'])->name('idod.export');
+        Route::get('/print/{id}', [IdOdController::class, 'print_idod'])->name('idod.print');
+        Route::get('/show/{id}', [IdOdController::class, 'show_idod'])->name('idod.show');
+        Route::delete('/destroy/{id}', [IdOdController::class, 'destroy_idod'])->name('idod.destroy');  
     });
 
     Route::prefix('fomcheck')->group(function () {
