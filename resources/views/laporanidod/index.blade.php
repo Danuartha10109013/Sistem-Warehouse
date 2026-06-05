@@ -159,7 +159,45 @@
         height: auto;
     }
     @media (max-width: 767.98px) {
+        .header .hero-header {
+            padding-left: 0.65rem !important;
+            padding-right: 0.65rem !important;
+        }
+        .idod-dashboard {
+            max-width: 100%;
+            margin: 0;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 5.25rem;
+        }
+        .idod-dashboard .page-actions {
+            width: 100%;
+        }
+        .idod-dashboard .page-actions .btn {
+            flex: 1 1 0;
+            min-width: 0;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+        .idod-filter-card {
+            border-radius: 0.65rem;
+            padding: 0.85rem !important;
+        }
+        .idod-chart-card {
+            border-radius: 0.65rem;
+        }
+        .idod-stat-card .stat-value {
+            font-size: 1.35rem;
+        }
+        .chart-wrap {
+            height: 240px;
+        }
+        .chart-wrap-sm {
+            height: 220px;
+        }
         #idodFormModal .modal-dialog {
+            max-width: 100%;
+            width: 100%;
             max-height: 100dvh;
             height: 100%;
             margin: 0;
@@ -171,6 +209,32 @@
         }
         #idodFormModal .idod-modal-body-scroll {
             max-height: none;
+            padding-left: 0.85rem;
+            padding-right: 0.85rem;
+        }
+        #idodFormModal .modal-header,
+        #idodFormModal .modal-footer {
+            padding-left: 0.85rem;
+            padding-right: 0.85rem;
+        }
+        #idodFormModal .modal-footer .btn {
+            flex: 1 1 0;
+        }
+    }
+    @media (min-width: 768px) and (max-width: 991.98px) {
+        .header .hero-header {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        .idod-dashboard {
+            max-width: 100%;
+            padding-left: 0.25rem !important;
+            padding-right: 0.25rem !important;
+        }
+        #idodFormModal .modal-dialog {
+            max-width: calc(100% - 1.25rem);
+            width: calc(100% - 1.25rem);
+            margin: 0.625rem auto;
         }
     }
 </style>
@@ -187,13 +251,13 @@
 </script>
 @endif
 
-<div class="container-fluid idod-dashboard px-4">
-    <div class="row mb-4 align-items-center">
-        <div class="col">
+<div class="container-fluid idod-dashboard px-2 px-md-3 px-lg-4">
+    <div class="row mb-4 align-items-center g-2">
+        <div class="col-12 col-md">
             <h2 class="fw-bold text-dark mb-1">Dashboard Laporan ID &amp; OD</h2>
-            <p class="text-muted mb-0">Ringkasan data per hari, bulan, dan tahun — filter langsung tanpa reload halaman.</p>
+            <p class="text-muted mb-0 small">Ringkasan data per hari, bulan, dan tahun — filter langsung tanpa reload halaman.</p>
         </div>
-        <div class="col-auto d-flex flex-wrap gap-2">
+        <div class="col-12 col-md-auto d-flex flex-wrap gap-2 page-actions">
             <button type="button" class="btn btn-success rounded-pill px-4" id="btnExportExcel" title="Unduh data sesuai filter aktif (.xlsx)">
                 <i class="fas fa-file-excel me-1"></i> Export Excel
             </button>
@@ -399,7 +463,7 @@
 
 {{-- Modal Tambah / Edit --}}
 <div class="modal fade" id="idodFormModal" tabindex="-1" aria-labelledby="idodFormModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-sm-down">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-md-down">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="idodFormModalLabel">Tambah Data ID &amp; OD</h5>
@@ -502,7 +566,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer flex-nowrap gap-2">
                     <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-4" id="idodFormSubmit">
                         <span class="submit-text">Simpan</span>
