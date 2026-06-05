@@ -124,6 +124,55 @@
     #idodFormModal .idod-ok-field .form-label {
         color: #047857;
     }
+  /* Scroll modal form — terutama di HP */
+    #idodFormModal .modal-dialog {
+        max-height: calc(100dvh - 1rem);
+        margin: 0.5rem auto;
+    }
+    #idodFormModal .modal-content {
+        max-height: calc(100dvh - 1rem);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    #idodFormModal #idodForm {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+    }
+    #idodFormModal .modal-header,
+    #idodFormModal .modal-footer {
+        flex-shrink: 0;
+    }
+    #idodFormModal .idod-modal-body-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+    }
+    #idodFormModal .idod-form-section {
+        height: auto;
+    }
+    @media (max-width: 767.98px) {
+        #idodFormModal .modal-dialog {
+            max-height: 100dvh;
+            height: 100%;
+            margin: 0;
+        }
+        #idodFormModal .modal-content {
+            max-height: 100dvh;
+            height: 100%;
+            border-radius: 0;
+        }
+        #idodFormModal .idod-modal-body-scroll {
+            max-height: none;
+        }
+    }
 </style>
 @endpush
 
@@ -350,14 +399,14 @@
 
 {{-- Modal Tambah / Edit --}}
 <div class="modal fade" id="idodFormModal" tabindex="-1" aria-labelledby="idodFormModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-sm-down">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="idodFormModalLabel">Tambah Data ID &amp; OD</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <form id="idodForm" novalidate>
-                <div class="modal-body">
+                <div class="modal-body idod-modal-body-scroll">
                     <div id="idodFormErrors" class="alert alert-danger d-none" role="alert"></div>
                     <input type="hidden" id="idodRecordId" name="id" value="">
                     <div class="row g-3">
@@ -392,7 +441,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold" for="idodSizeId">Size ID <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="size_id" id="idodSizeId" list="sizeIdList" placeholder="………………………………………" required>
+                                    <input type="text" class="form-control" name="size_id" id="idodSizeId" list="sizeIdList" value=508 required>
                                     <datalist id="sizeIdList">
                                         @foreach($sizeIdOptions as $opt)
                                         <option value="{{ $opt }}"></option>
