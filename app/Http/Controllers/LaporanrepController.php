@@ -1,0 +1,289 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\LaporanrepackingM;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
+class LaporanrepController extends Controller
+{
+    private const STATUS_OPTIONS = ['OK', 'Not OK', 'Proses'];
+
+    private const GROUP_OPTIONS = ['Group A', 'Group B'];
+
+    private const WRAPPING_OPTIONS = ['Pakai', 'Tidak Pakai'];
+
+    private const VCIPAPER_OPTIONS = ['Pakai', 'Tidak Pakai'];
+
+    public function index()
+    {
+        return view('laporanrepacking.index', [
+            'statusOptions' => collect(self::STATUS_OPTIONS),
+            'groupOptions' => collect(self::GROUP_OPTIONS),
+            'wrappingOptions' => collect(self::WRAPPING_OPTIONS),
+            'vcipaperOptions' => collect(self::VCIPAPER_OPTIONS),
+        ]);
+    }
+
+    public function dashboardData(Request $request)
+    {
+        $validated = $request->validate([
+            'from' => 'nullable|date',
+            'to' => 'nullable|date|after_or_equal:from',
+            'status' => 'nullable|string|max:191',
+            'group' => 'nullable|string|max:191',
+            'search' => 'nullable|string|max:191',
+            'page' => 'nullable|integer|min:1',
+        ]);
+
+        $page = max(1, (int) ($validated['page'] ?? $request->input('page', 1)));
+        $perPage = 15;
+
+        ['query' => $query, 'filters' => $filterMeta] = $this->buildFilteredContext($request, $validated);
+
+        $totalRecords = (clone $query)->count();
+
+        $paginated = (clone $query)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json([
+            'filters' => $filterMeta,
+            'summary' => [
+                'total_records' => $totalRecords,
+            ],
+            'rows' => collect($paginated->items())
+                ->map(fn (LaporanrepackingM $row) => $this->formatRow($row))
+                ->values(),
+            'pagination' => [
+                'current_page' => $paginated->currentPage(),
+                'last_page' => $paginated->lastPage(),
+                'per_page' => $paginated->perPage(),
+                'total' => $paginated->total(),
+                'from' => $paginated->firstItem(),
+                'to' => $paginated->lastItem(),
+            ],
+        ]);
+    }
+
+    public function add_laporanrepacking()
+    {
+        return redirect()->to(route('laporanrepacking') . '#tambah-data');
+    }
+
+    public function edit_laporanrepacking($id)
+    {
+        return redirect()->to(route('laporanrepacking') . '?edit=' . $id);
+    }
+
+    public function create_laporanrepacking(Request $request)
+    {
+        $data = $this->validatedPayload($request);
+        $data['created_by'] = Auth::user()->name ?? Auth::user()->email ?? 'System';
+
+        $record = LaporanrepackingM::create($data);
+
+        return $this->crudResponse($request, 'Laporan repacking CRC berhasil ditambahkan.', $record, 201);
+    }
+
+    public function show_laporanrepacking(Request $request, $id)
+    {
+        $record = LaporanrepackingM::findOrFail($id);
+
+        return response()->json([
+            'record' => $this->formatRow($record, forForm: true),
+        ]);
+    }
+
+    public function update_laporanrepacking(Request $request, $id)
+    {
+        $record = LaporanrepackingM::findOrFail($id);
+        $record->update($this->validatedPayload($request));
+
+        return $this->crudResponse($request, 'Laporan repacking CRC berhasil diperbarui.', $record->fresh());
+    }
+
+    public function destroy_laporanrepacking(Request $request, $id)
+    {
+        $record = LaporanrepackingM::findOrFail($id);
+        $record->delete();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus.',
+            ]);
+        }
+
+        return redirect()->route('laporanrepacking')->with('success', 'Data berhasil dihapus.');
+    }
+
+    public function laporanrepacking_export(Request $request): StreamedResponse
+    {
+        ['query' => $query, 'filters' => $filters] = $this->buildFilteredContext($request);
+
+        $records = (clone $query)->orderByDesc('created_at')->get();
+
+        $filename = sprintf(
+            'Laporan_Repacking_CRC_%s_%s.csv',
+            $filters['from'],
+            $filters['to']
+        );
+
+        return response()->streamDownload(function () use ($records) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, [
+                'No',
+                'Attribute',
+                'Tanggal',
+                'Status',
+                'Group',
+                'Wrapping',
+                'VCI Paper',
+                'Keterangan',
+                'Dibuat Oleh',
+                'Dibuat Pada',
+            ]);
+
+            foreach ($records as $index => $row) {
+                $formatted = $this->formatRow($row);
+                fputcsv($handle, [
+                    $index + 1,
+                    $formatted['atributte'],
+                    $formatted['tanggal'],
+                    $formatted['status'],
+                    $formatted['group'],
+                    $formatted['wrapping'],
+                    $formatted['vcipaper'],
+                    $formatted['keterangan'],
+                    $formatted['created_by'],
+                    $formatted['created_at'],
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    public function print_laporanrepacking($id)
+    {
+        $record = LaporanrepackingM::findOrFail($id);
+
+        return view('laporanrepacking.print', [
+            'record' => $this->formatRow($record),
+        ]);
+    }
+
+    private function validatedPayload(Request $request): array
+    {
+        $validated = $request->validate([
+            'atributte' => 'required|string|max:191',
+            'tanggal' => 'required|date',
+            'status' => ['required', 'string', Rule::in(self::STATUS_OPTIONS)],
+            'group' => ['required', 'string', Rule::in(self::GROUP_OPTIONS)],
+            'wrapping' => ['required', 'string', Rule::in(self::WRAPPING_OPTIONS)],
+            'vcipaper' => ['required', 'string', Rule::in(self::VCIPAPER_OPTIONS)],
+            'keterangan' => 'nullable|string|max:500',
+        ]);
+
+        $validated['tanggal'] = Carbon::parse($validated['tanggal'])->format('Y-m-d');
+
+        return $validated;
+    }
+
+    private function formatRow(LaporanrepackingM $row, bool $forForm = false): array
+    {
+        $reportDate = $row->report_date;
+
+        return [
+            'id' => $row->id,
+            'atributte' => $forForm ? ($row->atributte ?? '') : ($row->atributte ?: '—'),
+            'tanggal' => $forForm
+                ? ($reportDate?->format('Y-m-d') ?? '')
+                : ($row->tanggal ?: ($row->created_at?->format('d-m-Y') ?? '—')),
+            'status' => $forForm ? ($row->status ?? '') : ($row->status ?: '—'),
+            'group' => $forForm ? ($row->group ?? '') : ($row->group ?: '—'),
+            'wrapping' => $forForm ? ($row->wrapping ?? '') : ($row->wrapping ?: '—'),
+            'vcipaper' => $forForm ? ($row->vcipaper ?? '') : ($row->vcipaper ?: '—'),
+            'keterangan' => $forForm ? ($row->keterangan ?? '') : ($row->keterangan ?: '—'),
+            'created_by' => $forForm ? ($row->created_by ?? '') : ($row->created_by ?: '—'),
+            'created_at' => $row->created_at?->format('d-m-Y H:i') ?? '—',
+        ];
+    }
+
+    private function crudResponse(Request $request, string $message, LaporanrepackingM $record, int $status = 200)
+    {
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'record' => $this->formatRow($record),
+            ], $status);
+        }
+
+        return redirect()->route('laporanrepacking')->with('success', $message);
+    }
+
+    /**
+     * @return array{query: Builder, filters: array<string, string>}
+     */
+    private function buildFilteredContext(Request $request, ?array $validated = null): array
+    {
+        $validated ??= $request->validate([
+            'from' => 'nullable|date',
+            'to' => 'nullable|date|after_or_equal:from',
+            'status' => 'nullable|string|max:191',
+            'group' => 'nullable|string|max:191',
+            'search' => 'nullable|string|max:191',
+        ]);
+
+        $to = isset($validated['to'])
+            ? Carbon::parse($validated['to'])->endOfDay()
+            : Carbon::now()->endOfDay();
+        $from = isset($validated['from'])
+            ? Carbon::parse($validated['from'])->startOfDay()
+            : (clone $to)->subDays(30)->startOfDay();
+
+        $query = LaporanrepackingM::query()
+            ->inReportRange($from->toDateString(), $to->toDateString());
+
+        foreach (['status', 'group'] as $field) {
+            if (!empty($validated[$field])) {
+                $query->where($field, $validated[$field]);
+            }
+        }
+
+        if (!empty($validated['search'])) {
+            $term = '%' . $validated['search'] . '%';
+            $query->where(function (Builder $q) use ($term) {
+                $q->where('atributte', 'like', $term)
+                    ->orWhere('status', 'like', $term)
+                    ->orWhere('group', 'like', $term)
+                    ->orWhere('wrapping', 'like', $term)
+                    ->orWhere('vcipaper', 'like', $term)
+                    ->orWhere('keterangan', 'like', $term)
+                    ->orWhere('created_by', 'like', $term);
+            });
+        }
+
+        return [
+            'query' => $query,
+            'filters' => [
+                'from' => $from->format('d-m-Y'),
+                'to' => $to->format('d-m-Y'),
+                'status' => $validated['status'] ?? '',
+                'group' => $validated['group'] ?? '',
+                'search' => $validated['search'] ?? '',
+            ],
+        ];
+    }
+}

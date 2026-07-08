@@ -13,6 +13,7 @@ use App\Http\Controllers\OpenPackingController;
 use App\Http\Controllers\KendaraanController;
 use App\Http\Controllers\KUserController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\LaporanrepController;
 use App\Http\Controllers\MappingController;
 use App\Http\Controllers\MappingTrukController;
 use App\Http\Controllers\MaterialController;
@@ -146,6 +147,19 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::get('/print/{id}', [IdOdController::class, 'print_idod'])->name('idod.print');
         Route::get('/show/{id}', [IdOdController::class, 'show_idod'])->name('idod.show');
         Route::delete('/destroy/{id}', [IdOdController::class, 'destroy_idod'])->name('idod.destroy');  
+    });
+
+    Route::prefix('laporan-repacking')->group(function () {
+        Route::get('/', [LaporanrepController::class, 'index'])->name('laporanrepacking');
+        Route::get('/dashboard-data', [LaporanrepController::class, 'dashboardData'])->name('laporanrep.dashboard-data');
+        Route::get('/add', [LaporanrepController::class, 'add_laporanrepacking'])->name('laporanrepacking.add');
+        Route::post('/create', [LaporanrepController::class, 'create_laporanrepacking'])->name('laporanrepacking.create');
+        Route::get('/edit/{id}', [LaporanrepController::class, 'edit_laporanrepacking'])->name('laporanrepacking.edit');
+        Route::put('/update/{id}', [LaporanrepController::class, 'update_laporanrepacking'])->name('laporanrepacking.update');
+        Route::get('/export', [LaporanrepController::class, 'laporanrepacking_export'])->name('laporanrepacking.export');
+        Route::get('/print/{id}', [LaporanrepController::class, 'print_laporanrepacking'])->name('laporanrepacking.print');
+        Route::get('/show/{id}', [LaporanrepController::class, 'show_laporanrepacking'])->name('laporanrepacking.show');
+        Route::delete('/destroy/{id}', [LaporanrepController::class, 'destroy_laporanrepacking'])->name('laporanrepacking.destroy');  
     });
 
     Route::prefix('fomcheck')->group(function () {

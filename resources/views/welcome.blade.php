@@ -387,6 +387,13 @@ $menuItems = [
         </div>
     </a>
 
+    <a href="{{ route('laporanrepacking') }}" class="menu-item">
+        <div>
+            <i class="mdi mdi-recycle"></i>
+            <div class="menu-title">Laporan Repacking</div>
+        </div>
+    </a>
+
     @endif
 
     @if (Auth::user()->username == "danuartha")
