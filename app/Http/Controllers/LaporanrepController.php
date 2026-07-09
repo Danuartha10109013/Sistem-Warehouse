@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LaporanrepController extends Controller
 {
-    private const STATUS_OPTIONS = ['OK', 'Not OK', 'Proses'];
+    private const STATUS_OPTIONS = ['Retur', 'Naik Lagi', 'Skip Lama'];
 
-    private const GROUP_OPTIONS = ['Group A', 'Group B'];
+    private const GROUP_OPTIONS = ['Grup A', 'Grup B', 'Grup C', 'Grup D'];
 
     private const WRAPPING_OPTIONS = ['Pakai', 'Tidak Pakai'];
 

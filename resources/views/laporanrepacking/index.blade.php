@@ -295,7 +295,7 @@
                         </div>
                     </div>
 
-                    <div class="lrep-form-section">
+                    <div class="lrep-form-section" id="lrepKondisiPackingSection" style="display: none;">
                         <div class="lrep-section-head">
                             <i class="bi bi-layers text-primary"></i>
                             <span>Kondisi Packing</span>
@@ -443,10 +443,21 @@ document.addEventListener('DOMContentLoaded', function () {
         wrap?.classList.remove('d-none');
         scanBtn?.classList.add('active');
 
-        lrepQrScanner = new Html5Qrcode('lrepQrReader');
+        const formats = [
+            Html5QrcodeSupportedFormats.QR_CODE,
+            Html5QrcodeSupportedFormats.DATA_MATRIX,
+            Html5QrcodeSupportedFormats.CODE_128,
+            Html5QrcodeSupportedFormats.CODE_39
+        ];
+        lrepQrScanner = new Html5Qrcode('lrepQrReader', { formatsToSupport: formats });
+        
         lrepQrScanner.start(
             { facingMode: 'environment' },
-            { fps: 10, qrbox: { width: 220, height: 220 } },
+            { 
+                fps: 15, 
+                qrbox: { width: 250, height: 250 },
+                disableFlip: false
+            },
             (decodedText) => {
                 const value = String(decodedText || '').trim();
                 if (!value) return;
@@ -517,8 +528,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function statusBadge(status) {
         const s = String(status ?? '');
         let cls = 'status-badge-proses';
-        if (s === 'OK') cls = 'status-badge-ok';
-        else if (s === 'Not OK') cls = 'status-badge-ng';
+        if (s === 'Skip Lama') cls = 'status-badge-ok';
+        else if (s === 'Retur') cls = 'status-badge-ng';
+        else if (s === 'Naik Lagi') cls = 'status-badge-proses';
         return `<span class="badge rounded-pill ${cls}">${escapeHtml(s)}</span>`;
     }
 
@@ -690,6 +702,9 @@ document.addEventListener('DOMContentLoaded', function () {
         el('lrepTanggal').value = new Date().toISOString().slice(0, 10);
         showFormErrors(null);
         el('lrepForm')?.querySelectorAll('.is-invalid').forEach((f) => f.classList.remove('is-invalid'));
+        if (el('lrepKondisiPackingSection')) {
+            el('lrepKondisiPackingSection').style.display = 'none';
+        }
     }
 
     function openAddModal() {
@@ -714,6 +729,11 @@ document.addEventListener('DOMContentLoaded', function () {
             el('lrepTanggal').value = r.tanggal;
             el('lrepStatus').value = r.status;
             el('lrepGroup').value = r.group;
+            
+            if (r.status) {
+                el('lrepKondisiPackingSection').style.display = 'block';
+            }
+            
             el('lrepWrapping').value = r.wrapping;
             el('lrepVcipaper').value = r.vcipaper;
             el('lrepKeterangan').value = r.keterangan;
@@ -741,6 +761,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     el('btnLrepScanQr')?.addEventListener('click', startLrepQrScanner);
     el('btnLrepCloseQr')?.addEventListener('click', stopLrepQrScanner);
+
+    el('lrepStatus')?.addEventListener('change', function () {
+        const val = this.value;
+        const section = el('lrepKondisiPackingSection');
+        if (!section) return;
+        
+        if (val) {
+            section.style.display = 'block';
+            if (val === 'Retur') {
+                el('lrepWrapping').value = 'Tidak Pakai';
+                el('lrepVcipaper').value = 'Pakai';
+            } else if (val === 'Naik Lagi') {
+                el('lrepWrapping').value = 'Pakai';
+                el('lrepVcipaper').value = 'Tidak Pakai';
+            } else if (val === 'Skip Lama') {
+                el('lrepWrapping').value = 'Pakai';
+                el('lrepVcipaper').value = 'Pakai';
+            }
+        } else {
+            section.style.display = 'none';
+            el('lrepWrapping').value = '';
+            el('lrepVcipaper').value = '';
+        }
+    });
 
     el('btnExportData')?.addEventListener('click', function () {
         const p = params();
