@@ -57,13 +57,20 @@
     $isAdmin = Auth::user()->role == 0;
     $queryBase = request()->only(['search', 'start', 'end', 'sort', 'direction']);
     $tabUrl = fn ($t) => route('fomcheck', array_merge($queryBase, ['type' => $t]));
-    $typeLabels = ['crc' => 'CRC', 'ingot' => 'INGOT', 'resin' => 'RESIN/ALKALI'];
+    $tabRoutes = [
+        'crc' => $tabUrl('crc'),
+        'ingot' => $tabUrl('ingot'),
+        'resin' => $tabUrl('resin'),
+        'trailler' => route('Form-Check.admin.trailler'),
+    ];
+    $typeLabels = ['crc' => 'CRC', 'ingot' => 'INGOT', 'resin' => 'RESIN/ALKALI', 'trailler' => 'TRAILLER'];
     $exportRoute = "fomcheck.{$type}.export";
     $printRoute = "fomcheck.{$type}.print";
     $modalAddUrls = [
         'crc' => route('fomcheck.crc.add', ['embed' => 1]),
         'ingot' => route('fomcheck.ingot.add', ['embed' => 1]),
         'resin' => route('fomcheck.resin.add', ['embed' => 1]),
+        'trailler' => route('Form-Check.admin.trailler'),
     ];
 @endphp
 
@@ -120,7 +127,7 @@
                     @foreach($typeLabels as $key => $label)
                     <li class="nav-item" role="presentation">
                         <a class="nav-link {{ $type === $key ? 'active fw-semibold' : '' }}"
-                           href="{{ $tabUrl($key) }}">
+                           href="{{ $tabRoutes[$key] }}">
                             {{ $label }}
                         </a>
                     </li>

@@ -8,6 +8,8 @@
     $navINGOT = request()->routeIs('fomcheck') && request('type') == 'ingot';
 
     $navRESIN = request()->routeIs('fomcheck') && request('type') == 'resin';
+    
+    $navTRAILLER = request()->routeIs('Form-Check.admin.trailler');
 @endphp
 <nav class="navbar navbar-expand-lg fixed-top navbar-light px-4 px-lg-5 py-3 py-lg-3">
     <a href="{{route('welcome')}}" class="navbar-brand p-0">
@@ -40,6 +42,10 @@
                 <a href="{{ route('fomcheck', ['type' => 'resin']) }}"
                 class="nav-item nav-link {{ $navRESIN ? 'active' : '' }}">
                     RESIN
+                </a>
+                <a href="{{ route('Form-Check.admin.trailler') }}"
+                class="nav-item nav-link {{ $navTRAILLER ? 'active' : '' }}">
+                    TRAILLER
                 </a>
         </div>
         {{-- <a href="#" class="btn btn-light border border-primary rounded-pill text-primary py-2 px-4 me-4">Log In</a> --}}
