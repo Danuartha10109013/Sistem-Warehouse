@@ -43,7 +43,7 @@
     .lrep-loading.show { display: flex; }
     .lrep-panel { position: relative; }
     .lrep-dashboard .page-actions { position: relative; z-index: 3; }
-    #lrepFormModal, #lrepDeleteModal { z-index: 1060; }
+    #lrepFormModal, #lrepDeleteModal, #uploadDaftarModal, #manualDaftarModal { z-index: 1060; }
     .modal-backdrop { z-index: 1055; }
     #lrepFormModal .lrep-form-section {
         border: 1px solid #e2e8f0;
@@ -185,48 +185,125 @@
         <div class="mt-2 small text-muted" id="filterSummary">Memuat data…</div>
     </div>
 
-    <div class="lrep-panel">
-        <div class="lrep-loading" id="tableLoading">
-            <div class="spinner-border text-primary" role="status"></div>
+    <!-- Excel-like Tabs and Content -->
+    <div class="card lrep-table-card mb-4 overflow-hidden border-0 shadow-sm">
+        
+        <!-- Top Tabs -->
+        <div class="bg-light border-bottom p-1" style="border-radius: 0.5rem 0.5rem 0 0;">
+            <style>
+                .excel-tab {
+                    font-weight: 500;
+                    font-size: 0.9rem;
+                    background-color: #f1f5f9;
+                    color: #64748b;
+                    transition: all 0.2s ease;
+                }
+                .excel-tab.active {
+                    background-color: #fff !important;
+                    color: #1e293b !important;
+                    border-bottom-color: transparent !important;
+                }
+                #uploadDaftarModal, #manualDaftarModal { z-index: 1060; }
+            </style>
+            <ul class="nav nav-tabs border-0 gap-1" id="repackingTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active excel-tab px-4 py-2 border rounded-top shadow-sm" id="laporan-tab" data-bs-toggle="tab" data-bs-target="#laporan-pane" type="button" role="tab">Laporan Packing</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link excel-tab px-4 py-2 border rounded-top shadow-sm" id="daftar-tab" data-bs-toggle="tab" data-bs-target="#daftar-pane" type="button" role="tab">Daftar Packing</button>
+                </li>
+            </ul>
         </div>
+        
+        <!-- Tab Content -->
+        <div class="tab-content" id="repackingTabContent">
+            
+            <!-- Tab 1: Data Laporan -->
+            <div class="tab-pane fade show active position-relative" id="laporan-pane" role="tabpanel" tabindex="0">
+                <div class="lrep-loading" id="tableLoading">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
 
-        <div class="card lrep-table-card">
-            <div class="card-header py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <span>Data Pelaporan Repacking CRC</span>
-                <span class="badge bg-primary rounded-pill" id="tableCount">0 data</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0" id="lrepTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th>No</th>
-                                <th>Attribute</th>
-                                <th>Tanggal</th>
-                                <th>Status</th>
-                                <th>Group</th>
-                                <th>Wrapping</th>
-                                <th>VCI Paper</th>
-                                <th>Keterangan</th>
-                                <th>Dibuat Oleh</th>
-                                <th class="text-center" style="width:130px">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lrepTableBody">
-                            <tr>
-                                <td colspan="10" class="text-center text-muted py-5">Memuat…</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center border-bottom">
+                    <span class="fw-bold">Data Pelaporan Repacking CRC</span>
+                    <span class="badge bg-primary rounded-pill" id="tableCount">0 data</span>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="lrepTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Attribute</th>
+                                    <th>Tanggal</th>
+                                    <th>Status</th>
+                                    <th>Group</th>
+                                    <th>Wrapping</th>
+                                    <th>VCI Paper</th>
+                                    <th>Keterangan</th>
+                                    <th>Dibuat Oleh</th>
+                                    <th class="text-center" style="width:130px">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lrepTableBody">
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted py-5">Memuat…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-white py-3 d-flex flex-wrap justify-content-between align-items-center border-top">
+                    <div class="small text-muted" id="lrepPaginationInfo">—</div>
+                    <nav aria-label="Paginasi tabel">
+                        <ul class="pagination pagination-sm mb-0" id="lrepPagination"></ul>
+                    </nav>
                 </div>
             </div>
-            <div class="card-footer py-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border-top">
-                <div class="small text-muted" id="lrepPaginationInfo">—</div>
-                <nav aria-label="Paginasi tabel">
-                    <ul class="pagination pagination-sm mb-0" id="lrepPagination"></ul>
-                </nav>
+
+            <!-- Tab 2: Daftar Repacking Excel -->
+            <div class="tab-pane fade" id="daftar-pane" role="tabpanel" tabindex="0">
+                <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center border-bottom">
+                    <span class="fw-bold">Daftar Repacking</span>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#manualDaftarModal">
+                            <i class="bi bi-plus-circle"></i> Input Manual
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success rounded-pill" data-bs-toggle="modal" data-bs-target="#uploadDaftarModal">
+                            <i class="bi bi-file-earmark-excel"></i> Upload Excel
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0 text-nowrap" id="daftarRepackingTable">
+                            <thead class="table-light position-sticky top-0 z-1" style="box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Attribute</th>
+                                    <th>Ukuran</th>
+                                    <th>Berat</th>
+                                    <th>Layout</th>
+                                    <th class="text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="daftarRepackingBody">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-5">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                        <span class="ms-2">Memuat...</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+            
         </div>
+        
     </div>
 </div>
 @endsection
@@ -361,6 +438,75 @@
         </div>
     </div>
 </div>
+
+{{-- Modal Upload Daftar Repacking --}}
+<div class="modal fade" id="uploadDaftarModal" tabindex="-1" aria-hidden="true" style="z-index: 9999 !important;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Upload Daftar Repacking (Excel)</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <form id="formUploadDaftar" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p class="small text-muted mb-0">Pilih file Excel (.xlsx, .xls) yang berisi daftar material untuk direpacking.</p>
+                        <a href="{{ route('laporanrepacking.download-format') }}" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-download"></i> Format
+                        </a>
+                    </div>
+                    <input type="file" class="form-control" name="file_excel" id="fileExcelDaftar" accept=".xlsx, .xls, .csv" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4" id="btnSubmitUploadDaftar">
+                        <span class="upload-text">Upload</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Input Manual Daftar Repacking --}}
+<div class="modal fade" id="manualDaftarModal" tabindex="-1" aria-hidden="true" style="z-index: 9999 !important;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Input Manual Daftar Repacking</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <form id="formManualDaftar">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Attribute <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="atribute" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ukuran</label>
+                        <input type="text" class="form-control" name="ukuran">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Berat</label>
+                        <input type="text" class="form-control" name="berat">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Layout</label>
+                        <input type="text" class="form-control" name="layout">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4" id="btnSubmitManualDaftar">
+                        <span class="submit-text">Simpan</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endpush
 
 @push('scripts')
@@ -369,6 +515,9 @@
 document.addEventListener('DOMContentLoaded', function () {
 (function () {
     const apiUrl = @json(route('laporanrep.dashboard-data'));
+    const daftarUrl = @json(route('laporanrepacking.daftar-data'));
+    const uploadDaftarUrl = @json(route('laporanrepacking.upload-daftar'));
+    const storeDaftarUrl = @json(route('laporanrepacking.store-daftar'));
     const exportUrl = @json(route('laporanrepacking.export'));
     const storeUrl = @json(route('laporanrepacking.create'));
     const updateUrlTemplate = @json(url('laporan-repacking/update/__ID__'));
@@ -648,6 +797,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!res.ok) throw new Error('Gagal memuat data');
             const data = await res.json();
             renderTable(data.rows || [], data.pagination || {}, data.filters || {});
+            
+            // Auto fetch daftar repacking whenever main table is loaded/updated
+            fetchDaftarRepacking();
         } catch (err) {
             el('lrepTableBody').innerHTML =
                 '<tr><td colspan="10" class="text-center text-danger py-5">Gagal memuat data. Silakan coba lagi.</td></tr>';
@@ -656,6 +808,132 @@ document.addEventListener('DOMContentLoaded', function () {
             setLoading(false);
         }
     }
+
+    async function fetchDaftarRepacking() {
+        const tbody = el('daftarRepackingBody');
+        if (!tbody) return;
+        
+        try {
+            const res = await fetch(daftarUrl, {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const resData = await res.json();
+            if (resData.success) {
+                const data = resData.data || [];
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-5">Tidak ada daftar repacking.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = data.map((item, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td class="fw-semibold">${escapeHtml(item.atribute)}</td>
+                        <td>${escapeHtml(item.ukuran)}</td>
+                        <td>${escapeHtml(item.berat)}</td>
+                        <td>${escapeHtml(item.layout)}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-pilih-daftar" data-atribute="${escapeAttr(item.atribute)}" title="Proses Data">
+                                <i class="bi bi-arrow-right-circle"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                document.querySelectorAll('.btn-pilih-daftar').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const attr = this.getAttribute('data-atribute');
+                        openAddModalWithAttribute(attr);
+                    });
+                });
+            }
+        } catch (err) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-3">Gagal memuat daftar.</td></tr>';
+        }
+    }
+    
+    function openAddModalWithAttribute(attr) {
+        resetForm();
+        el('lrepFormModalLabel').textContent = 'Tambah Laporan Repacking CRC';
+        el('lrepAtributte').value = attr;
+        if (!formModal) formModal = getModal(formModalEl);
+        formModal?.show();
+    }
+    
+    // Upload Daftar Form Submit
+    el('formUploadDaftar')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = el('btnSubmitUploadDaftar');
+        const fileInput = el('fileExcelDaftar');
+        
+        if (!fileInput.files.length) return;
+        
+        btn.disabled = true;
+        btn.querySelector('.upload-text').classList.add('d-none');
+        btn.querySelector('.spinner-border').classList.remove('d-none');
+        
+        const formData = new FormData();
+        formData.append('file_excel', fileInput.files[0]);
+        if (csrfToken) formData.append('_token', csrfToken);
+        
+        try {
+            const res = await fetch(uploadDaftarUrl, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message, timer: 1700, showConfirmButton: false });
+                getModal(el('uploadDaftarModal'))?.hide();
+                el('formUploadDaftar').reset();
+                fetchDaftarRepacking();
+            } else {
+                Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
+            }
+        } catch (err) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem.' });
+        } finally {
+            btn.disabled = false;
+            btn.querySelector('.upload-text').classList.remove('d-none');
+            btn.querySelector('.spinner-border').classList.add('d-none');
+        }
+    });
+
+    // Manual Daftar Form Submit
+    el('formManualDaftar')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = el('btnSubmitManualDaftar');
+        
+        btn.disabled = true;
+        btn.querySelector('.submit-text').classList.add('d-none');
+        btn.querySelector('.spinner-border').classList.remove('d-none');
+        
+        const formData = new FormData(this);
+        if (csrfToken) formData.append('_token', csrfToken);
+        
+        try {
+            const res = await fetch(storeDaftarUrl, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message, timer: 1700, showConfirmButton: false });
+                getModal(el('manualDaftarModal'))?.hide();
+                el('formManualDaftar').reset();
+                fetchDaftarRepacking();
+            } else {
+                Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
+            }
+        } catch (err) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan sistem.' });
+        } finally {
+            btn.disabled = false;
+            btn.querySelector('.submit-text').classList.remove('d-none');
+            btn.querySelector('.spinner-border').classList.add('d-none');
+        }
+    });
 
     function scheduleFetch() {
         clearTimeout(debounceTimer);

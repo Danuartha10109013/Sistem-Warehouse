@@ -19,6 +19,9 @@ class LaporanrepackingM extends Model
         'vcipaper',
         'keterangan',
         'created_by',
+        'ukuran',
+        'berat',
+        'layout',
     ];
 
     public function getReportDateAttribute(): ?Carbon

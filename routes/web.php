@@ -160,6 +160,10 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::get('/print/{id}', [LaporanrepController::class, 'print_laporanrepacking'])->name('laporanrepacking.print');
         Route::get('/show/{id}', [LaporanrepController::class, 'show_laporanrepacking'])->name('laporanrepacking.show');
         Route::delete('/destroy/{id}', [LaporanrepController::class, 'destroy_laporanrepacking'])->name('laporanrepacking.destroy');  
+        Route::get('/daftar-data', [LaporanrepController::class, 'getDaftarRepacking'])->name('laporanrepacking.daftar-data');
+        Route::get('/download-format', [LaporanrepController::class, 'downloadFormatDaftar'])->name('laporanrepacking.download-format');
+        Route::post('/upload-daftar', [LaporanrepController::class, 'uploadDaftarRepacking'])->name('laporanrepacking.upload-daftar');
+        Route::post('/store-daftar', [LaporanrepController::class, 'storeDaftarRepacking'])->name('laporanrepacking.store-daftar');
     });
 
     Route::prefix('fomcheck')->group(function () {

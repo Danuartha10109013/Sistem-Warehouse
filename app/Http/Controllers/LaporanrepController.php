@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LaporanrepackingM;
+use App\Imports\DaftarRepackingImport;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LaporanrepController extends Controller
 {
@@ -60,7 +62,7 @@ class LaporanrepController extends Controller
                 'total_records' => $totalRecords,
             ],
             'rows' => collect($paginated->items())
-                ->map(fn (LaporanrepackingM $row) => $this->formatRow($row))
+                ->map(fn(LaporanrepackingM $row) => $this->formatRow($row))
                 ->values(),
             'pagination' => [
                 'current_page' => $paginated->currentPage(),
@@ -88,9 +90,23 @@ class LaporanrepController extends Controller
         $data = $this->validatedPayload($request);
         $data['created_by'] = Auth::user()->name ?? Auth::user()->email ?? 'System';
 
-        $record = LaporanrepackingM::create($data);
+        // Cek apakah ada record dengan status Pending untuk atribut ini
+        $record = LaporanrepackingM::where('atributte', $data['atributte'])
+            ->where('status', 'Pending')
+            ->orderBy('id', 'asc')
+            ->first();
 
-        return $this->crudResponse($request, 'Laporan repacking CRC berhasil ditambahkan.', $record, 201);
+        if ($record) {
+            // Update record yang Pending
+            $record->update($data);
+            $message = 'Laporan repacking CRC berhasil diperbarui dari daftar.';
+        } else {
+            // Buat record baru jika tidak ada yang Pending
+            $record = LaporanrepackingM::create($data);
+            $message = 'Laporan repacking CRC berhasil ditambahkan.';
+        }
+
+        return $this->crudResponse($request, $message, $record, 201);
     }
 
     public function show_laporanrepacking(Request $request, $id)
@@ -123,6 +139,60 @@ class LaporanrepController extends Controller
         }
 
         return redirect()->route('laporanrepacking')->with('success', 'Data berhasil dihapus.');
+    }
+
+    public function getDaftarRepacking(Request $request)
+    {
+        $data = LaporanrepackingM::where('status', 'Pending')->orderBy('id', 'asc')->get();
+        // ubah 'atributte' menjadi 'atribute' agar sesuai dgn frontend JS yg sdh ada
+        $data = $data->map(function ($item) {
+            $item->atribute = $item->atributte;
+            return $item;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+
+    public function uploadDaftarRepacking(Request $request)
+    {
+        $request->validate([
+            'file_excel' => 'required|file|max:10240'
+        ]);
+
+        try {
+            Excel::import(new DaftarRepackingImport, $request->file('file_excel'));
+            return response()->json(['success' => true, 'message' => 'Daftar Repacking berhasil diunggah!']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal mengunggah: ' . $e->getMessage()]);
+        }
+    }
+
+    public function storeDaftarRepacking(Request $request)
+    {
+        $request->validate([
+            'atribute' => 'required|string|max:255',
+            'ukuran' => 'nullable|string|max:255',
+            'berat' => 'nullable|string|max:255',
+            'layout' => 'nullable|string|max:255',
+        ]);
+
+        LaporanrepackingM::create([
+            'atributte' => $request->atribute, // note spelling difference in DB
+            'ukuran' => $request->ukuran,
+            'berat' => $request->berat,
+            'layout' => $request->layout,
+            'status' => 'Pending',
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Data Daftar Repacking berhasil ditambahkan!']);
+    }
+
+    public function downloadFormatDaftar()
+    {
+        return Excel::download(new \App\Exports\FormatDaftarExport, 'Format_Daftar_Repacking.xlsx');
     }
 
     public function laporanrepacking_export(Request $request): StreamedResponse
@@ -254,6 +324,7 @@ class LaporanrepController extends Controller
             : (clone $to)->subDays(30)->startOfDay();
 
         $query = LaporanrepackingM::query()
+            ->where('status', '!=', 'Pending')
             ->inReportRange($from->toDateString(), $to->toDateString());
 
         foreach (['status', 'group'] as $field) {
