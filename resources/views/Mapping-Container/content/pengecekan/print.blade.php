@@ -159,7 +159,10 @@
                         </tr>
                         <tr>
                             <th>Customer</th>
-                            <td>{{$d->customer}}</td>
+                            @php
+                                $container = App\Models\Shipment::where('no_gs', $d->no_gs)->value("container");
+                                @endphp
+                            <td>{{$d->customer}} - {{$container}}</td>
                         </tr>
                         <tr>
                             <th>Kota/Negara</th>
@@ -173,7 +176,7 @@
                 </div>
 
                 <div class="section">
-                    <p><strong>KONTAINER / TRAILER / TRUK</strong></p>
+                    <p><strong>KONTAINER</strong></p>
                     <table>
                         <tr>
                             <th>Lantai</th>
