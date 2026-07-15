@@ -23,6 +23,8 @@ use App\Http\Controllers\PListController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RekapController;
+use App\Http\Controllers\SuratJalanController;
+use App\Http\Controllers\ScanController;
 use App\Http\Controllers\ScanLayoutController;
 use App\Http\Controllers\ShippmentA;
 use App\Http\Controllers\ShippmentB;
@@ -63,7 +65,8 @@ Route::get('/', [LoginController::class, 'index'])->name('login');
 Route::post('/login', [LoginController::class, 'proses'])->name('login-proses');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
-
+Route::get('/scan', [ScanController::class, 'index']);
+Route::post('/api/run-scan', [ScanController::class, 'scan'])->name('laravel.scan');
 
 Route::prefix('Laporan-packing')->group(function () {
     Route::get('/',[PackingController::class,'index'])->name('pac');
@@ -146,7 +149,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::get('/export', [IdOdController::class, 'idod_export'])->name('idod.export');
         Route::get('/print/{id}', [IdOdController::class, 'print_idod'])->name('idod.print');
         Route::get('/show/{id}', [IdOdController::class, 'show_idod'])->name('idod.show');
-        Route::delete('/destroy/{id}', [IdOdController::class, 'destroy_idod'])->name('idod.destroy');  
+        Route::delete('/destroy/{id}', [IdOdController::class, 'destroy_idod'])->name('idod.destroy');
     });
 
     Route::prefix('laporan-repacking')->group(function () {
@@ -159,11 +162,20 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::get('/export', [LaporanrepController::class, 'laporanrepacking_export'])->name('laporanrepacking.export');
         Route::get('/print/{id}', [LaporanrepController::class, 'print_laporanrepacking'])->name('laporanrepacking.print');
         Route::get('/show/{id}', [LaporanrepController::class, 'show_laporanrepacking'])->name('laporanrepacking.show');
-        Route::delete('/destroy/{id}', [LaporanrepController::class, 'destroy_laporanrepacking'])->name('laporanrepacking.destroy');  
+        Route::delete('/destroy/{id}', [LaporanrepController::class, 'destroy_laporanrepacking'])->name('laporanrepacking.destroy');
         Route::get('/daftar-data', [LaporanrepController::class, 'getDaftarRepacking'])->name('laporanrepacking.daftar-data');
         Route::get('/download-format', [LaporanrepController::class, 'downloadFormatDaftar'])->name('laporanrepacking.download-format');
         Route::post('/upload-daftar', [LaporanrepController::class, 'uploadDaftarRepacking'])->name('laporanrepacking.upload-daftar');
         Route::post('/store-daftar', [LaporanrepController::class, 'storeDaftarRepacking'])->name('laporanrepacking.store-daftar');
+    });
+
+    Route::prefix('surat-jalan')->group(function () {
+        Route::get('/', [SuratJalanController::class, 'index'])->name('suratjalan');
+        Route::get('/dashboard-data', [SuratJalanController::class, 'dashboardData'])->name('suratjalan.dashboard-data');
+        Route::post('/store', [SuratJalanController::class, 'store'])->name('suratjalan.store');
+        Route::get('/show/{id}', [SuratJalanController::class, 'show'])->name('suratjalan.show');
+        Route::post('/update/{id}', [SuratJalanController::class, 'update'])->name('suratjalan.update');
+        Route::post('/destroy/{id}', [SuratJalanController::class, 'destroy'])->name('suratjalan.destroy');
     });
 
     Route::prefix('fomcheck')->group(function () {

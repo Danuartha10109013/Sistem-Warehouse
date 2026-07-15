@@ -393,6 +393,13 @@
                   </div>
                </a>
 
+               <a href="{{ route('suratjalan') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-printer-search"></i>
+                     <div class="menu-title">Scan Surat Jalan</div>
+                  </div>
+               </a>
+
             @endif
 
             @if (Auth::user()->username == "danuartha")
