@@ -978,3 +978,31 @@ Route::middleware([AutoLogout::class])->group(function () {
 
 
 
+// Modul Kapasitas Routes
+use App\Http\Controllers\KapasitasDashboardController;
+use App\Http\Controllers\KapasitasStockController;
+use App\Http\Controllers\KapasitasCategoryFilterController;
+use App\Http\Controllers\KapasitasController;
+use App\Http\Controllers\KelolaKapasitasController;
+
+Route::group(['prefix' => 'modul-kapasitas', 'as' => 'modul-kapasitas.'], function () {
+    Route::get('/dashboard', [KapasitasDashboardController::class, 'index'])->name('dashboard');
+
+    // Kategori Filter Routes
+    Route::get('/filter-kategori', [KapasitasCategoryFilterController::class, 'index'])->name('filter-kategori');
+    Route::post('/filter-kategori', [KapasitasCategoryFilterController::class, 'store'])->name('filter-kategori.store');
+    Route::delete('/filter-kategori/{id}', [KapasitasCategoryFilterController::class, 'destroy'])->name('filter-kategori.destroy');
+
+    Route::get('/input-harian', [KapasitasStockController::class, 'index'])->name('input-harian');
+    Route::post('/input-harian/import', [KapasitasStockController::class, 'import'])->name('input-harian.import');
+    Route::delete('/input-harian/delete-source', [KapasitasStockController::class, 'destroySource'])->name('input-harian.delete-source');
+    Route::get('/input-harian/check-sources', [KapasitasStockController::class, 'checkImportedSources'])->name('input-harian.check-sources');
+
+    // Kapasitas Routes
+    Route::get('/kapasitas/crc', [KapasitasController::class, 'crc'])->name('kapasitas.crc');
+    Route::get('/kapasitas/barang-jadi', [KapasitasController::class, 'barangJadi'])->name('kapasitas.barang-jadi');
+
+    // Kelola Kapasitas
+    Route::get('/kelola/kapasitas', [KelolaKapasitasController::class, 'index'])->name('kelola-kapasitas');
+    Route::post('/kelola/kapasitas', [KelolaKapasitasController::class, 'store'])->name('kelola-kapasitas.store');
+});

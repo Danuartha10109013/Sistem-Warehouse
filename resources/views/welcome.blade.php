@@ -26,7 +26,7 @@
       }
 
       /* Background STOP SUAP - Seperti cap air (watermark) di tengah bawah */
-      .stop-suap-background {
+      /* .stop-suap-background {
          position: fixed;
          top: 0;
          left: 0;
@@ -41,7 +41,7 @@
          z-index: 1;
          pointer-events: none;
          opacity: 0.3;
-      }
+      } */
 
       /* Wrapper untuk konten */
       .content-wrapper {
@@ -316,7 +316,7 @@
 
 <body>
    <!-- Background STOP SUAP -->
-   <div class="stop-suap-background" aria-label="Stop Suap - Hargai Petugas Kami"></div>
+   <!-- <div class="stop-suap-background" aria-label="Stop Suap - Hargai Petugas Kami"></div> -->
 
    <div class="content-wrapper">
       <div class="judul">
@@ -393,10 +393,19 @@
                   </div>
                </a>
 
+               {{-- [WIP] Disembunyikan sementara sebelum upload hosting
                <a href="{{ route('suratjalan') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-printer-search"></i>
                      <div class="menu-title">Scan Surat Jalan</div>
+                  </div>
+               </a>
+               --}}
+
+               <a href="{{ route('modul-kapasitas.dashboard') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-chart-bar"></i>
+                     <div class="menu-title">Modul Kapasitas</div>
                   </div>
                </a>
 
