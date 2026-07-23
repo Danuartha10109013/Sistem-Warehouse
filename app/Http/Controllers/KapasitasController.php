@@ -76,11 +76,16 @@ class KapasitasController extends Controller
         $sumTrend = 0;
 
         $maxWh = 0;
+        
+        $validDaysCount = 0;
         $maxPrdQa = 0;
         $maxTotal = 0;
         $maxTrend = 0;
 
         for ($d = 1; $d <= $daysInMonth; $d++) {
+            if (\Carbon\Carbon::create($year, $month, $d)->isSunday()) continue;
+            $validDaysCount++;
+            
             // Rumus: dibagi 1000
             $wh = $dataCrc[$d]['wh'] / 1000;
             $prdQa = $dataCrc[$d]['prd_qa'] / 1000;
@@ -111,13 +116,13 @@ class KapasitasController extends Controller
             ];
         }
 
-        // Rata-rata (Average) = Jumlah keseluruhan dibagi jumlah hari dalam bulan tersebut
+        // Rata-rata (Average) = Jumlah keseluruhan dibagi jumlah hari valid dalam bulan tersebut
         $averages = [
-            'wh' => $sumWh / $daysInMonth,
-            'prd_qa' => $sumPrdQa / $daysInMonth,
-            'total_stock' => $sumTotal / $daysInMonth,
+            'wh' => $validDaysCount > 0 ? $sumWh / $validDaysCount : 0,
+            'prd_qa' => $validDaysCount > 0 ? $sumPrdQa / $validDaysCount : 0,
+            'total_stock' => $validDaysCount > 0 ? $sumTotal / $validDaysCount : 0,
             'kap' => $kapasitasValue,
-            'trend' => $sumTrend / $daysInMonth,
+            'trend' => $validDaysCount > 0 ? $sumTrend / $validDaysCount : 0,
         ];
 
         $highest = [
@@ -202,11 +207,16 @@ class KapasitasController extends Controller
         $sumTrend = 0;
 
         $maxWh = 0;
+        
+        $validDaysCount = 0;
         $maxPrdQa = 0;
         $maxTotal = 0;
         $maxTrend = 0;
 
         for ($d = 1; $d <= $daysInMonth; $d++) {
+            if (\Carbon\Carbon::create($year, $month, $d)->isSunday()) continue;
+            $validDaysCount++;
+            
             // Rumus: dibagi 1000
             $wh = $dataBj[$d]['wh'] / 1000;
             $prdQa = $dataBj[$d]['prd_qa'] / 1000;
@@ -239,11 +249,11 @@ class KapasitasController extends Controller
 
         // Rata-rata (Average)
         $averages = [
-            'wh' => $sumWh / $daysInMonth,
-            'prd_qa' => $sumPrdQa / $daysInMonth,
-            'total_stock' => $sumTotal / $daysInMonth,
+            'wh' => $validDaysCount > 0 ? $sumWh / $validDaysCount : 0,
+            'prd_qa' => $validDaysCount > 0 ? $sumPrdQa / $validDaysCount : 0,
+            'total_stock' => $validDaysCount > 0 ? $sumTotal / $validDaysCount : 0,
             'kap' => $kapasitasValue,
-            'trend' => $sumTrend / $daysInMonth,
+            'trend' => $validDaysCount > 0 ? $sumTrend / $validDaysCount : 0,
         ];
 
         $highest = [

@@ -72,7 +72,7 @@
                 <div class="bg-lightgray dark:bg-dark h-full rounded-bb">
                     <!-- Body Content -->
                     <div class="w-full">
-                        <div class="container py-30 px-4 sm:px-30">
+                        <div class="w-full 2xl:container mx-auto py-8 px-4 sm:px-6 lg:px-8">
                             @yield('content')
                         </div>
                     </div>

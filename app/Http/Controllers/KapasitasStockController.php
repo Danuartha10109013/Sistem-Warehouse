@@ -44,7 +44,7 @@ class KapasitasStockController extends Controller
                 continue;
 
             $group = strtoupper($stock->kategori_grup ?: 'BARANG JADI');
-            
+
             // --- LOGIK PEMISAHAN CRC BERDASARKAN SUMBER (SOURCE) ---
             // Karena di database namanya tetap "CRC", kita pisahkan nama tampilannya di tabel
             // agar tidak menyatu (melebur) dengan CRC dari sumber lain.
@@ -76,6 +76,8 @@ class KapasitasStockController extends Controller
             'QA-L3' => 1,
             'L3-BJS' => 1,
             'L3-BJ' => 1,
+            'L8-BJS' => 1,
+            'L8-BJ' => 1,
             'WH-TATASENTOSA' => 1,
             'JASPER' => 2,
             'TATALOGAM' => 3,
@@ -102,6 +104,8 @@ class KapasitasStockController extends Controller
             'QA-L3' => 1,
             'L3-BJS' => 1,
             'L3-BJ' => 1,
+            'L8-BJS' => 1,
+            'L8-BJ' => 1,
             'WH-TATASENTOSA' => 1,
             'JASPER' => 2,
             'TATALOGAM' => 3,

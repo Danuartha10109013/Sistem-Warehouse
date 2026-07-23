@@ -82,12 +82,12 @@
 
         <!-- Tabel Data -->
         <div id="tableContainer" class="relative overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-md custom-scrollbar">
-            <table id="dataTable" class="w-full text-base text-left text-gray-700 dark:text-gray-300">
+            <table id="dataTable" class="w-full text-xs xl:text-sm 2xl:text-base text-left text-gray-700 dark:text-gray-300">
                 <thead class="text-xs text-white uppercase bg-primary dark:bg-blue-900 shadow-sm relative z-40">
                     <tr>
-                        <th scope="col" class="px-6 py-4 font-extrabold border-b border-blue-400 dark:border-blue-700 whitespace-nowrap sticky left-0 z-50 bg-primary dark:bg-blue-900 text-sm sticky-shadow">KATEGORI STOCK</th>
+                        <th scope="col" class="px-2 py-2 2xl:px-6 2xl:py-4 font-extrabold border-b border-blue-400 dark:border-blue-700 whitespace-nowrap sticky left-0 z-50 bg-primary dark:bg-blue-900 text-sm sticky-shadow">KATEGORI STOCK</th>
                         @for($d = 1; $d <= $daysInMonth; $d++)
-                            <th scope="col" class="px-3 py-4 text-center border-b border-r border-blue-400 dark:border-blue-700 min-w-[50px] last:border-r-0 bg-blue-600 dark:bg-blue-800 shadow-inner font-bold text-sm">{{ $d }}</th>
+                            <th scope="col" class="px-1 py-2 2xl:px-3 2xl:py-4 text-center border-b border-r border-blue-400 dark:border-blue-700 min-w-[50px] last:border-r-0 bg-blue-600 dark:bg-blue-800 shadow-inner font-bold text-sm">{{ $d }}</th>
                         @endfor
                     </tr>
                 </thead>
@@ -104,7 +104,7 @@
                         @if(isset($pivot[$groupName]) && count($pivot[$groupName]) > 0)
                             <!-- Group Header Row -->
                             <tr class="bg-gray-50 dark:bg-gray-800 relative">
-                                <td class="px-6 py-3 font-extrabold text-base sticky left-0 z-40 border-b border-gray-300 dark:border-gray-600 {{ $groupColors[$groupName] }} sticky-shadow">
+                                <td class="px-2 py-2 2xl:px-6 2xl:py-4 font-extrabold text-sm sticky left-0 z-40 border-b border-gray-300 dark:border-gray-600 {{ $groupColors[$groupName] }} sticky-shadow">
                                     {{ $groupName }}
                                 </td>
                                 <td colspan="{{ $daysInMonth }}" class="border-b border-gray-300 dark:border-gray-600 {{ $groupColors[$groupName] }} opacity-70"></td>
@@ -133,11 +133,11 @@
                                     $rowIndex++;
                                 @endphp
                                 <tr class="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group {{ $bgClass }} relative">
-                                    <td class="px-6 py-3 font-medium text-gray-800 whitespace-nowrap dark:text-gray-200 sticky left-0 z-30 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 {{ $stickyBgClass }} transition-colors sticky-shadow">
+                                    <td class="px-2 py-2 2xl:px-6 2xl:py-3 font-medium text-gray-800 whitespace-nowrap dark:text-gray-200 sticky left-0 z-30 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 {{ $stickyBgClass }} transition-colors sticky-shadow">
                                         {{ $kategori }}
                                     </td>
                                     @for($d = 1; $d <= $daysInMonth; $d++)
-                                        <td class="px-2 py-3 text-center border-r border-gray-300 dark:border-gray-600 last:border-r-0 hover:bg-blue-100 dark:hover:bg-gray-500 transition-colors cursor-default {{ $days[$d] > 0 ? 'text-gray-800 dark:text-gray-200 font-medium' : 'text-transparent' }}">
+                                        <td class="px-1 py-1.5 2xl:px-2 2xl:py-3 text-center border-r border-gray-300 dark:border-gray-600 last:border-r-0 hover:bg-blue-100 dark:hover:bg-gray-500 transition-colors cursor-default {{ $days[$d] > 0 ? 'text-gray-800 dark:text-gray-200 font-medium' : 'text-transparent' }}">
                                             {{ $days[$d] > 0 ? number_format($days[$d], 0, ',', '.') : '' }}
                                         </td>
                                     @endfor
@@ -146,7 +146,7 @@
                         @endif
                     @empty
                         <tr class="bg-white dark:bg-darkgray">
-                            <td colspan="{{ $daysInMonth + 1 }}" class="px-6 py-10 text-center text-gray-500 text-lg">Belum ada data stok untuk bulan ini...</td>
+                            <td colspan="{{ $daysInMonth + 1 }}" class="px-3 py-6 2xl:px-6 2xl:py-10 text-center text-gray-500 text-lg">Belum ada data stok untuk bulan ini...</td>
                         </tr>
                     @endforelse
                 </tbody>
