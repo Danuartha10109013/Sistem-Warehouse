@@ -3,8 +3,8 @@
 @section('title', 'Kapasitas CRC')
 
 @section('content')
-<div class="card h-full">
-    <div class="card-body">
+<div class="card h-full min-w-0">
+    <div class="card-body min-w-0">
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h4 class="text-lg font-semibold text-gray-800 dark:text-white">Perhitungan Kapasitas CRC</h4>
