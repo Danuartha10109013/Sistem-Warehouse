@@ -82,7 +82,7 @@
                 </div>
             </div>
             </div>
-        </div>
+        <div class="html2pdf__page-break"></div>
 
         <!-- Tabel Kapasitas Barang Jadi -->
         <div class="relative overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-md">
@@ -295,14 +295,13 @@
         const element = document.getElementById('export-container');
         const tableWrapper = element.querySelector('.overflow-x-auto');
         
-        // Temporarily remove overflow so the table isn't clipped
         if (tableWrapper) {
             tableWrapper.classList.remove('overflow-x-auto');
         }
 
         const opt = {
             margin:       0.3,
-            filename:     'Kapasitas_Barang_Jadi_Lengkap_{{ $months[$month] ?? '' }}_{{ $year }}.pdf',
+            filename:     'Kapasitas_{{ $months[$month] ?? '' }}_{{ $year }}.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
             jsPDF:        { unit: 'in', format: 'a3', orientation: 'landscape' },
@@ -310,7 +309,6 @@
         };
         
         html2pdf().set(opt).from(element).save().then(() => {
-            // Restore the overflow class after PDF is generated
             if (tableWrapper) {
                 tableWrapper.classList.add('overflow-x-auto');
             }

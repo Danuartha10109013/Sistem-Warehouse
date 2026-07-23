@@ -56,9 +56,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
     @stack('styles')
 </head>
-<body class="text-sm text-bodytext bg-white dark:bg-darkgray">
-    <div class="flex w-full min-h-screen dark:bg-darkgray">
-        <div class="page-wrapper flex w-full">
+<body class="text-sm text-bodytext bg-white dark:bg-darkgray overflow-x-hidden">
+    <div class="flex w-full min-h-screen dark:bg-darkgray overflow-x-hidden min-w-0">
+        <div class="page-wrapper flex w-full xl:w-[calc(100%-256px)] min-w-0">
             
             <!-- Sidebar / V_nav -->
             @include('modul_kapasitas.layout.V_nav')
