@@ -132,7 +132,7 @@
             <img style="width: 10%" src="{{ $pdfPublicPath('img/Logo_TML.png') }}" alt="Logo">
             <div><center>
 
-                <h3 style="font-size: 20px;margin-left: 80px"><strong>CONTAINER & TRAILER LOADING MAPPING AND INSPECTION CHECKLIST</strong></h3>
+                <h3 style="font-size: 20px;margin-left: 80px"><strong>MAPPING MUAT & CEKLIST KONTAINER & TRAILLER</strong></h3>
             </center>
             </div>
             <p style="margin-top: -70px;margin-left: 90px">FM.WH.09.04</p>
@@ -150,11 +150,11 @@
                     <table>
                         
                         <tr>
-                            <th>Loading Start Time</th>
+                            <th>Awal Muat</th>
                             <td>{{$d->awal_muat}} - {{$d->awal_muat1}}</td>
                         </tr>
                         <tr>
-                            <th>Date</th>
+                            <th>Tanggal</th>
                             <td>{{$d->tgl_gs}}</td>
                         </tr>
                         <tr>
@@ -165,69 +165,69 @@
                             <td>{{$d->customer}} - {{$container}}</td>
                         </tr>
                         <tr>
-                            <th>City/Country</th>
+                            <th>Kota/Negara</th>
                             <td>{{$d->kota_negara}}</td>
                         </tr>
                         <tr>
-                            <th>Shipping Company / Carrier</th>
+                            <th>Ekspedisi</th>
                             <td>{{$d->ekspedisi}}</td>
                         </tr>
                     </table>
                 </div>
 
                 <div class="section">
-                    <p><strong>CONTAINER</strong></p>
+                    <p><strong>KONTAINER</strong></p>
                     <table>
                         <tr>
-                            <th>Floor Condition</th>
+                            <th>Lantai</th>
                             <td>{{$d->lantai}}</td>
                         </tr>
                         <tr>
-                            <th>Wall Condition</th>
+                            <th>Dinding</th>
                             <td>{{$d->dinding}}</td>
                         </tr>
                         <tr>
-                            <th>Container Frame Condition</th>
+                            <th>Rangka Kontainer</th>
                             <td>{{$d->rangka}}</td>
                         </tr>
                         <tr>
-                            <th>Container Locking Devices</th>
+                            <th>Pengunci Kontainer</th>
                             <td>{{$d->pengunci_kontainer}}</td>
                         </tr>
                         <tr>
-                            <th>Swept</th>
+                            <th>Disapu</th>
                             <td>{{$d->sapu}}</td>
                         </tr>
                         <tr>
-                            <th>Vacuum Cleaned</th>
+                            <th>Vacum</th>
                             <td>{{$d->vacum}}</td>
                         </tr>
                         <tr>
-                            <th>Sprayed / Sanitized</th>
+                            <th>Disemprot</th>
                             <td>{{$d->disemprot}}</td>
                         </tr>
                         <tr>
-                            <th>Chocks</th>
+                            <th>Choke</th>
                             <td>{{$d->choke}}</td>
                         </tr>
                         <tr>
-                            <th>Stoppers / Wooden Blocks</th>
+                            <th>Stopper / Balok</th>
                             <td>{{$d->stopper}}</td>
                         </tr>
                         <tr>
-                            <th>Slings</th>
+                            <th>Sling</th>
                             <td>{{$d->sling}}</td>
                         </tr>
                         <tr>
-                            <th>Silica Gel Packs</th>
+                            <th>Silica Gel</th>
                             <td>{{$d->silica_gel}}</td>
                         </tr>
                         <tr>
-                            <th>Fumigation</th>
+                            <th>Fumigasi</th>
                             <td>{{$d->fumigasi}}</td>
                         </tr>
                         <tr>
-                            <th>Radiation Level</th>
+                            <th>Radiasi</th>
                             <td>{{$d->radiasi}}</td>
                         </tr>
                     </table>
@@ -239,41 +239,41 @@
                     
                     <table>
                         <tr>
-                            <th>Loading Finished Time</th>
+                            <th>Selesai muat</th>
                             <td>{{$d->selesai_muat}}</td>
                         </tr>
                         <tr>
-                            <th>Vehicle Registration Number</th>
+                            <th>No. Mobil</th>
                             <td>{{$d->no_mobil}}</td>
                         </tr>
                         <tr>
-                            <th>Container Number</th>
+                            <th>No. Kontainer</th>
                             <td>{{$d->no_container}}</td>
                         </tr>
                         <tr>
-                            <th>Weather</th>
+                            <th>Cuaca</th>
                             <td>{{$d->cuaca}}</td>
                         </tr>
                         <tr>
-                            <th>Gross Weight / Tare Weight</th>
+                            <th>Tonase / Tare</th>
                             <td>{{$d->tonase_tare}}</td>
                         </tr>
                     </table>
                 </div>
 
                 <div class="section">
-                    <p><strong>TRAILER / TRUCK</strong></p>
+                    <p><strong>TRAILER / TRUK</strong></p>
                     <table>
                         <tr>
-                            <th>Tire Condition</th>
+                            <th>Kondisi Ban</th>
                             <td>{{$d->kondisi_ban}}</td>
                         </tr>
                         <tr>
-                            <th>Floor Condition</th>
+                            <th>Kondisi Lantai</th>
                             <td>{{$d->kondisi_lantai}}</td>
                         </tr>
                         <tr>
-                            <th>Chains / Webbing Straps</th>
+                            <th>Rantai / Webbing</th>
                             <td>{{$d->rantai_webbing}}</td>
                         </tr>
                         <tr>
@@ -281,7 +281,7 @@
                             <td>{{$d->tonase}}</td>
                         </tr>
                         <tr>
-                            <th>Tarpaulin</th>
+                            <th>Terpal</th>
                             <td>{{$d->terpal}}</td>
                         </tr>
                         <tr>
@@ -296,12 +296,10 @@
                 <div class="section">
                     <table>
                         <tr>
-                            <th>Remarks <small style="color: red">*</small></th>
+                            <th>Catatan <small style="color: red">*</small></th>
                         </tr>
                         <tr>
-                            <td>{{$d->catatan}} <br>
-                            <b>No damage to the goods was identified during the loading process. All goods were handed over for shipment in good condition.
-                            </b></td>
+                            <td>{{$d->catatan}}</td>
                         </tr>
                     </table>
                 </div>
@@ -346,7 +344,7 @@
 }
 
                 </style>
-                {{-- <p class="text-center">FRONT</p> --}}
+                {{-- <p class="text-center">DEPAN</p> --}}
                 <table class="mapping kiri mb-5">
                     @foreach ($coil as $c)
                         
@@ -509,17 +507,14 @@
                     
                     @endforeach
                 </table>
-                <p class="text-start" style="font-size: 9px; margin-top: -20px;">
-    <small style="color: red">*</small>
-    This mapping illustrates the coil arrangement inside the container from a <b>Top View</b>.
-</p>
+            <p class="text-start" style="font-size: 9px;margin-top: -20px"><small style="color: red">*</small>Mapping ini mereferensikan layout koil saat berada di dalam kontainer dari <b>Tampak Atas</b></p>
             <div class="tablebaru" style="width: 90%; text-align: center;">
                 <table style="width: 100%; border-collapse: collapse; margin: 0 auto; outline: none;">
                     <tbody>
                         <tr>
                             <td style="border: none; padding: 10px; text-align: center; vertical-align: middle;">Team Leader</td>
                             <td style="border: none; padding: 10px; text-align: center;"></td>
-                            <td style="border: none; padding: 10px; text-align: center; vertical-align: middle;">Forklift Operator</td>
+                            <td style="border: none; padding: 10px; text-align: center; vertical-align: middle;">Opr Forklift</td>
                         </tr>
                         <tr>
                             <td style="border: none; padding: 10px; text-align: center; vertical-align: middle; display: flex; justify-content: center; align-items: center;">
