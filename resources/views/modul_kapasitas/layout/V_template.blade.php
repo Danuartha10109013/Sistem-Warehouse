@@ -64,15 +64,15 @@
             @include('modul_kapasitas.layout.V_nav')
 
             <!-- Main Content Area -->
-            <div class="page-wrapper-sub flex flex-col w-full dark:bg-darkgray">
+            <div class="page-wrapper-sub flex flex-col w-full min-w-0 dark:bg-darkgray">
                 
                 <!-- Top Header -->
                 @include('modul_kapasitas.layout.V_header')
 
-                <div class="bg-lightgray dark:bg-dark h-full rounded-bb">
+                <div class="bg-lightgray dark:bg-dark h-full rounded-bb min-w-0">
                     <!-- Body Content -->
-                    <div class="w-full">
-                        <div class="w-full 2xl:container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                    <div class="w-full min-w-0 overflow-x-hidden">
+                        <div class="w-full 2xl:container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-w-0">
                             @yield('content')
                         </div>
                     </div>
