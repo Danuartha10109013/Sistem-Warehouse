@@ -8,21 +8,59 @@
         min-width: 0;
         max-width: 100%;
     }
-    .kapasitas-table-wrap {
+    .kapasitas-toolbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        background: #fff;
+        border: 1px solid #f3f4f6;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .dark .kapasitas-toolbar {
+        background: var(--color-darkgray, #1f2937);
+        border-color: #374151;
+    }
+    @media (min-width: 1024px) {
+        .kapasitas-toolbar {
+            grid-template-columns: minmax(180px, 220px) minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+        }
+    }
+    .kapasitas-table-scroll {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: visible;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior-x: contain;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    }
+    .dark .kapasitas-table-scroll {
+        border-color: #374151;
+    }
+    .kapasitas-table-scroll table {
+        width: max-content;
+        min-width: 100%;
+        border-collapse: collapse;
     }
     .kapasitas-sticky-col {
+        position: sticky;
+        left: 0;
+        z-index: 20;
         max-width: min(42vw, 11rem);
     }
     @media (min-width: 640px) {
         .kapasitas-sticky-col {
             max-width: none;
         }
-    }
-    .sticky-shadow {
-        position: sticky;
-        left: 0;
     }
     .sticky-shadow::after {
         content: '';
@@ -31,15 +69,28 @@
         right: -10px;
         bottom: 0;
         width: 10px;
-        box-shadow: inset 6px 0 8px -4px rgba(0,0,0,0.25);
+        box-shadow: inset 6px 0 8px -4px rgba(0, 0, 0, 0.25);
         pointer-events: none;
         z-index: 50;
+    }
+    .kapasitas-scroll-hint {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+    @media (min-width: 1024px) {
+        .kapasitas-scroll-hint {
+            display: none;
+        }
     }
 </style>
 @endpush
 
 @section('content')
-<div class="card h-full min-w-0 overflow-hidden">
+<div class="card min-w-0">
     <div class="card-body min-w-0">
         <div class="mb-4 sm:mb-6">
             <h4 class="text-base sm:text-lg font-semibold text-gray-800 dark:text-white">Rekap Stok Kapasitas Warehouse</h4>
@@ -61,7 +112,7 @@
         </div>
         @endif
 
-        <div class="kapasitas-page grid grid-cols-1 gap-3 sm:gap-4 mb-4 sm:mb-6 bg-white dark:bg-darkgray p-3 sm:p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 lg:grid-cols-[minmax(0,220px)_minmax(0,1fr)_auto] lg:items-center">
+        <div class="kapasitas-page kapasitas-toolbar">
             <!-- Filter Bulan/Tahun -->
             <form method="GET" action="{{ route('modul-kapasitas.input-harian') }}" class="w-full min-w-0">
                 @php
@@ -83,33 +134,29 @@
                     <input type="text" id="table-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary focus:border-primary dark:bg-dark dark:border-gray-600 dark:placeholder-gray-400 dark:text-white shadow-sm transition-colors" placeholder="Cari kategori...">
                 </div>
 
-            <button type="button" data-modal-target="importModal" data-modal-toggle="importModal" class="text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors shadow-sm flex items-center justify-center gap-2 whitespace-nowrap w-full lg:w-auto">
+            <button type="button" data-modal-target="importModal" data-modal-toggle="importModal" class="text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors shadow-sm inline-flex items-center justify-center gap-2 whitespace-nowrap w-full lg:w-auto">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Input Data Baru
             </button>
         </div>
 
-        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 lg:hidden flex items-center gap-1.5">
+        <p class="kapasitas-scroll-hint">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"/></svg>
             Geser tabel ke kanan/kiri untuk melihat semua tanggal
         </p>
 
-        <div id="topScrollbar" class="w-full max-w-full overflow-x-auto overflow-y-hidden mb-1 custom-scrollbar kapasitas-table-wrap">
-            <div id="topScrollbarContent" class="h-[1px]"></div>
-        </div>
-
         <!-- Tabel Data -->
-        <div id="tableContainer" class="relative max-w-full overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-md custom-scrollbar kapasitas-table-wrap">
-            <table id="dataTable" class="w-full text-xs sm:text-sm text-left text-gray-700 dark:text-gray-300">
-                <thead class="text-[10px] sm:text-xs text-white uppercase bg-primary dark:bg-blue-900 shadow-sm relative z-40">
+        <div id="tableContainer" class="kapasitas-table-scroll">
+            <table id="dataTable" class="text-xs sm:text-sm text-left text-gray-700 dark:text-gray-300">
+                <thead class="text-[10px] sm:text-xs text-white uppercase bg-primary dark:bg-blue-900">
                     <tr>
-                        <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 font-extrabold border-b border-blue-400 dark:border-blue-700 whitespace-nowrap sticky left-0 z-50 bg-primary dark:bg-blue-900 sticky-shadow kapasitas-sticky-col">KATEGORI STOCK</th>
+                        <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 font-extrabold border-b border-blue-400 dark:border-blue-700 whitespace-nowrap kapasitas-sticky-col sticky-shadow bg-primary dark:bg-blue-900">KATEGORI STOCK</th>
                         @for($d = 1; $d <= $daysInMonth; $d++)
                             <th scope="col" class="px-1.5 sm:px-3 py-3 sm:py-4 text-center border-b border-r border-blue-400 dark:border-blue-700 min-w-[2.25rem] sm:min-w-[50px] last:border-r-0 bg-blue-600 dark:bg-blue-800 shadow-inner font-bold">{{ $d }}</th>
                         @endfor
                     </tr>
                 </thead>
-                <tbody class="relative z-10">
+                <tbody>
                     @php 
                         $groupColors = [
                             'BAHAN BAKU' => 'bg-green-200 dark:bg-green-900 text-green-900 dark:text-green-100',
@@ -118,11 +165,22 @@
                         ];
                     @endphp
 
-                    @forelse(['BAHAN BAKU', 'BARANG JADI', 'LIMBAH'] as $groupName)
+                    @php
+                        $hasPivotData = false;
+                        foreach (['BAHAN BAKU', 'BARANG JADI', 'LIMBAH'] as $groupCheck) {
+                            if (!empty($pivot[$groupCheck])) {
+                                $hasPivotData = true;
+                                break;
+                            }
+                        }
+                    @endphp
+
+                    @if($hasPivotData)
+                    @foreach(['BAHAN BAKU', 'BARANG JADI', 'LIMBAH'] as $groupName)
                         @if(isset($pivot[$groupName]) && count($pivot[$groupName]) > 0)
                             <!-- Group Header Row -->
-                            <tr class="bg-gray-50 dark:bg-gray-800 relative">
-                                <td class="px-3 sm:px-6 py-2 sm:py-3 font-extrabold text-sm sm:text-base sticky left-0 z-40 border-b border-gray-300 dark:border-gray-600 {{ $groupColors[$groupName] }} sticky-shadow kapasitas-sticky-col">
+                            <tr>
+                                <td class="px-3 sm:px-6 py-2 sm:py-3 font-extrabold text-sm sm:text-base kapasitas-sticky-col sticky-shadow border-b border-gray-300 dark:border-gray-600 {{ $groupColors[$groupName] }}">
                                     {{ $groupName }}
                                 </td>
                                 <td colspan="{{ $daysInMonth }}" class="border-b border-gray-300 dark:border-gray-600 {{ $groupColors[$groupName] }} opacity-70"></td>
@@ -150,8 +208,8 @@
                                     }
                                     $rowIndex++;
                                 @endphp
-                                <tr class="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group {{ $bgClass }} relative">
-                                    <td class="px-3 sm:px-6 py-2 sm:py-3 font-medium text-gray-800 dark:text-gray-200 sticky left-0 z-30 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 {{ $stickyBgClass }} transition-colors sticky-shadow kapasitas-sticky-col truncate max-w-[11rem] sm:max-w-none sm:whitespace-nowrap" title="{{ $kategori }}">
+                                <tr class="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group {{ $bgClass }}">
+                                    <td class="px-3 sm:px-6 py-2 sm:py-3 font-medium text-gray-800 dark:text-gray-200 kapasitas-sticky-col sticky-shadow group-hover:bg-gray-200 dark:group-hover:bg-gray-600 {{ $stickyBgClass }} transition-colors truncate max-w-[11rem] sm:max-w-none sm:whitespace-nowrap" title="{{ $kategori }}">
                                         {{ $kategori }}
                                     </td>
                                     @for($d = 1; $d <= $daysInMonth; $d++)
@@ -162,11 +220,12 @@
                                 </tr>
                             @endforeach
                         @endif
-                    @empty
+                    @endforeach
+                    @else
                         <tr class="bg-white dark:bg-darkgray">
                             <td colspan="{{ $daysInMonth + 1 }}" class="px-4 sm:px-6 py-8 sm:py-10 text-center text-gray-500 text-sm sm:text-lg">Belum ada data stok untuk bulan ini...</td>
                         </tr>
-                    @endforelse
+                    @endif
                 </tbody>
             </table>
         </div>
@@ -320,45 +379,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check when date changes
     tanggalInput.addEventListener('change', function() {
         checkImportedSources(this.value);
-    });
-    
-    // 3. Sync Top and Bottom Scrollbars
-    const topScrollbar = document.getElementById('topScrollbar');
-    const topScrollbarContent = document.getElementById('topScrollbarContent');
-    const tableContainer = document.getElementById('tableContainer');
-    const dataTable = document.getElementById('dataTable');
-
-    function syncScrollWidth() {
-        if(dataTable && topScrollbarContent) {
-            topScrollbarContent.style.width = dataTable.offsetWidth + 'px';
-        }
-    }
-
-    // Initial sync
-    syncScrollWidth();
-    // Sync on window resize
-    window.addEventListener('resize', syncScrollWidth);
-    if (typeof ResizeObserver !== 'undefined' && dataTable) {
-        new ResizeObserver(syncScrollWidth).observe(dataTable);
-    }
-
-    let isSyncingLeftScroll = false;
-    let isSyncingRightScroll = false;
-
-    topScrollbar.addEventListener('scroll', function() {
-        if (!isSyncingLeftScroll) {
-            isSyncingRightScroll = true;
-            tableContainer.scrollLeft = this.scrollLeft;
-        }
-        isSyncingLeftScroll = false;
-    });
-
-    tableContainer.addEventListener('scroll', function() {
-        if (!isSyncingRightScroll) {
-            isSyncingLeftScroll = true;
-            topScrollbar.scrollLeft = this.scrollLeft;
-        }
-        isSyncingRightScroll = false;
     });
 });
 </script>

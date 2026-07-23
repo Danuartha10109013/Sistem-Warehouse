@@ -28,11 +28,70 @@
             min-height: 320px;
         }
     }
+    .dashboard-header {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    @media (min-width: 1024px) {
+        .dashboard-header {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+    .dashboard-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+    }
+    @media (min-width: 640px) {
+        .dashboard-actions {
+            flex-direction: row;
+            align-items: stretch;
+        }
+    }
+    @media (min-width: 1024px) {
+        .dashboard-actions {
+            width: auto;
+            max-width: 28rem;
+        }
+    }
+    .dashboard-summary-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    @media (min-width: 640px) {
+        .dashboard-summary-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.5rem;
+        }
+    }
+    @media (min-width: 1280px) {
+        .dashboard-summary-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+    .dashboard-charts-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    @media (min-width: 1280px) {
+        .dashboard-charts-grid {
+            grid-template-columns: 2fr 1fr;
+        }
+    }
 </style>
 @endpush
 
 @section('content')
-<div class="kapasitas-page mb-6 flex flex-col gap-4 lg:flex-row lg:justify-between lg:items-center">
+<div class="kapasitas-page dashboard-header">
     <div class="min-w-0">
         <h4 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Dashboard Analitik Stok</h4>
         <p class="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">
@@ -43,7 +102,7 @@
         </p>
     </div>
 
-    <div class="flex flex-col sm:flex-row items-stretch gap-3 w-full lg:w-auto lg:max-w-md shrink-0">
+    <div class="dashboard-actions shrink-0">
         <!-- Filter Bulan/Tahun -->
         <form method="GET" action="{{ route('modul-kapasitas.dashboard') }}" class="w-full min-w-0 flex-1">
             @php
@@ -65,7 +124,7 @@
 </div>
 
 <!-- Summary Cards -->
-<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-6">
+<div class="dashboard-summary-grid">
     <!-- Card 1 -->
     <div class="bg-white dark:bg-darkgray rounded-xl p-4 sm:p-6 border-t-4 border-t-primary shadow-sm summary-card relative overflow-hidden border border-gray-100 dark:border-gray-700">
         <div class="flex justify-between items-start gap-3">
@@ -119,9 +178,9 @@
 </div>
 
 <!-- Charts Section -->
-<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+<div class="dashboard-charts-grid">
     <!-- Line Chart (Trend Tahunan) -->
-    <div class="xl:col-span-2 bg-white dark:bg-darkgray rounded-xl p-4 sm:p-6 border border-gray-100 dark:border-gray-700 shadow-sm min-w-0">
+    <div class="bg-white dark:bg-darkgray rounded-xl p-4 sm:p-6 border border-gray-100 dark:border-gray-700 shadow-sm min-w-0">
         <div class="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center mb-4">
             <h5 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Tren Stok Tahunan ({{ $year }})</h5>
             <div class="self-start sm:self-auto px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-xs font-semibold rounded-full text-primary border border-blue-100 dark:border-blue-800 shrink-0">
