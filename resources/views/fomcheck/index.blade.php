@@ -135,9 +135,22 @@
                 </ul>
             </div>
             <div class="card-body">
-                <h5 class="card-title mb-3">Data Kedatangan — {{ $typeLabels[$type] }}</h5>
+                <h5 class="card-title mb-2">Data Kedatangan — {{ $typeLabels[$type] }}</h5>
+                @if($type === 'crc')
+                <div class="mb-3">
+                    <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#uploadChecklistModal" style="font-weight: bold;">
+                        <i class="bi bi-file-earmark-excel"></i> Lengkapi Checklist
+                    </button>
+                </div>
+                @endif
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
+                    <style>
+                        .table-thick-borders > :not(caption) > * > * {
+                            border-bottom-width: 2px !important;
+                            border-bottom-color: #000 !important;
+                        }
+                    </style>
+                    <table class="table table-hover align-middle table-thick-borders">
                         <thead class="table-light">
                             <tr>
                                 <th>No</th>
@@ -161,6 +174,7 @@
                                 @if($type === 'crc')
                                 <th>Awal Muat</th>
                                 <th>Akhir Muat</th>
+                                <th>Data Checklist</th>
                                 @endif
                                 <th class="text-center">Action</th>
                             </tr>
@@ -189,6 +203,27 @@
                                 @if($type === 'crc')
                                 <td>{{ $d->time ?? '—' }}</td>
                                 <td>{{ $d->time_last ?? '—' }}</td>
+                                <td>
+                                    @php
+                                        $checklists = json_decode($d->checklist_data, true);
+                                        if ($checklists && !isset($checklists[0])) {
+                                            $checklists = [$checklists];
+                                        }
+                                    @endphp
+                                    @if($checklists && count($checklists) > 0)
+                                        <div class="text-start" style="font-size: 0.82rem;">
+                                            @foreach($checklists as $index => $chk)
+                                                @if($index > 0) <hr style="margin: 6px 0; border-top: 2px solid #000; opacity: 1;"> @endif
+                                                <div style="white-space: nowrap;">
+                                                    <span class="fw-bold">{{ $chk['produk'] ?? '-' }}</span><br>
+                                                    <span class="text-muted">{{ $chk['attribute'] ?? '-' }} | {{ $chk['supplier_lot_no'] ?? '-' }} | {{ $chk['berat'] ?? '-' }} kg</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <span class="badge bg-secondary">Belum Lengkap</span>
+                                    @endif
+                                </td>
                                 @endif
                                 <td class="text-center">
                                     <div class="d-inline-flex flex-wrap gap-1 justify-content-center">
@@ -220,6 +255,66 @@
                                                 data-type="{{ $type }}">
                                             Hapus
                                         </button>
+                                        @endif
+                                        @if($type === 'crc')
+                                        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#manualChecklistModal{{ $d->id }}">
+                                            Manual
+                                        </button>
+
+                                        <!-- Manual Checklist Modal -->
+                                        <div class="modal fade" id="manualChecklistModal{{ $d->id }}" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+                                            <div class="modal-dialog">
+                                                <form action="{{ route('fomcheck.crc.manual-checklist', $d->id) }}" method="POST">
+                                                    @csrf
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Input Manual Checklist (No: {{ $d->shift_leader }})</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body text-start" id="manual-checklist-container-{{ $d->id }}">
+                                                            @php 
+                                                                $chkManuals = $d->checklist_data ? json_decode($d->checklist_data, true) : []; 
+                                                                if ($chkManuals && !isset($chkManuals[0])) $chkManuals = [$chkManuals];
+                                                                if (empty($chkManuals)) $chkManuals = [[]]; // At least one empty form
+                                                            @endphp
+                                                            @foreach($chkManuals as $idx => $chkManual)
+                                                            <div class="checklist-item-group border p-2 mb-2 rounded bg-light">
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <strong class="text-secondary">Item Checklist</strong>
+                                                                    @if($idx > 0)
+                                                                    <button type="button" class="btn btn-sm btn-danger py-0 px-2" onclick="this.closest('.checklist-item-group').remove()">X</button>
+                                                                    @endif
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label style="font-size: 0.8rem;">Produk</label>
+                                                                    <input type="text" name="produk[]" class="form-control form-control-sm" value="{{ $chkManual['produk'] ?? '' }}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label style="font-size: 0.8rem;">Attribute</label>
+                                                                    <input type="text" name="attribute[]" class="form-control form-control-sm" value="{{ $chkManual['attribute'] ?? '' }}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label style="font-size: 0.8rem;">Supplier Lot No</label>
+                                                                    <input type="text" name="supplier_lot_no[]" class="form-control form-control-sm" value="{{ $chkManual['supplier_lot_no'] ?? '' }}">
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label style="font-size: 0.8rem;">Berat</label>
+                                                                    <input type="text" name="berat[]" class="form-control form-control-sm" value="{{ $chkManual['berat'] ?? '' }}">
+                                                                </div>
+                                                            </div>
+                                                            @endforeach
+                                                            <button type="button" class="btn btn-sm btn-success w-100 mt-2" onclick="addChecklistItem({{ $d->id }})">
+                                                                <i class="mdi mdi-plus"></i> Tambah Item
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                         @endif
                                     </div>
                                 </td>
@@ -280,6 +375,33 @@
         </div>
     </div>
 </div>
+
+@if($type === 'crc')
+<!-- Upload Excel Modal -->
+<div class="modal fade" id="uploadChecklistModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog">
+        <form action="{{ route('fomcheck.crc.upload-checklist') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Lengkapi Checklist Excel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Upload File Excel (.xlsx, .xls)</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@endif
 
 @endpush
 
@@ -347,5 +469,35 @@
         }
     });
 })();
+
+function addChecklistItem(id) {
+    const container = document.getElementById('manual-checklist-container-' + id);
+    const btn = container.querySelector('.btn-success');
+    const html = `
+        <div class="checklist-item-group border p-2 mb-2 rounded bg-light">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong class="text-secondary">Item Checklist (Baru)</strong>
+                <button type="button" class="btn btn-sm btn-danger py-0 px-2" onclick="this.closest('.checklist-item-group').remove()">X</button>
+            </div>
+            <div class="mb-2">
+                <label style="font-size: 0.8rem;">Produk</label>
+                <input type="text" name="produk[]" class="form-control form-control-sm" value="">
+            </div>
+            <div class="mb-2">
+                <label style="font-size: 0.8rem;">Attribute</label>
+                <input type="text" name="attribute[]" class="form-control form-control-sm" value="">
+            </div>
+            <div class="mb-2">
+                <label style="font-size: 0.8rem;">Supplier Lot No</label>
+                <input type="text" name="supplier_lot_no[]" class="form-control form-control-sm" value="">
+            </div>
+            <div class="mb-2">
+                <label style="font-size: 0.8rem;">Berat</label>
+                <input type="text" name="berat[]" class="form-control form-control-sm" value="">
+            </div>
+        </div>
+    `;
+    btn.insertAdjacentHTML('beforebegin', html);
+}
 </script>
 @endpush

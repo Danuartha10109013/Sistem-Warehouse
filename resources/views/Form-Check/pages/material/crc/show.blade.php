@@ -146,6 +146,43 @@
                             <input type="text" class="form-control" value="{{ $submission->time_last ? \Carbon\Carbon::parse($submission->time_last)->format('H:i:s') : '-' }}" readonly>
                         </div>
 
+                        <hr>
+                        <h5>Data Lengkap Checklist</h5>
+                        @php
+                            $checklists = $submission->checklist_data ? json_decode($submission->checklist_data, true) : null;
+                            if ($checklists && !isset($checklists[0])) {
+                                $checklists = [$checklists];
+                            }
+                        @endphp
+                        @if($checklists && count($checklists) > 0)
+                            <div class="border rounded p-3 mb-3 bg-light">
+                                @foreach($checklists as $index => $chk)
+                                    @if($index > 0) <hr style="margin: 15px 0; border-top: 2px solid #000; opacity: 1;"> @endif
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <strong>Produk</strong><br>
+                                            {{ $chk['produk'] ?? '-' }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Attribute</strong><br>
+                                            {{ $chk['attribute'] ?? '-' }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Supplier Lot No</strong><br>
+                                            {{ $chk['supplier_lot_no'] ?? '-' }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Berat</strong><br>
+                                            {{ $chk['berat'] ?? '-' }} kg
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-muted">Belum ada data checklist.</p>
+                        @endif
+                        <hr>
+
                         <div class="form-group">
                             <label>PENGIRIM/SUPPLIER</label>
                             <ul>

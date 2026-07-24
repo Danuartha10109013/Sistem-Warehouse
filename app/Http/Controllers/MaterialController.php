@@ -570,4 +570,46 @@ class MaterialController extends Controller
         $date = now()->format('d-m-Y');
         return Excel::download(new CrcExportExcel, $date . '_CrC.xlsx');
     }
+    public function uploadChecklistExcel(Request $request){
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        try {
+            Excel::import(new \App\Imports\CrcChecklistImport, $request->file('file'));
+            return redirect()->back()->with('success', 'Data checklist berhasil diimport dan dicocokkan!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
+
+    public function updateChecklistManual(Request $request, $id){
+        $crc = CrcM::find($id);
+        if(!$crc){
+            return redirect()->back()->with('error', 'Data tidak ditemukan');
+        }
+
+        $produk = $request->input('produk', []);
+        $attribute = $request->input('attribute', []);
+        $supplier_lot_no = $request->input('supplier_lot_no', []);
+        $berat = $request->input('berat', []);
+
+        $checklist_data = [];
+        foreach ($produk as $index => $prod) {
+            if (!empty($prod) || !empty($attribute[$index])) {
+                $checklist_data[] = [
+                    'produk' => $prod,
+                    'attribute' => $attribute[$index] ?? null,
+                    'supplier_lot_no' => $supplier_lot_no[$index] ?? null,
+                    'berat' => $berat[$index] ?? null,
+                ];
+            }
+        }
+
+        $crc->update([
+            'checklist_data' => count($checklist_data) > 0 ? json_encode($checklist_data) : null
+        ]);
+
+        return redirect()->back()->with('success', 'Data checklist manual berhasil disimpan!');
+    }
 }

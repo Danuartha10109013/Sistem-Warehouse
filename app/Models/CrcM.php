@@ -42,6 +42,7 @@ class CrcM extends Model
         'time',
         'time_last',
         'note_keseluruhan',
+        'checklist_data',
     ];
 
     // You can add relationships here if necessary, for example:

@@ -31,7 +31,7 @@
             <a href="{{ Auth::user()->role == 0 ? route('Form-Check.admin.crc.add') : route('Form-Check.pegawai.crc.add') }}"
                class="btn btn-primary mr-2" style="text-decoration: none; font-size: 15px">Tambahkan response</a>
             <a href="{{ route('Form-Check.admin.crc.export') }}"
-               class="btn btn-success" style="text-decoration: none; font-size: 15px">Export Excel</a>
+               class="btn btn-success mr-2" style="text-decoration: none; font-size: 15px">Export Excel</a>
         </div>
 
         <form action="{{ route('Form-Check.admin.crc') }}" method="GET" class="ml-2" style="display: inline;">
@@ -67,6 +67,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                   </div>
                 @endif
+                @if(session('error'))
+                  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                @endif
                 <div class="table-responsive">
                   <table class="table">
                     <thead>
@@ -83,6 +89,7 @@
                       </a> </th>
                         <th> Awal Muat </th>
                         <th> Akhir Muat </th>
+                        <th> Data Checklist </th>
                         <th> Action </th>
                       </tr>
                     </thead>
@@ -116,6 +123,21 @@
                         <td>{{$d->created_at}}</td>
                         <td>{{$d->time}}</td>
                         <td>{{$d->time_last}}</td>
+                        <td>
+                            @php
+                                $chk = $d->checklist_data ? json_decode($d->checklist_data, true) : null;
+                            @endphp
+                            @if($chk)
+                                <ul>
+                                    <li><b>Produk:</b> {{ $chk['produk'] ?? '-' }}</li>
+                                    <li><b>Attribute:</b> {{ $chk['attribute'] ?? '-' }}</li>
+                                    <li><b>Lot No:</b> {{ $chk['supplier_lot_no'] ?? '-' }}</li>
+                                    <li><b>Berat:</b> {{ $chk['berat'] ?? '-' }}</li>
+                                </ul>
+                            @else
+                                <span class="badge bg-secondary">Belum Lengkap</span>
+                            @endif
+                        </td>
 
                         <td>
                           @if (Auth::user()->role == 0)
@@ -133,8 +155,48 @@
                                 data-bs-target="#deleteModal">
                                 Hapus
                             </button>
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#manualChecklistModal{{ $d->id }}">
+                                Manual
+                            </button>
                         </div>
 
+                        <!-- Manual Checklist Modal -->
+                        <div class="modal fade" id="manualChecklistModal{{ $d->id }}" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+                            <div class="modal-dialog">
+                                <form action="{{ route('crc.manual-checklist', $d->id) }}" method="POST">
+                                    @csrf
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Input Manual Checklist (No: {{ $d->shift_leader }})</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            @php $chkManual = $d->checklist_data ? json_decode($d->checklist_data, true) : []; @endphp
+                                            <div class="mb-3 text-start">
+                                                <label>Produk</label>
+                                                <input type="text" name="produk" class="form-control" value="{{ $chkManual['produk'] ?? '' }}">
+                                            </div>
+                                            <div class="mb-3 text-start">
+                                                <label>Attribute</label>
+                                                <input type="text" name="attribute" class="form-control" value="{{ $chkManual['attribute'] ?? '' }}">
+                                            </div>
+                                            <div class="mb-3 text-start">
+                                                <label>Supplier Lot No</label>
+                                                <input type="text" name="supplier_lot_no" class="form-control" value="{{ $chkManual['supplier_lot_no'] ?? '' }}">
+                                            </div>
+                                            <div class="mb-3 text-start">
+                                                <label>Berat</label>
+                                                <input type="text" name="berat" class="form-control" value="{{ $chkManual['berat'] ?? '' }}">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
 
                             <!-- Confirmation Modal (No Backdrop) -->
                             <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" data-bs-backdrop="false">
@@ -199,6 +261,14 @@
                 <div class="mt-3">
                   {{ $data->onEachSide(2)->links() }}
                 </div>
+                
+                <!-- Lengkapi Checklist button below table data -->
+                <div class="mt-4">
+                  <button class="btn btn-info w-100" data-bs-toggle="modal" data-bs-target="#uploadChecklistModal" style="font-size: 16px; font-weight: bold;">
+                      Lengkapi Checklist
+                  </button>
+                </div>
+
                 </div>
               </div>
             </div>
@@ -206,4 +276,30 @@
       </div>
     </div>
 </div>
+
+<!-- Upload Excel Modal -->
+<div class="modal fade" id="uploadChecklistModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog">
+        <form action="{{ route('crc.upload-checklist') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Lengkapi Checklist Excel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Upload File Excel (.xlsx, .xls)</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 @endsection

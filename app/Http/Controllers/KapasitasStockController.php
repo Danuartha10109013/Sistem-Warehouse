@@ -138,9 +138,9 @@ class KapasitasStockController extends Controller
                     continue;
                 foreach ($sheet[$i] as $colIdx => $val) {
                     $v = strtolower(trim((string) $val));
-                    if ($v == 'kategori produk')
+                    if (str_contains($v, 'kategori'))
                         $catCol = $colIdx;
-                    if ($v == 'quantity')
+                    if (str_contains($v, 'quantity') || str_contains($v, 'qty') || str_contains($v, 'stok akhir'))
                         $qtyCol = $colIdx;
                 }
                 if ($catCol != -1 && $qtyCol != -1) {
@@ -187,9 +187,9 @@ class KapasitasStockController extends Controller
                     continue;
                 foreach ($sheet[$i] as $colIdx => $val) {
                     $v = strtolower(trim((string) $val));
-                    if ($v == 'kategori')
+                    if (str_contains($v, 'kategori'))
                         $catCol = $colIdx;
-                    if (str_contains($v, 'stok akhir'))
+                    if (str_contains($v, 'quantity') || str_contains($v, 'qty') || str_contains($v, 'stok akhir'))
                         $qtyCol = $colIdx;
                 }
                 if ($catCol != -1 && $qtyCol != -1) {
@@ -235,9 +235,9 @@ class KapasitasStockController extends Controller
                     continue;
                 foreach ($sheet[$i] as $colIdx => $val) {
                     $v = strtolower(trim((string) $val));
-                    if ($v == 'kategori produk')
+                    if (str_contains($v, 'kategori'))
                         $catCol = $colIdx;
-                    if ($v == 'qty')
+                    if (str_contains($v, 'quantity') || str_contains($v, 'qty') || str_contains($v, 'stok akhir'))
                         $qtyCol = $colIdx;
                 }
                 if ($catCol != -1 && $qtyCol != -1) {

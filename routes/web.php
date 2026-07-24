@@ -190,6 +190,8 @@ Route::middleware([AutoLogout::class])->group(function () {
             Route::get('/print/{id}', [FomController::class, 'print_crc'])->name('print');
             Route::get('/show/{id}', [FomController::class, 'show_crc'])->name('show');
             Route::delete('/destroy/{id}', [FomController::class, 'destroy_crc'])->name('destroy');
+            Route::post('/upload-checklist', [\App\Http\Controllers\MaterialController::class, 'uploadChecklistExcel'])->name('upload-checklist');
+            Route::post('/manual-checklist/{id}', [\App\Http\Controllers\MaterialController::class, 'updateChecklistManual'])->name('manual-checklist');
         });
 
         Route::prefix('ingot')->name('fomcheck.ingot.')->group(function () {
