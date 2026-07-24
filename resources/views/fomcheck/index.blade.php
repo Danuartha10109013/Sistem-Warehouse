@@ -1,475 +1,501 @@
 @extends('fomcheck.main')
 @section('title')
-     FORM CHECK
+    FORM CHECK
 @endsection
 @section('content')
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<style>
-    .fomcheck-pagination nav {
-        width: 100%;
-        justify-content: center !important;
-    }
-    .fomcheck-pagination nav > div.d-none.flex-sm-fill {
-        flex-direction: column;
-        align-items: center;
-        gap: .5rem;
-    }
-    .fomcheck-pagination nav p.small {
-        display: none;
-    }
-    .fomcheck-pagination .pagination {
-        margin-bottom: 0;
-        justify-content: center;
-    }
-    #formModal, #deleteModal {
-        z-index: 1060;
-    }
-    .modal-backdrop {
-        z-index: 1055;
-    }
-</style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .fomcheck-pagination nav {
+            width: 100%;
+            justify-content: center !important;
+        }
 
-@if(session('success'))
-<script>
-    Swal.fire({
-        icon: 'success',
-        title: 'Berhasil',
-        text: '{{ session('success') }}',
-        showConfirmButton: false,
-        timer: 1700
-    })
-</script>
-@endif
+        .fomcheck-pagination nav>div.d-none.flex-sm-fill {
+            flex-direction: column;
+            align-items: center;
+            gap: .5rem;
+        }
 
-@if($errors->any())
-<script>
-    Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        html: `{!! implode('<br>', $errors->all()) !!}`,
-    })
-</script>
-@endif
+        .fomcheck-pagination nav p.small {
+            display: none;
+        }
 
-@php
-    $isAdmin = Auth::user()->role == 0;
-    $queryBase = request()->only(['search', 'start', 'end', 'sort', 'direction']);
-    $tabUrl = fn ($t) => route('fomcheck', array_merge($queryBase, ['type' => $t]));
-    $tabRoutes = [
-        'crc' => $tabUrl('crc'),
-        'ingot' => $tabUrl('ingot'),
-        'resin' => $tabUrl('resin'),
-        'trailler' => route('Form-Check.admin.trailler'),
-    ];
-    $typeLabels = ['crc' => 'CRC', 'ingot' => 'INGOT', 'resin' => 'RESIN/ALKALI', 'trailler' => 'TRAILLER'];
-    $exportRoute = "fomcheck.{$type}.export";
-    $printRoute = "fomcheck.{$type}.print";
-    $modalAddUrls = [
-        'crc' => route('fomcheck.crc.add', ['embed' => 1]),
-        'ingot' => route('fomcheck.ingot.add', ['embed' => 1]),
-        'resin' => route('fomcheck.resin.add', ['embed' => 1]),
-        'trailler' => route('Form-Check.admin.trailler'),
-    ];
-@endphp
+        .fomcheck-pagination .pagination {
+            margin-bottom: 0;
+            justify-content: center;
+        }
 
-<div class="row mb-4 mt-4">
-    <div class="col-12 text-center">
-        <h3 class="m-0 fw-bold text-dark">FORM CHECK KEDATANGAN MATERIAL</h3>
-    </div>
-</div>
+        #formModal,
+        #deleteModal {
+            z-index: 1060;
+        }
 
-<div class="row g-3 mb-3 align-items-end">
-    <div class="col-12 col-lg-auto d-flex flex-wrap gap-2">
-        <button type="button"
-                class="btn btn-primary btn-open-modal"
-                data-bs-toggle="modal"
-                data-bs-target="#formModal"
-                data-url="{{ $modalAddUrls[$type] }}"
-                data-title="Tambah {{ $typeLabels[$type] }}">
-            <i class="bi bi-plus-circle me-1"></i> Tambah {{ $typeLabels[$type] }}
-        </button>
-        @if($isAdmin)
-        <a href="{{ route($exportRoute) }}" class="btn btn-success">
-            <i class="bi bi-download me-1"></i> Export Excel
-        </a>
-        @endif
+        .modal-backdrop {
+            z-index: 1055;
+        }
+    </style>
+
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '{{ session('success') }}',
+                showConfirmButton: false,
+                timer: 1700
+            })
+        </script>
+    @endif
+
+    @if($errors->any())
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                html: `{!! implode('<br>', $errors->all()) !!}`,
+            })
+        </script>
+    @endif
+
+    @php
+        $isAdmin = Auth::user()->role == 0;
+        $queryBase = request()->only(['search', 'start', 'end', 'sort', 'direction']);
+        $tabUrl = fn($t) => route('fomcheck', array_merge($queryBase, ['type' => $t]));
+        $tabRoutes = [
+            'crc' => $tabUrl('crc'),
+            'ingot' => $tabUrl('ingot'),
+            'resin' => $tabUrl('resin'),
+            'trailler' => route('Form-Check.admin.trailler'),
+        ];
+        $typeLabels = ['crc' => 'CRC', 'ingot' => 'INGOT', 'resin' => 'RESIN/ALKALI', 'trailler' => 'TRAILLER'];
+        $exportRoute = "fomcheck.{$type}.export";
+        $printRoute = "fomcheck.{$type}.print";
+        $modalAddUrls = [
+            'crc' => route('fomcheck.crc.add', ['embed' => 1]),
+            'ingot' => route('fomcheck.ingot.add', ['embed' => 1]),
+            'resin' => route('fomcheck.resin.add', ['embed' => 1]),
+            'trailler' => route('Form-Check.admin.trailler'),
+        ];
+    @endphp
+
+    <div class="row mb-4 mt-4">
+        <div class="col-12 text-center">
+            <h3 class="m-0 fw-bold text-dark">FORM CHECK KEDATANGAN MATERIAL</h3>
+        </div>
     </div>
 
-    <div class="col-12 col-lg">
-        <form action="{{ route('fomcheck') }}" method="GET" class="row g-2 align-items-end">
-            <input type="hidden" name="type" value="{{ $type }}">
-            <input type="hidden" name="sort" value="{{ $sort }}">
-            <input type="hidden" name="direction" value="{{ $direction }}">
-            <div class="col-md-3">
-                <input type="date" name="start" value="{{ $start }}" class="form-control">
-            </div>
-            <div class="col-md-3">
-                <input type="date" name="end" value="{{ $end }}" class="form-control">
-            </div>
-            <div class="col-md-4">
-                <input type="text" name="search" value="{{ $searchTerm }}" class="form-control"
-                       placeholder="Cari responden / no dokumen">
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Filter</button>
-            </div>
-        </form>
-    </div>
-</div>
+    <div class="row g-3 mb-3 align-items-end">
+        <div class="col-12 col-lg-auto d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-primary btn-open-modal" data-bs-toggle="modal" data-bs-target="#formModal"
+                data-url="{{ $modalAddUrls[$type] }}" data-title="Tambah {{ $typeLabels[$type] }}">
+                <i class="bi bi-plus-circle me-1"></i> Tambah {{ $typeLabels[$type] }}
+            </button>
+            @if($isAdmin)
+                <a href="{{ route($exportRoute) }}" class="btn btn-success">
+                    <i class="bi bi-download me-1"></i> Export Excel
+                </a>
+            @endif
+        </div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
-                <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                    @foreach($typeLabels as $key => $label)
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link {{ $type === $key ? 'active fw-semibold' : '' }}"
-                           href="{{ $tabRoutes[$key] }}">
-                            {{ $label }}
-                        </a>
-                    </li>
-                    @endforeach
-                </ul>
-            </div>
-            <div class="card-body">
-                <h5 class="card-title mb-2">Data Kedatangan — {{ $typeLabels[$type] }}</h5>
-                @if($type === 'crc')
-                <div class="mb-3">
-                    <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#uploadChecklistModal" style="font-weight: bold;">
-                        <i class="bi bi-file-earmark-excel"></i> Lengkapi Checklist
-                    </button>
+        <div class="col-12 col-lg">
+            <form action="{{ route('fomcheck') }}" method="GET" class="row g-2 align-items-end">
+                <input type="hidden" name="type" value="{{ $type }}">
+                <input type="hidden" name="sort" value="{{ $sort }}">
+                <input type="hidden" name="direction" value="{{ $direction }}">
+                <div class="col-md-3">
+                    <input type="date" name="start" value="{{ $start }}" class="form-control">
                 </div>
-                @endif
-                <div class="table-responsive">
-                    <style>
-                        .table-thick-borders > :not(caption) > * > * {
-                            border-bottom-width: 2px !important;
-                            border-bottom-color: #000 !important;
-                        }
-                    </style>
-                    <table class="table table-hover align-middle table-thick-borders">
-                        <thead class="table-light">
-                            <tr>
-                                <th>No</th>
-                                <th>No Dokumen</th>
-                                @if($type === 'crc')
-                                <th>Supplier</th>
-                                @endif
-                                <th>Responden</th>
-                                <th>
-                                    <a href="{{ route('fomcheck', array_merge($queryBase, [
-                                        'type' => $type,
-                                        'sort' => 'date',
-                                        'direction' => request('direction') === 'asc' ? 'desc' : 'asc',
-                                    ])) }}" class="text-decoration-none text-dark">
-                                        Tanggal
-                                        @if($sort === 'date')
-                                        <i class="bi bi-arrow-{{ $direction === 'asc' ? 'up' : 'down' }}"></i>
-                                        @endif
-                                    </a>
-                                </th>
-                                @if($type === 'crc')
-                                <th>Awal Muat</th>
-                                <th>Akhir Muat</th>
-                                <th>Data Checklist</th>
-                                @endif
-                                <th class="text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($data as $d)
-                            <tr>
-                                <td>{{ $loop->iteration + ($data->currentPage() - 1) * $data->perPage() }}</td>
-                                <td>{{ $d->shift_leader }}</td>
-                                @if($type === 'crc')
-                                <td>
-                                    @php $suppliers = json_decode($d->supplier, true) ?? []; @endphp
-                                    @if(count($suppliers))
-                                    <ul class="mb-0 ps-3 small">
-                                        @foreach($suppliers as $item)
-                                        <li>{{ $item }}</li>
-                                        @endforeach
-                                    </ul>
-                                    @else
-                                    —
-                                    @endif
-                                </td>
-                                @endif
-                                <td>{{ $users[$d->user_id] ?? '—' }}</td>
-                                <td>{{ $d->date ? \Carbon\Carbon::parse($d->date)->format('d-m-Y') : $d->created_at }}</td>
-                                @if($type === 'crc')
-                                <td>{{ $d->time ?? '—' }}</td>
-                                <td>{{ $d->time_last ?? '—' }}</td>
-                                <td>
-                                    @php
-                                        $checklists = json_decode($d->checklist_data, true);
-                                        if ($checklists && !isset($checklists[0])) {
-                                            $checklists = [$checklists];
-                                        }
-                                    @endphp
-                                    @if($checklists && count($checklists) > 0)
-                                        <div class="text-start" style="font-size: 0.82rem;">
-                                            @foreach($checklists as $index => $chk)
-                                                @if($index > 0) <hr style="margin: 6px 0; border-top: 2px solid #000; opacity: 1;"> @endif
-                                                <div style="white-space: nowrap;">
-                                                    <span class="fw-bold">{{ $chk['produk'] ?? '-' }}</span><br>
-                                                    <span class="text-muted">{{ $chk['attribute'] ?? '-' }} | {{ $chk['supplier_lot_no'] ?? '-' }} | {{ $chk['berat'] ?? '-' }} kg</span>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <span class="badge bg-secondary">Belum Lengkap</span>
-                                    @endif
-                                </td>
-                                @endif
-                                <td class="text-center">
-                                    <div class="d-inline-flex flex-wrap gap-1 justify-content-center">
-                                        <button type="button"
-                                                class="btn btn-sm btn-primary btn-open-modal"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#formModal"
-                                                data-url="{{ route('fomcheck.'.$type.'.show', ['id' => $d->id, 'embed' => 1]) }}"
-                                                data-title="Detail {{ $typeLabels[$type] }}">
-                                            Detail
-                                        </button>
-                                        @if(Auth::user()->email == 'danuartha@tatametal.com')
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-primary btn-open-modal"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#formModal"
-                                                    data-url="{{ route('fomcheck.'.$type.'.edit', ['id' => $d->id, 'embed' => 1]) }}"
-                                                    data-title="Edit {{ $typeLabels[$type] }}">
-                                                Edit
-                                            </button>
-                                        @endif
-                                        @if($isAdmin)
-                                        <a href="{{ route($printRoute, $d->id) }}" class="btn btn-sm btn-success">Print</a>
-                                        <button type="button"
-                                                class="btn btn-sm btn-danger btn-delete-material"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal"
-                                                data-id="{{ $d->id }}"
-                                                data-type="{{ $type }}">
-                                            Hapus
-                                        </button>
-                                        @endif
-                                        @if($type === 'crc')
-                                        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#manualChecklistModal{{ $d->id }}">
-                                            Manual
-                                        </button>
+                <div class="col-md-3">
+                    <input type="date" name="end" value="{{ $end }}" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="search" value="{{ $searchTerm }}" class="form-control"
+                        placeholder="Cari responden / no dokumen">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                                        <!-- Manual Checklist Modal -->
-                                        <div class="modal fade" id="manualChecklistModal{{ $d->id }}" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
-                                            <div class="modal-dialog">
-                                                <form action="{{ route('fomcheck.crc.manual-checklist', $d->id) }}" method="POST">
-                                                    @csrf
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Input Manual Checklist (No: {{ $d->shift_leader }})</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body text-start" id="manual-checklist-container-{{ $d->id }}">
-                                                            @php 
-                                                                $chkManuals = $d->checklist_data ? json_decode($d->checklist_data, true) : []; 
-                                                                if ($chkManuals && !isset($chkManuals[0])) $chkManuals = [$chkManuals];
-                                                                if (empty($chkManuals)) $chkManuals = [[]]; // At least one empty form
-                                                            @endphp
-                                                            @foreach($chkManuals as $idx => $chkManual)
-                                                            <div class="checklist-item-group border p-2 mb-2 rounded bg-light">
-                                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                                    <strong class="text-secondary">Item Checklist</strong>
-                                                                    @if($idx > 0)
-                                                                    <button type="button" class="btn btn-sm btn-danger py-0 px-2" onclick="this.closest('.checklist-item-group').remove()">X</button>
-                                                                    @endif
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <label style="font-size: 0.8rem;">Produk</label>
-                                                                    <input type="text" name="produk[]" class="form-control form-control-sm" value="{{ $chkManual['produk'] ?? '' }}">
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <label style="font-size: 0.8rem;">Attribute</label>
-                                                                    <input type="text" name="attribute[]" class="form-control form-control-sm" value="{{ $chkManual['attribute'] ?? '' }}">
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <label style="font-size: 0.8rem;">Supplier Lot No</label>
-                                                                    <input type="text" name="supplier_lot_no[]" class="form-control form-control-sm" value="{{ $chkManual['supplier_lot_no'] ?? '' }}">
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <label style="font-size: 0.8rem;">Berat</label>
-                                                                    <input type="text" name="berat[]" class="form-control form-control-sm" value="{{ $chkManual['berat'] ?? '' }}">
-                                                                </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        @foreach($typeLabels as $key => $label)
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {{ $type === $key ? 'active fw-semibold' : '' }}"
+                                    href="{{ $tabRoutes[$key] }}">
+                                    {{ $label }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title mb-2">Data Kedatangan — {{ $typeLabels[$type] }}</h5>
+                    @if($type === 'crc' && (Auth::user()->email == 'danuartha@tatametal.com'))
+                        <div class="mb-3">
+                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#uploadChecklistModal"
+                                style="font-weight: bold;">
+                                <i class="bi bi-file-earmark-excel"></i> Lengkapi Checklist
+                            </button>
+                        </div>
+                    @endif
+                    <div class="table-responsive">
+                        <style>
+                            .table-thick-borders> :not(caption)>*>* {
+                                border-bottom-width: 2px !important;
+                                border-bottom-color: #000 !important;
+                            }
+                        </style>
+                        <table class="table table-hover align-middle table-thick-borders">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>No</th>
+                                    <th>No Dokumen</th>
+                                    @if($type === 'crc')
+                                        <th>Supplier</th>
+                                    @endif
+                                    <th>Responden</th>
+                                    <th>
+                                        <a href="{{ route('fomcheck', array_merge($queryBase, [
+        'type' => $type,
+        'sort' => 'date',
+        'direction' => request('direction') === 'asc' ? 'desc' : 'asc',
+    ])) }}" class="text-decoration-none text-dark">
+                                            Tanggal
+                                            @if($sort === 'date')
+                                                <i class="bi bi-arrow-{{ $direction === 'asc' ? 'up' : 'down' }}"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    @if($type === 'crc')
+                                        <th>Awal Muat</th>
+                                        <th>Akhir Muat</th>
+                                        <th>Data Checklist</th>
+                                    @endif
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($data as $d)
+                                    <tr>
+                                        <td>{{ $loop->iteration + ($data->currentPage() - 1) * $data->perPage() }}</td>
+                                        <td>{{ $d->shift_leader }}</td>
+                                        @if($type === 'crc')
+                                            <td>
+                                                @php $suppliers = json_decode($d->supplier, true) ?? []; @endphp
+                                                @if(count($suppliers))
+                                                    <ul class="mb-0 ps-3 small">
+                                                        @foreach($suppliers as $item)
+                                                            <li>{{ $item }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    —
+                                                @endif
+                                            </td>
+                                        @endif
+                                        <td>{{ $users[$d->user_id] ?? '—' }}</td>
+                                        <td>{{ $d->date ? \Carbon\Carbon::parse($d->date)->format('d-m-Y') : $d->created_at }}
+                                        </td>
+                                        @if($type === 'crc')
+                                            <td>{{ $d->time ?? '—' }}</td>
+                                            <td>{{ $d->time_last ?? '—' }}</td>
+                                            <td>
+                                                @php
+                                                    $checklists = json_decode($d->checklist_data, true);
+                                                    if ($checklists && !isset($checklists[0])) {
+                                                        $checklists = [$checklists];
+                                                    }
+                                                @endphp
+                                                @if($checklists && count($checklists) > 0)
+                                                    <div class="text-start" style="font-size: 0.82rem;">
+                                                        @foreach($checklists as $index => $chk)
+                                                            @if($index > 0)
+                                                            <hr style="margin: 6px 0; border-top: 2px solid #000; opacity: 1;"> @endif
+                                                            <div style="white-space: nowrap;">
+                                                                <span class="fw-bold">{{ $chk['produk'] ?? '-' }}</span><br>
+                                                                <span class="text-muted">{{ $chk['attribute'] ?? '-' }} |
+                                                                    {{ $chk['supplier_lot_no'] ?? '-' }} | {{ $chk['berat'] ?? '-' }}
+                                                                    kg</span>
                                                             </div>
-                                                            @endforeach
-                                                            <button type="button" class="btn btn-sm btn-success w-100 mt-2" onclick="addChecklistItem({{ $d->id }})">
-                                                                <i class="mdi mdi-plus"></i> Tambah Item
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    <span class="badge bg-secondary">Belum Lengkap</span>
+                                                @endif
+                                            </td>
+                                        @endif
+                                        <td class="text-center">
+                                            <div class="d-inline-flex flex-wrap gap-1 justify-content-center">
+                                                <button type="button" class="btn btn-sm btn-primary btn-open-modal"
+                                                    data-bs-toggle="modal" data-bs-target="#formModal"
+                                                    data-url="{{ route('fomcheck.' . $type . '.show', ['id' => $d->id, 'embed' => 1]) }}"
+                                                    data-title="Detail {{ $typeLabels[$type] }}">
+                                                    Detail
+                                                </button>
+                                                @if(Auth::user()->email == 'danuartha@tatametal.com')
+                                                    <button type="button" class="btn btn-sm btn-outline-primary btn-open-modal"
+                                                        data-bs-toggle="modal" data-bs-target="#formModal"
+                                                        data-url="{{ route('fomcheck.' . $type . '.edit', ['id' => $d->id, 'embed' => 1]) }}"
+                                                        data-title="Edit {{ $typeLabels[$type] }}">
+                                                        Edit
+                                                    </button>
+                                                @endif
+                                                @if($isAdmin)
+                                                    <a href="{{ route($printRoute, $d->id) }}"
+                                                        class="btn btn-sm btn-success">Print</a>
+                                                    <button type="button" class="btn btn-sm btn-danger btn-delete-material"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ $d->id }}"
+                                                        data-type="{{ $type }}">
+                                                        Hapus
+                                                    </button>
+                                                @endif
+                                                @if($type === 'crc' && (Auth::user()->email == 'danuartha@tatametal.com'))
+                                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                        data-bs-target="#manualChecklistModal{{ $d->id }}">
+                                                        Manual
+                                                    </button>
+
+                                                    <!-- Manual Checklist Modal -->
+                                                    <div class="modal fade" id="manualChecklistModal{{ $d->id }}" tabindex="-1"
+                                                        aria-hidden="true" data-bs-backdrop="false">
+                                                        <div class="modal-dialog">
+                                                            <form action="{{ route('fomcheck.crc.manual-checklist', $d->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Input Manual Checklist (No:
+                                                                            {{ $d->shift_leader }})</h5>
+                                                                        <button type="button" class="btn-close"
+                                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body text-start"
+                                                                        id="manual-checklist-container-{{ $d->id }}">
+                                                                        @php 
+                                                                                                                                    $chkManuals = $d->checklist_data ? json_decode($d->checklist_data, true) : [];
+                                                                            if ($chkManuals && !isset($chkManuals[0]))
+                                                                                $chkManuals = [$chkManuals];
+                                                                            if (empty($chkManuals))
+                                                                                $chkManuals = [[]]; // At least one empty form
+                                                                        @endphp
+
+                                                                                                                                               @foreach($chkManuals as $idx => $chkManual)
+                                                                                                                                                                                                            <div class="checklist-item-gr
+                                                                                                                                                                                       o                                up border p-2 mb-2 rounded bg-light">
+
+                                                                                                                                                                                                                                                                                       <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                                                                                                                                                                    <strong class="text-secondary">Item Checklist</strong>
+                                                                                                                                                                                                                    @if($idx > 0)
+                                                                                                                                                                                                                        <button type="button" class="btn btn-sm btn-danger py-0 px-2" onclick="this.closest('.checklist-item-group').remove()">X</button>
+                                                                                                                                                                                                                    @endif
+
+
+                                                                                                                                                                                                                                                                                       </div>
+                                                                                                                                                                                                                <div class="mb-2">
+                                                                                                                                                                                                                    <label style="font-size: 0.8rem;">Produk</label>
+                                                                                                                                                                                                                    <input type="text" name="produk[]" cl
+                                                                                                                                                                              a                                         ss="form-control form-control-sm" va
+                                                                                                                                                                                                   l                    ue="{{ $chkManual['produk'] ?? '' }}">
+                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                <div class="mb-2">
+                                                                                                                                                                                                                    <label style="font-size: 0.8rem;">Attribute</l
+                                                                                                                                                                          a                                             bel>
+                                                                                                                                                                                                                    <input type="text" name="attribute[]" class
+                                                                                                                                                =                                                                       "form-control form-control-sm" value
+                                                                                                                                                                     =                                                  "{{ $chkManual['attribute'] ?? '' }}">
+                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                <div class="mb-2">
+                                                                                                                                                                                                                    <label style="font-size: 0.8rem;">Supplier Lot No</label>
+                                                                                                                                                                                                                    <input type="text" name="supplier
+                                                                                                                                                                                          _                             lot_no[]" class="form-control form-c
+                                                                                                                                                                                                              o         ntrol-sm" value="{{ $chkManual['supplier_lot_no'] ?? '' }}">
+                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                <div class="mb-2">
+                                                                                                                                                                                                                    <label style="font-size: 0.8rem;">Berat</label>
+                                                                                                                                                                                                                    <input type="
+                                                                                                                                                                                     t                          ext" name="berat[]" class="form-control f
+                                                                                                                                                                   o                                            rm-control-sm" value="{{ $chkManual['berat'] ?? '' }}">
+                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                            </div>
+                                                                                                                                            @endforeach
+                                                                        <button type="button" class="btn btn-sm btn-success w-100 mt-2" onclick="addChecklistItem({{ $d->id }})">
+                                                                            <i class="mdi mdi-plus"></i> Tambah Item
+
+                                                                                                                        </button>
+
+                                                                                                   </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
                                                         </div>
                                                     </div>
-                                                </form>
+                                                @endif
                                             </div>
-                                        </div>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="{{ $type === 'crc' ? 8 : 5 }}" class="text-center text-muted py-4">
-                                    Belum ada data {{ $typeLabels[$type] }}.
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="{{ $type === 'crc' ? 8 : 5 }}" class="text-center text-muted py-4">
+                                            Belum ada data {{ $typeLabels[$type] }}.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    @if($data->hasPages())
+                        <div class="mt-3 fomcheck-pagination">
+                            {{ $data->onEachSide(1)->links('pagination::bootstrap-5') }}
+                        </div>
+                    @endif
                 </div>
-                @if($data->hasPages())
-                <div class="mt-3 fomcheck-pagination">
-                    {{ $data->onEachSide(1)->links('pagination::bootstrap-5') }}
-                </div>
-                @endif
             </div>
         </div>
     </div>
-</div>
 
 @endsection
 
 @push('modals')
-<div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="formModalLabel">Form</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
-            <div class="modal-body p-0">
-                <iframe id="formModalFrame" title="Form Check" style="width:100%;height:78vh;border:0;display:block;"></iframe>
+    <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="formModalLabel">Fo
+                 r      m</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe id="formModalFrame" title="Form Check" style="width:100%;height:78vh;border:0;display:block;"></iframe>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">Apakah Anda yakin ingin menghapus data ini?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form id="deleteForm" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                    </form>
+                </div>
             </div>
-            <div class="modal-body">Apakah Anda yakin ingin menghapus data ini?</div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <form id="deleteForm" method="POST">
+        </div>
+    </div>
+
+    @if($type === 'crc')
+        <!-- Upload Excel Modal -->
+        <div class="modal fade" id="uploadChecklistModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog">
+                <form action="{{ route('fomcheck.crc.upload-checklist') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Hapus</button>
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Lengkapi Checklist Excel</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Upload File Excel (.xlsx, .xls)</label>
+                                <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Upload</button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
-    </div>
-</div>
-
-@if($type === 'crc')
-<!-- Upload Excel Modal -->
-<div class="modal fade" id="uploadChecklistModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
-    <div class="modal-dialog">
-        <form action="{{ route('fomcheck.crc.upload-checklist') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Lengkapi Checklist Excel</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Upload File Excel (.xlsx, .xls)</label>
-                        <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Upload</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-@endif
+    @endif
 
 @endpush
-
-@push('scripts')
-<script>
-(function () {
+        
+ @push('scripts')
+     <script>
+        (function () {
     const formModal = document.getElementById('formModal');
-    const formModalFrame = document.getElementById('formModalFrame');
-    const formModalLabel = document.getElementById('formModalLabel');
-    const deleteForm = document.getElementById('deleteForm');
-
-    const destroyBase = {
+            const formModalFrame = document.getElementById('formModalFrame');
+        cons    t formModalLabel = document.getElementById('formModalLabel');
+           cons t deleteForm = document.getElementById('deleteForm');
+     
+               const destroyBase = {
         crc: @json(url('fomcheck/crc/destroy')),
-        ingot: @json(url('fomcheck/ingot/destroy')),
-        resin: @json(url('fomcheck/resin/destroy')),
-    };
-
-    function hideFormModal() {
+                ingot: @json(url('fomcheck/ingot/destroy')),
+                resin: @json(url('fomcheck/resin/destroy')),
+      };
+            
+              function hideFormModal() {
         if (typeof bootstrap === 'undefined' || !formModal) return;
-        const instance = bootstrap.Modal.getInstance(formModal);
-        if (instance) instance.hide();
-    }
-
-    document.querySelectorAll('.btn-open-modal').forEach(function (button) {
-        button.addEventListener('click', function () {
+                const instance = bootstrap.Modal.getInstance(formModal);
+                if (instance) instance.hide();
+       }
+      
+               docu    ment.querySelectorAll('.btn-open-modal').forEach(function (button) {
+                button.addEventListener('click', function () {
             if (formModalLabel) formModalLabel.textContent = this.dataset.title || 'Form';
-            if (formModalFrame) formModalFrame.src = this.dataset.url || 'about:blank';
-        });
-    });
-
-    if (formModal) {
+                    if (formModalFrame) formModalFrame.src = this.dataset.url || 'about:blank';
+                });
+           });
+      
+               if (formModal) {
         formModal.addEventListener('hidden.bs.modal', function () {
-            if (formModalFrame) formModalFrame.src = 'about:blank';
-        });
-    }
-
-    document.querySelectorAll('.btn-delete-material').forEach(function (button) {
-        button.addEventListener('click', function () {
-            if (deleteForm) {
+                    if (formModalFrame) formModalFrame.src = 'about:blank';
+                });
+      }
+            
+          document    .querySelectorAll('.btn-delete-material').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    if (deleteForm) {
                 deleteForm.action = destroyBase[this.dataset.type] + '/' + this.dataset.id;
+                    }
+                });
+    });
+    
+                window.addEventListener('message', function (event) {
+        if (        !event.data || !event.data.type) return;
+    
+                   if (even t.data.type === 'fomcheck-success') {
+                 hide   FormModal();
+               Swal     .fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: event.data.message || 'Data berhasil disimpan',
+                        showConfirmButton: false,
+                        timer: 1700
+                    }).then(function () {
+                        var params = new URLSearchParams(window.location.search);
+                if (event.data.materialType) params.set('type', event.data.materialType);
+                        window.location.search = params.toString();
+                    });
+                }
+
+                        if (event.data.type === 'fomcheck-close') {
+            hideFormModal();
             }
         });
-    });
-
-    window.addEventListener('message', function (event) {
-        if (!event.data || !event.data.type) return;
-
-        if (event.data.type === 'fomcheck-success') {
-            hideFormModal();
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: event.data.message || 'Data berhasil disimpan',
-                showConfirmButton: false,
-                timer: 1700
-            }).then(function () {
-                var params = new URLSearchParams(window.location.search);
-                if (event.data.materialType) params.set('type', event.data.materialType);
-                window.location.search = params.toString();
-            });
-        }
-
-        if (event.data.type === 'fomcheck-close') {
-            hideFormModal();
-        }
-    });
-})();
-
+    })();
+    
 function addChecklistItem(id) {
     const container = document.getElementById('manual-checklist-container-' + id);
     const btn = container.querySelector('.btn-success');
@@ -493,8 +519,8 @@ function addChecklistItem(id) {
             </div>
             <div class="mb-2">
                 <label style="font-size: 0.8rem;">Berat</label>
-                <input type="text" name="berat[]" class="form-control form-control-sm" value="">
-            </div>
+                    <input type="text" name="berat[]" class="form-control form-control-sm" value="">
+                </div>
         </div>
     `;
     btn.insertAdjacentHTML('beforebegin', html);
