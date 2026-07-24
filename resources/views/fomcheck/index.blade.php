@@ -35,6 +35,38 @@
         .modal-backdrop {
             z-index: 1055;
         }
+
+        .btn-action-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: padding 0.2s ease;
+        }
+
+        .btn-action-icon .btn-action-label {
+            display: inline-block;
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            vertical-align: middle;
+            transition: max-width 0.25s ease, opacity 0.2s ease, margin-left 0.2s ease;
+            margin-left: 0;
+        }
+
+        .btn-action-icon:hover .btn-action-label,
+        .btn-action-icon:focus-visible .btn-action-label {
+            max-width: 6rem;
+            opacity: 1;
+            margin-left: 0.35rem;
+        }
+
+        .btn-action-icon i {
+            font-size: 0.95rem;
+            line-height: 1;
+        }
     </style>
 
     @if(session('success'))
@@ -234,33 +266,45 @@
                                         @endif
                                         <td class="text-center">
                                             <div class="d-inline-flex flex-wrap gap-1 justify-content-center">
-                                                <button type="button" class="btn btn-sm btn-primary btn-open-modal"
+                                                <button type="button" class="btn btn-sm btn-primary btn-open-modal btn-action-icon"
                                                     data-bs-toggle="modal" data-bs-target="#formModal"
                                                     data-url="{{ route('fomcheck.' . $type . '.show', ['id' => $d->id, 'embed' => 1]) }}"
-                                                    data-title="Detail {{ $typeLabels[$type] }}">
-                                                    Detail
+                                                    data-title="Detail {{ $typeLabels[$type] }}"
+                                                    title="Detail">
+                                                    <i class="bi bi-eye"></i>
+                                                    <span class="btn-action-label">Detail</span>
                                                 </button>
                                                 @if(Auth::user()->email == 'danuartha@tatametal.com')
-                                                    <button type="button" class="btn btn-sm btn-outline-primary btn-open-modal"
+                                                    <button type="button" class="btn btn-sm btn-outline-primary btn-open-modal btn-action-icon"
                                                         data-bs-toggle="modal" data-bs-target="#formModal"
                                                         data-url="{{ route('fomcheck.' . $type . '.edit', ['id' => $d->id, 'embed' => 1]) }}"
-                                                        data-title="Edit {{ $typeLabels[$type] }}">
-                                                        Edit
+                                                        data-title="Edit {{ $typeLabels[$type] }}"
+                                                        title="Edit">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                        <span class="btn-action-label">Edit</span>
                                                     </button>
                                                 @endif
                                                 @if($isAdmin)
                                                     <a href="{{ route($printRoute, $d->id) }}"
-                                                        class="btn btn-sm btn-success">Print</a>
-                                                    <button type="button" class="btn btn-sm btn-danger btn-delete-material"
+                                                        class="btn btn-sm btn-success btn-action-icon"
+                                                        title="Print">
+                                                        <i class="bi bi-printer"></i>
+                                                        <span class="btn-action-label">Print</span>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-danger btn-delete-material btn-action-icon"
                                                         data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ $d->id }}"
-                                                        data-type="{{ $type }}">
-                                                        Hapus
+                                                        data-type="{{ $type }}"
+                                                        title="Hapus">
+                                                        <i class="bi bi-trash3"></i>
+                                                        <span class="btn-action-label">Hapus</span>
                                                     </button>
                                                 @endif
                                                 @if($type === 'crc' && (Auth::user()->email == 'danuartha@tatametal.com'))
-                                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                        data-bs-target="#manualChecklistModal{{ $d->id }}">
-                                                        Manual
+                                                    <button type="button" class="btn btn-sm btn-warning btn-action-icon" data-bs-toggle="modal"
+                                                        data-bs-target="#manualChecklistModal{{ $d->id }}"
+                                                        title="Manual Checklist">
+                                                        <i class="bi bi-clipboard-check"></i>
+                                                        <span class="btn-action-label">Manual</span>
                                                     </button>
 
                                                     <!-- Manual Checklist Modal -->
