@@ -475,53 +475,53 @@
 
 @endpush
         
- @push('scripts')
-     <script>
+@push('scripts')
+    <script>
         (function () {
-    const formModal = document.getElementById('formModal');
+            const formModal = document.getElementById('formModal');
             const formModalFrame = document.getElementById('formModalFrame');
-        cons    t formModalLabel = document.getElementById('formModalLabel');
-           cons t deleteForm = document.getElementById('deleteForm');
-     
-               const destroyBase = {
-        crc: @json(url('fomcheck/crc/destroy')),
+            const formModalLabel = document.getElementById('formModalLabel');
+            const deleteForm = document.getElementById('deleteForm');
+
+            const destroyBase = {
+                crc: @json(url('fomcheck/crc/destroy')),
                 ingot: @json(url('fomcheck/ingot/destroy')),
                 resin: @json(url('fomcheck/resin/destroy')),
-      };
-            
-              function hideFormModal() {
-        if (typeof bootstrap === 'undefined' || !formModal) return;
+            };
+
+            function hideFormModal() {
+                if (typeof bootstrap === 'undefined' || !formModal) return;
                 const instance = bootstrap.Modal.getInstance(formModal);
                 if (instance) instance.hide();
-       }
-      
-               docu    ment.querySelectorAll('.btn-open-modal').forEach(function (button) {
+            }
+
+            document.querySelectorAll('.btn-open-modal').forEach(function (button) {
                 button.addEventListener('click', function () {
-            if (formModalLabel) formModalLabel.textContent = this.dataset.title || 'Form';
+                    if (formModalLabel) formModalLabel.textContent = this.dataset.title || 'Form';
                     if (formModalFrame) formModalFrame.src = this.dataset.url || 'about:blank';
                 });
-           });
-      
-               if (formModal) {
-        formModal.addEventListener('hidden.bs.modal', function () {
+            });
+
+            if (formModal) {
+                formModal.addEventListener('hidden.bs.modal', function () {
                     if (formModalFrame) formModalFrame.src = 'about:blank';
                 });
-      }
-            
-          document    .querySelectorAll('.btn-delete-material').forEach(function (button) {
+            }
+
+            document.querySelectorAll('.btn-delete-material').forEach(function (button) {
                 button.addEventListener('click', function () {
                     if (deleteForm) {
-                deleteForm.action = destroyBase[this.dataset.type] + '/' + this.dataset.id;
+                        deleteForm.action = destroyBase[this.dataset.type] + '/' + this.dataset.id;
                     }
                 });
-    });
-    
-                window.addEventListener('message', function (event) {
-        if (        !event.data || !event.data.type) return;
-    
-                   if (even t.data.type === 'fomcheck-success') {
-                 hide   FormModal();
-               Swal     .fire({
+            });
+
+            window.addEventListener('message', function (event) {
+                if (!event.data || !event.data.type) return;
+
+                if (event.data.type === 'fomcheck-success') {
+                    hideFormModal();
+                    Swal.fire({
                         icon: 'success',
                         title: 'Berhasil',
                         text: event.data.message || 'Data berhasil disimpan',
@@ -529,16 +529,16 @@
                         timer: 1700
                     }).then(function () {
                         var params = new URLSearchParams(window.location.search);
-                if (event.data.materialType) params.set('type', event.data.materialType);
+                        if (event.data.materialType) params.set('type', event.data.materialType);
                         window.location.search = params.toString();
                     });
                 }
 
-                        if (event.data.type === 'fomcheck-close') {
-            hideFormModal();
-            }
-        });
-    })();
+                if (event.data.type === 'fomcheck-close') {
+                    hideFormModal();
+                }
+            });
+        })();
     
 function addChecklistItem(id) {
     const container = document.getElementById('manual-checklist-container-' + id);
