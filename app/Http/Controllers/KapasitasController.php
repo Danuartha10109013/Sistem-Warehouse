@@ -133,6 +133,22 @@ class KapasitasController extends Controller
             'trend' => $maxTrend,
         ];
 
+        // Array nama bulan dalam Bahasa Indonesia
+        $months = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember',
+        ];
+
         // 8. Kirim semua variabel ke tampilan view (blade)
         return view('modul_kapasitas.kapasitas.V_crc', compact(
             'processedData', 
@@ -141,7 +157,8 @@ class KapasitasController extends Controller
             'daysInMonth', 
             'month', 
             'year',
-            'kapasitasValue'
+            'kapasitasValue',
+            'months'
         ));
     }
 
@@ -264,6 +281,22 @@ class KapasitasController extends Controller
             'trend' => $maxTrend,
         ];
 
+        // Array nama bulan dalam Bahasa Indonesia
+        $months = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember',
+        ];
+
         // 8. Kirim semua variabel ke tampilan view (blade)
         return view('modul_kapasitas.kapasitas.V_barang_jadi', compact(
             'processedData', 
@@ -272,7 +305,8 @@ class KapasitasController extends Controller
             'daysInMonth', 
             'month', 
             'year',
-            'kapasitasValue'
+            'kapasitasValue',
+            'months'
         ));
     }
 }

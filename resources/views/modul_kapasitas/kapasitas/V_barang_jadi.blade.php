@@ -71,14 +71,17 @@
                     <div>Kapasitas</div>
                     <div>{{ number_format($kapasitasValue, 0, ',', '.') }} Ton</div>
                     
-                    <div>Posisi Stock {{ sprintf('%02d', $lastDayWithValue) }} {{ strtoupper(substr($months[$month] ?? '', 0, 3)) }} {{ substr($year, 2) }}</div>
+                    <div>Posisi Stock {{ sprintf('%02d', $lastDayWithValue) }} {{ $months[(int)$month] ?? '' }} {{ $year }}</div>
                     <div>{{ number_format($lastStock, 0, ',', '.') }} Ton</div>
                     
                     <div>Kapasitas (%)</div>
-                    <div>{{ number_format($lastTrend, 1, ',', '.') }}% Ton</div>
+                    <div>{{ number_format($lastTrend, 2, ',', '.') }}%</div>
                     
                     <div>Kapasitas tersisa</div>
-                    <div>{{ number_format($tersisaPersen, 1, ',', '.') }}% Ton</div>
+                    <div>{{ number_format($tersisaPersen, 1, ',', '.') }}%</div>
+
+                    <div>Kapasitas tersisa (Ton)</div>
+                    <div>{{ number_format($kapasitasValue - $lastStock, 0, ',', '.') }} Ton</div>
                 </div>
             </div>
             </div>
@@ -114,7 +117,11 @@
                             <td class="px-3 py-2 2xl:px-6 2xl:py-3 border-r border-gray-300 dark:border-gray-600">{{ $row['prd_qa'] > 0 ? number_format($row['prd_qa'], 0, ',', '.') : '0' }}</td>
                             <td class="px-3 py-2 2xl:px-6 2xl:py-3 border-r border-gray-300 dark:border-gray-600 font-medium">{{ $row['total_stock'] > 0 ? number_format($row['total_stock'], 0, ',', '.') : '0' }}</td>
                             <td class="px-3 py-2 2xl:px-6 2xl:py-3 border-r border-gray-300 dark:border-gray-600">{{ number_format($row['kap'], 0, ',', '.') }}</td>
-                            <td class="px-3 py-2 2xl:px-6 2xl:py-3 font-medium">{{ number_format($row['trend'], 0, ',', '.') }}%</td>
+                            <td class="px-3 py-2 2xl:px-6 2xl:py-3 font-medium">
+                                @if($row['total_stock'] > 0)
+                                    {{ number_format($row['trend'], 2, ',', '.') }}%
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                     
@@ -125,7 +132,7 @@
                         <td class="px-3 py-2 2xl:px-6 2xl:py-3 border-r border-gray-400 dark:border-gray-700 font-bold">{{ number_format($averages['prd_qa'], 0, ',', '.') }}</td>
                         <td class="px-3 py-2 2xl:px-6 2xl:py-3 border-r border-gray-400 dark:border-gray-700 font-bold">{{ number_format($averages['total_stock'], 0, ',', '.') }}</td>
                         <td class="px-3 py-2 2xl:px-6 2xl:py-3 border-r border-gray-400 dark:border-gray-700 font-bold">{{ number_format($averages['kap'], 0, ',', '.') }}</td>
-                        <td class="px-3 py-2 2xl:px-6 2xl:py-3 font-bold">{{ number_format($averages['trend'], 0, ',', '.') }}%</td>
+                        <td class="px-3 py-2 2xl:px-6 2xl:py-3 font-bold">{{ number_format($averages['trend'], 2, ',', '.') }}%</td>
                     </tr>
                     
                     <!-- Highest Row -->
@@ -135,7 +142,7 @@
                         <td class="px-3 py-2 2xl:px-6 2xl:py-3 border-r border-gray-300 dark:border-gray-600">{{ number_format($highest['prd_qa'], 0, ',', '.') }}</td>
                         <td class="px-3 py-2 2xl:px-6 2xl:py-3 border-r border-gray-300 dark:border-gray-600">{{ number_format($highest['total_stock'], 0, ',', '.') }}</td>
                         <td class="px-3 py-2 2xl:px-6 2xl:py-3 border-r border-gray-300 dark:border-gray-600">{{ number_format($highest['kap'], 0, ',', '.') }}</td>
-                        <td class="px-3 py-2 2xl:px-6 2xl:py-3">{{ number_format($highest['trend'], 0, ',', '.') }}%</td>
+                        <td class="px-3 py-2 2xl:px-6 2xl:py-3">{{ number_format($highest['trend'], 2, ',', '.') }}%</td>
                     </tr>
                 </tbody>
             </table>
@@ -158,17 +165,23 @@
         
         const labels = [
             @foreach($processedData as $d => $row)
-                {{ $d }},
+                @if($d <= $lastDayWithValue)
+                    {{ $d }},
+                @endif
             @endforeach
         ];
         const stockData = [
             @foreach($processedData as $d => $row)
-                {{ $row['total_stock'] }},
+                @if($d <= $lastDayWithValue)
+                    {{ $row['total_stock'] }},
+                @endif
             @endforeach
         ];
         const kapData = [
             @foreach($processedData as $d => $row)
-                {{ $kapasitasValue }},
+                @if($d <= $lastDayWithValue)
+                    {{ $kapasitasValue }},
+                @endif
             @endforeach
         ];
 
@@ -180,22 +193,27 @@
                     {
                         label: 'POSISI STOCK',
                         data: stockData,
-                        borderColor: '#3b82f6', // blue-500
-                        backgroundColor: '#3b82f6',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#ef4444', // red points
-                        pointBorderColor: '#3b82f6',
+                        borderColor: '#2563eb',
+                        backgroundColor: '#2563eb',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
                         pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#1d4ed8',
+                        pointHoverBorderColor: '#ffffff',
                         fill: false,
-                        tension: 0
+                        tension: 0.15
                     },
                     {
                         label: 'KAPASITAS STOCK',
                         data: kapData,
-                        borderColor: '#ef4444', // red-500
-                        backgroundColor: '#ef4444',
-                        borderWidth: 3,
-                        pointRadius: 0, // flat line without points
+                        borderColor: '#ea580c',
+                        backgroundColor: '#ea580c',
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
                         fill: false,
                         tension: 0
                     }
@@ -204,10 +222,26 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.25)'
+                        },
+                        ticks: {
+                            color: '#64748b'
+                        }
+                    },
                     y: {
                         beginAtZero: true,
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.25)'
+                        },
                         ticks: {
+                            color: '#64748b',
                             callback: function(value) {
                                 return value.toLocaleString('id-ID');
                             }
@@ -219,10 +253,28 @@
                         position: 'bottom',
                         labels: {
                             font: {
-                                size: 14,
-                                weight: 'bold'
+                                size: 13,
+                                weight: '600'
                             },
-                            usePointStyle: true
+                            color: '#334155',
+                            usePointStyle: true,
+                            padding: 18,
+                            boxWidth: 10,
+                            boxHeight: 10
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#e2e8f0',
+                        borderColor: 'rgba(148, 163, 184, 0.35)',
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed.y ?? 0;
+                                return context.dataset.label + ': ' + value.toLocaleString('id-ID') + ' Ton';
+                            }
                         }
                     }
                 }
@@ -279,51 +331,144 @@
             '{{ number_format($kapasitasValue, 0, ",", ".") }} Ton'
         ];
         sheet.getRow(summaryStartRow + 2).values = [
-            'Posisi Stock {{ sprintf("%02d", $lastDayWithValue) }} {{ strtoupper(substr($months[$month] ?? "", 0, 3)) }} {{ substr($year, 2) }}',
+            'Posisi Stock {{ sprintf("%02d", $lastDayWithValue) }} {{ $months[(int)$month] ?? "" }} {{ $year }}',
             '{{ number_format($lastStock, 0, ",", ".") }} Ton'
         ];
         sheet.getRow(summaryStartRow + 3).values = [
             'Kapasitas (%)',
-            '{{ number_format($lastTrend, 1, ",", ".") }}% Ton'
+            '{{ number_format($lastTrend, 2, ",", ".") }}%'
         ];
         sheet.getRow(summaryStartRow + 4).values = [
             'Kapasitas tersisa',
-            '{{ number_format($tersisaPersen, 1, ",", ".") }}% Ton'
+            '{{ number_format($tersisaPersen, 1, ",", ".") }}%'
+        ];
+        sheet.getRow(summaryStartRow + 5).values = [
+            'Kapasitas tersisa (Ton)',
+            '{{ number_format($kapasitasValue - $lastStock, 0, ",", ".") }} Ton'
         ];
 
-        for (let r = summaryStartRow + 1; r <= summaryStartRow + 4; r++) {
+        for (let r = summaryStartRow + 1; r <= summaryStartRow + 5; r++) {
             sheet.getCell(`A${r}`).font = { bold: true };
             sheet.getRow(r).height = 18;
         }
 
         // Start Table Data setelah summary
-        const startRow = summaryStartRow + 7;
+        const startRow = summaryStartRow + 8;
 
         // Table Headers
         sheet.getRow(startRow).values = ['TGL', 'WH', 'PRD & QA', 'TOTAL STOCK', 'KAP', 'TREND (%)'];
-        sheet.getRow(startRow).font = { bold: true };
+        sheet.getRow(startRow).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        
+        // Apply borders, alignment, and blue background to header cells only
+        for (let c = 1; c <= 6; c++) {
+            const cell = sheet.getCell(startRow, c);
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2563EB' } };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        }
 
         // Add Data Rows
         let rowIdx = startRow + 1;
 
         @foreach($processedData as $d => $r)
-            sheet.getRow(rowIdx++).values = [
+            sheet.getRow(rowIdx).values = [
                 {{ $d }},
                 {{ $r['wh'] }},
                 {{ $r['prd_qa'] }},
                 {{ $r['total_stock'] }},
                 {{ $r['kap'] }},
-                {{ $r['trend'] }}
+                @if($r['total_stock'] > 0)
+                    {{ round($r['trend'], 2) }}
+                @else
+                    ''
+                @endif
             ];
+            
+            // Apply number formatting and borders to data row
+            sheet.getCell(rowIdx, 1).numFmt = '0';
+            sheet.getCell(rowIdx, 1).alignment = { horizontal: 'center', vertical: 'middle' };
+            sheet.getCell(rowIdx, 2).numFmt = '#,##0';
+            sheet.getCell(rowIdx, 2).alignment = { horizontal: 'right', vertical: 'middle' };
+            sheet.getCell(rowIdx, 3).numFmt = '#,##0';
+            sheet.getCell(rowIdx, 3).alignment = { horizontal: 'right', vertical: 'middle' };
+            sheet.getCell(rowIdx, 4).numFmt = '#,##0';
+            sheet.getCell(rowIdx, 4).alignment = { horizontal: 'right', vertical: 'middle' };
+            sheet.getCell(rowIdx, 5).numFmt = '#,##0';
+            sheet.getCell(rowIdx, 5).alignment = { horizontal: 'right', vertical: 'middle' };
+            @if($r['total_stock'] > 0)
+                sheet.getCell(rowIdx, 6).numFmt = '0.00';
+                sheet.getCell(rowIdx, 6).alignment = { horizontal: 'right', vertical: 'middle' };
+            @endif
+            
+            for (let c = 1; c <= 6; c++) {
+                sheet.getCell(rowIdx, c).border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                };
+            }
+            
+            rowIdx++;
         @endforeach
 
         // Add Average & Highest
-        sheet.getRow(rowIdx).values = ['AVERAGE', {{ $averages['wh'] }}, {{ $averages['prd_qa'] }}, {{ $averages['total_stock'] }}, {{ $averages['kap'] }}, {{ $averages['trend'] }}];
+        sheet.getRow(rowIdx).values = ['AVERAGE', {{ $averages['wh'] }}, {{ $averages['prd_qa'] }}, {{ $averages['total_stock'] }}, {{ $averages['kap'] }}, {{ round($averages['trend'], 2) }}];
         sheet.getRow(rowIdx).font = { bold: true };
+        sheet.getRow(rowIdx).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD3D3D3' } };
+        
+        // Apply formatting to Average row
+        sheet.getCell(rowIdx, 1).alignment = { horizontal: 'center', vertical: 'middle' };
+        sheet.getCell(rowIdx, 2).numFmt = '#,##0';
+        sheet.getCell(rowIdx, 2).alignment = { horizontal: 'right', vertical: 'middle' };
+        sheet.getCell(rowIdx, 3).numFmt = '#,##0';
+        sheet.getCell(rowIdx, 3).alignment = { horizontal: 'right', vertical: 'middle' };
+        sheet.getCell(rowIdx, 4).numFmt = '#,##0';
+        sheet.getCell(rowIdx, 4).alignment = { horizontal: 'right', vertical: 'middle' };
+        sheet.getCell(rowIdx, 5).numFmt = '#,##0';
+        sheet.getCell(rowIdx, 5).alignment = { horizontal: 'right', vertical: 'middle' };
+        sheet.getCell(rowIdx, 6).numFmt = '0.00';
+        sheet.getCell(rowIdx, 6).alignment = { horizontal: 'right', vertical: 'middle' };
+        
+        for (let c = 1; c <= 6; c++) {
+            sheet.getCell(rowIdx, c).border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        }
         rowIdx++;
 
-        sheet.getRow(rowIdx).values = ['Stock Tertinggi', {{ $highest['wh'] }}, {{ $highest['prd_qa'] }}, {{ $highest['total_stock'] }}, {{ $highest['kap'] }}, {{ $highest['trend'] }}];
+        sheet.getRow(rowIdx).values = ['Stock Tertinggi', {{ $highest['wh'] }}, {{ $highest['prd_qa'] }}, {{ $highest['total_stock'] }}, {{ $highest['kap'] }}, {{ round($highest['trend'], 2) }}];
         sheet.getRow(rowIdx).font = { bold: true, color: { argb: 'FFFF0000' } };
+        
+        // Apply formatting to Highest row
+        sheet.getCell(rowIdx, 1).alignment = { horizontal: 'center', vertical: 'middle' };
+        sheet.getCell(rowIdx, 2).numFmt = '#,##0';
+        sheet.getCell(rowIdx, 2).alignment = { horizontal: 'right', vertical: 'middle' };
+        sheet.getCell(rowIdx, 3).numFmt = '#,##0';
+        sheet.getCell(rowIdx, 3).alignment = { horizontal: 'right', vertical: 'middle' };
+        sheet.getCell(rowIdx, 4).numFmt = '#,##0';
+        sheet.getCell(rowIdx, 4).alignment = { horizontal: 'right', vertical: 'middle' };
+        sheet.getCell(rowIdx, 5).numFmt = '#,##0';
+        sheet.getCell(rowIdx, 5).alignment = { horizontal: 'right', vertical: 'middle' };
+        sheet.getCell(rowIdx, 6).numFmt = '0.00';
+        sheet.getCell(rowIdx, 6).alignment = { horizontal: 'right', vertical: 'middle' };
+        
+        for (let c = 1; c <= 6; c++) {
+            sheet.getCell(rowIdx, c).border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        }
 
         // Save file
         const buffer = await workbook.xlsx.writeBuffer();
@@ -344,7 +489,7 @@
 
         const opt = {
             margin:       0.3,
-            filename:     'Kapasitas_{{ $months[$month] ?? '' }}_{{ $year }}.pdf',
+            filename:     'Kapasitas_Barang_Jadi_{{ $months[$month] ?? '' }}_{{ $year }}.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
             jsPDF:        { unit: 'in', format: 'a3', orientation: 'landscape' },
