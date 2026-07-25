@@ -417,7 +417,7 @@
         @endforeach
         
         // Add Average & Highest
-        sheet.getRow(rowIdx).values = ['AVERAGE', {{ $averages['wh'] }}, {{ $averages['prd_qa'] }}, {{ $averages['total_stock'] }}, {{ $averages['kap'] }], '{{ number_format($averages['trend'], 2, ',', '.') }}%'];
+        sheet.getRow(rowIdx).values = ['AVERAGE', {{ $averages['wh'] }}, {{ $averages['prd_qa'] }}, {{ $averages['total_stock'] }}, {{ $averages['kap'] }}, '{{ number_format($averages['trend'], 2, ',', '.') }}%'];
         sheet.getRow(rowIdx).font = { bold: true };
         sheet.getRow(rowIdx).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD3D3D3' } };
         
