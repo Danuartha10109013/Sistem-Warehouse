@@ -383,7 +383,7 @@
                 {{ $r['total_stock'] }}, 
                 {{ $r['kap'] }}, 
                 @if($r['total_stock'] > 0)
-                    {{ round($r['trend'], 2) }}
+                    '{{ number_format($r['trend'], 2, ',', '.') }}%'
                 @else
                     ''
                 @endif
@@ -401,7 +401,6 @@
             sheet.getCell(rowIdx, 5).numFmt = '#,##0';
             sheet.getCell(rowIdx, 5).alignment = { horizontal: 'right', vertical: 'middle' };
             @if($r['total_stock'] > 0)
-                sheet.getCell(rowIdx, 6).numFmt = '0.00';
                 sheet.getCell(rowIdx, 6).alignment = { horizontal: 'right', vertical: 'middle' };
             @endif
             
@@ -418,7 +417,7 @@
         @endforeach
         
         // Add Average & Highest
-        sheet.getRow(rowIdx).values = ['AVERAGE', {{ $averages['wh'] }}, {{ $averages['prd_qa'] }}, {{ $averages['total_stock'] }}, {{ $averages['kap'] }}, {{ round($averages['trend'], 2) }}];
+        sheet.getRow(rowIdx).values = ['AVERAGE', {{ $averages['wh'] }}, {{ $averages['prd_qa'] }}, {{ $averages['total_stock'] }}, {{ $averages['kap'] }], '{{ number_format($averages['trend'], 2, ',', '.') }}%'];
         sheet.getRow(rowIdx).font = { bold: true };
         sheet.getRow(rowIdx).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD3D3D3' } };
         
@@ -432,7 +431,6 @@
         sheet.getCell(rowIdx, 4).alignment = { horizontal: 'right', vertical: 'middle' };
         sheet.getCell(rowIdx, 5).numFmt = '#,##0';
         sheet.getCell(rowIdx, 5).alignment = { horizontal: 'right', vertical: 'middle' };
-        sheet.getCell(rowIdx, 6).numFmt = '0.00';
         sheet.getCell(rowIdx, 6).alignment = { horizontal: 'right', vertical: 'middle' };
         
         for (let c = 1; c <= 6; c++) {
@@ -445,7 +443,7 @@
         }
         rowIdx++;
         
-        sheet.getRow(rowIdx).values = ['Stock Tertinggi', {{ $highest['wh'] }}, {{ $highest['prd_qa'] }}, {{ $highest['total_stock'] }}, {{ $highest['kap'] }}, {{ round($highest['trend'], 2) }}];
+        sheet.getRow(rowIdx).values = ['Stock Tertinggi', {{ $highest['wh'] }}, {{ $highest['prd_qa'] }}, {{ $highest['total_stock'] }}, {{ $highest['kap'] }}, '{{ number_format($highest['trend'], 2, ',', '.') }}%'];
         sheet.getRow(rowIdx).font = { bold: true, color: { argb: 'FFFF0000' } };
         
         // Apply formatting to Highest row
@@ -458,7 +456,6 @@
         sheet.getCell(rowIdx, 4).alignment = { horizontal: 'right', vertical: 'middle' };
         sheet.getCell(rowIdx, 5).numFmt = '#,##0';
         sheet.getCell(rowIdx, 5).alignment = { horizontal: 'right', vertical: 'middle' };
-        sheet.getCell(rowIdx, 6).numFmt = '0.00';
         sheet.getCell(rowIdx, 6).alignment = { horizontal: 'right', vertical: 'middle' };
         
         for (let c = 1; c <= 6; c++) {
