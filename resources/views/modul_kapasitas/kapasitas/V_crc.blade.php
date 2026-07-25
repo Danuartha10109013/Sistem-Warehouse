@@ -234,11 +234,19 @@
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Kapasitas CRC');
 
+        sheet.getColumn(1).width = 8;
+        sheet.getColumn(2).width = 18;
+        sheet.getColumn(3).width = 14;
+        sheet.getColumn(4).width = 16;
+        sheet.getColumn(5).width = 12;
+        sheet.getColumn(6).width = 12;
+
         // Add Title
         sheet.mergeCells('A1:F1');
         sheet.getCell('A1').value = 'KAPASITAS CRC (layout + transit) - {{ $months[$month] ?? '' }} {{ $year }}';
         sheet.getCell('A1').font = { size: 14, bold: true };
         sheet.getCell('A1').alignment = { horizontal: 'center' };
+        sheet.getRow(1).height = 22;
 
         // Convert Chart to Base64 Image
         const canvas = document.getElementById('kapasitasChart');
@@ -246,15 +254,50 @@
             base64: canvas.toDataURL('image/png'),
             extension: 'png',
         });
-        
-        // Add image to sheet (spans from row 3 to row 20)
+
+        const chartTopRow0 = 1.05; // 0-indexed, tepat di bawah judul
+        const chartWidth = 680;
+        const chartHeight = 240;
+        const pxPerRow = 18;
+
         sheet.addImage(imageId, {
-            tl: { col: 0, row: 2 },
-            ext: { width: canvas.width * 0.7, height: canvas.height * 0.7 }
+            tl: { col: 0, row: chartTopRow0 },
+            ext: { width: chartWidth, height: chartHeight }
         });
 
-        // Start Table Data at Row 22
-        const startRow = 22;
+        const chartEndRow = Math.ceil(chartTopRow0 + (chartHeight / pxPerRow));
+        const summaryStartRow = chartEndRow + 2;
+
+        // Summary perhitungan kapasitas (langsung di bawah grafik)
+        sheet.mergeCells(`A${summaryStartRow}:F${summaryStartRow}`);
+        sheet.getCell(`A${summaryStartRow}`).value = 'PERHITUNGAN KAPASITAS : RATA-RATA BERAT PER COIL 20 TON';
+        sheet.getCell(`A${summaryStartRow}`).font = { bold: true };
+        sheet.getCell(`A${summaryStartRow}`).alignment = { horizontal: 'left' };
+
+        sheet.getRow(summaryStartRow + 1).values = [
+            'Kapasitas',
+            '{{ number_format($kapasitasValue, 0, ",", ".") }} Ton'
+        ];
+        sheet.getRow(summaryStartRow + 2).values = [
+            'Posisi Stock {{ sprintf("%02d", $lastDayWithValue) }} {{ strtoupper(substr($months[$month] ?? "", 0, 3)) }} {{ substr($year, 2) }}',
+            '{{ number_format($lastStock, 0, ",", ".") }} Ton'
+        ];
+        sheet.getRow(summaryStartRow + 3).values = [
+            'Kapasitas (%)',
+            '{{ number_format($lastTrend, 1, ",", ".") }}% Ton'
+        ];
+        sheet.getRow(summaryStartRow + 4).values = [
+            'Kapasitas tersisa',
+            '{{ number_format($tersisaPersen, 1, ",", ".") }}% Ton'
+        ];
+
+        for (let r = summaryStartRow + 1; r <= summaryStartRow + 4; r++) {
+            sheet.getCell(`A${r}`).font = { bold: true };
+            sheet.getRow(r).height = 18;
+        }
+
+        // Start Table Data setelah summary (jarak 1 baris)
+        const startRow = summaryStartRow + 7;
         
         // Table Headers
         sheet.getRow(startRow).values = ['TGL', 'WH', 'PRD & QA', 'TOTAL STOCK', 'KAP', 'TREND (%)'];
