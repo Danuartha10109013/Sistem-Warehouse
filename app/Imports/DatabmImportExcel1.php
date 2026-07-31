@@ -19,7 +19,7 @@ class DatabMImportExcel1 implements ToCollection,ToModel
     /**
     * @param Collection $collection
     */
-    
+
     public function collection(Collection $collection)
     {
         $this->current++;
@@ -62,7 +62,7 @@ class DatabMImportExcel1 implements ToCollection,ToModel
                 $data->save();
                 // dd($data);
             }
-            
+
         }
     }
 }
