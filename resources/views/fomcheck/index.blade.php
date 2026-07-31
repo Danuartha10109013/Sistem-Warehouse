@@ -274,7 +274,7 @@
                                                     <i class="bi bi-eye"></i>
                                                     <span class="btn-action-label">Detail</span>
                                                 </button>
-                                                @if(Auth::user()->email == 'danuartha@tatametal.com')
+                                                @if(Auth::user()->email == 'danuartha@tatametal.com' || 'freddy@tatametal.com')
                                                     <button type="button" class="btn btn-sm btn-outline-primary btn-open-modal btn-action-icon"
                                                         data-bs-toggle="modal" data-bs-target="#formModal"
                                                         data-url="{{ route('fomcheck.' . $type . '.edit', ['id' => $d->id, 'embed' => 1]) }}"
