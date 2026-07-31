@@ -39,6 +39,7 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\SACController;
 use App\Http\Controllers\FomController;
 use App\Http\Controllers\IdOdController;
+use App\Http\Controllers\SidewallController;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -123,8 +124,10 @@ Route::get('/download/{file}', function($file) {
 
 Route::get('/download-report/{id}', [CraneController::class, 'downloadReport'])->name('download.report');
 
-
-
+Route::prefix('report-open-pack')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ReportOpenPackController::class, 'index'])->name('report-open-pack');
+    Route::get('/export/{id}', [\App\Http\Controllers\ReportOpenPackController::class, 'exportPdf'])->name('report-open-pack.export');
+});
 Route::middleware([AutoLogout::class])->group(function () {
 
     Route::get('/welcome', [LoginController::class, 'welcome'])->name('welcome');
@@ -150,6 +153,22 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::get('/print/{id}', [IdOdController::class, 'print_idod'])->name('idod.print');
         Route::get('/show/{id}', [IdOdController::class, 'show_idod'])->name('idod.show');
         Route::delete('/destroy/{id}', [IdOdController::class, 'destroy_idod'])->name('idod.destroy');
+    });
+
+    Route::prefix('sidewall')->group(function () {
+        Route::get('/', [SidewallController::class, 'index'])->name('sidewall');
+        Route::get('/dashboard-data', [SidewallController::class, 'dashboardData'])->name('sidewall.dashboard-data');
+        Route::get('/add', [SidewallController::class, 'add_idod'])->name('sidewall.add');
+        Route::post('/create', [SidewallController::class, 'create_idod'])->name('sidewall.create');
+        Route::get('/edit/{id}', [SidewallController::class, 'edit_idod'])->name('sidewall.edit');
+        Route::put('/update/{id}', [SidewallController::class, 'update_idod'])->name('sidewall.update');
+        Route::get('/export', [SidewallController::class, 'idod_export'])->name('sidewall.export');
+        Route::get('/print/{id}', [SidewallController::class, 'print_idod'])->name('sidewall.print');
+        Route::get('/show/{id}', [SidewallController::class, 'show_idod'])->name('sidewall.show');
+        Route::delete('/destroy/{id}', [SidewallController::class, 'destroy_idod'])->name('sidewall.destroy');
+        Route::get('/master', [SidewallController::class, 'getMasters'])->name('sidewall.master.get');
+        Route::post('/master', [SidewallController::class, 'storeMaster'])->name('sidewall.master.store');
+        Route::delete('/master/{id}', [SidewallController::class, 'destroyMaster'])->name('sidewall.master.destroy');
     });
 
     Route::prefix('laporan-repacking')->group(function () {

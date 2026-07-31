@@ -379,10 +379,16 @@
                      <div class="menu-title">Laporan ID OD</div>
                   </div>
                </a>
-               <a href="{{ route('opc') }}" class="menu-item">
+               <a href="{{ route('sidewall') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-chart-donut"></i>
+                     <div class="menu-title">Laporan Sidewall</div>
+                  </div>
+               </a>
+               <a href="{{ route('report-open-pack') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-note"></i>
-                     <div class="menu-title">Report Open Packing</div>
+                     <div class="menu-title">Report Open Pack</div>
                   </div>
                </a>
 

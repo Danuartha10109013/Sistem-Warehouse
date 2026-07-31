@@ -89,7 +89,7 @@ class RekapStockSeeder extends Seeder
                         $qtyStr = str_replace(',', '', $qtyStr);
                         $qty = (float)$qtyStr;
                         
-                        if ($qty > 0 || $qtyStr === '0') {
+                        if ($qty > 0) {
                             $tanggal = sprintf('%04d-%02d-%02d', $year, $month, $day);
                             $insertData[] = [
                                 'tanggal' => $tanggal,

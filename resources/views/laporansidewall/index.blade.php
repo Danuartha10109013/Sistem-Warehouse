@@ -1,0 +1,1381 @@
+@extends('laporansidewall.main')
+@section('title')
+    Dashboard Laporan Sidewall
+@endsection
+
+@push('styles')
+<style>
+    .idod-dashboard {
+        padding-top: 6.5rem;
+        padding-bottom: 3rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    .idod-filter-card {
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+    }
+    .idod-stat-card {
+        border: 0;
+        border-radius: 1rem;
+        color: #fff;
+        overflow: hidden;
+        min-height: 110px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    }
+    .idod-stat-card .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .idod-stat-card .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+    .bg-stat-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+    .bg-stat-success { background: linear-gradient(135deg, #059669, #047857); }
+    .bg-stat-warning { background: linear-gradient(135deg, #d97706, #b45309); }
+    .bg-stat-info { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .idod-chart-card {
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        border: 1px solid #e2e8f0;
+        height: 100%;
+    }
+    .idod-chart-card .card-header {
+        background: transparent;
+        border-bottom: 1px solid #f1f5f9;
+        font-weight: 600;
+        color: #0f172a;
+    }
+    .chart-wrap {
+        position: relative;
+        height: 280px;
+    }
+    .chart-wrap-sm {
+        height: 240px;
+    }
+    .period-btn.active {
+        background: #2563eb !important;
+        border-color: #2563eb !important;
+        color: #fff !important;
+    }
+    #idodTable tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    .idod-loading {
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.75);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+        border-radius: 1rem;
+    }
+    .idod-loading.show {
+        display: flex;
+    }
+    .dashboard-panel {
+        position: relative;
+    }
+    #idodFormModal .idod-form-section {
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1rem 1.1rem;
+        height: 100%;
+        background: #fff;
+    }
+    #idodFormModal .idod-section-id {
+        border-top: 3px solid #2563eb;
+    }
+    #idodFormModal .idod-section-od {
+        border-top: 3px solid #059669;
+    }
+    #idodFormModal .idod-section-head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        margin-bottom: 0.85rem;
+        color: #0f172a;
+    }
+    #idodFormModal .idod-section-head .badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+    #idodFormModal .idod-ng-field .form-label {
+        color: #b91c1c;
+    }
+    #idodFormModal .idod-ng-field .form-control {
+        border-color: #fecaca;
+        background-color: #fffbfb;
+    }
+    #idodFormModal .idod-ng-field .form-control:focus {
+        border-color: #f87171;
+        box-shadow: 0 0 0 0.2rem rgba(248, 113, 113, 0.2);
+    }
+    #idodFormModal .idod-ok-field .form-label {
+        color: #047857;
+    }
+  /* Scroll modal form — terutama di HP */
+    #idodFormModal .modal-dialog {
+        max-height: calc(100dvh - 1rem);
+        margin: 0.5rem auto;
+    }
+    #idodFormModal .modal-content {
+        max-height: calc(100dvh - 1rem);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    #idodFormModal #idodForm {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+    }
+    #idodFormModal .modal-header,
+    #idodFormModal .modal-footer {
+        flex-shrink: 0;
+    }
+    #idodFormModal .idod-modal-body-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+    }
+    #idodFormModal .idod-form-section {
+        height: auto;
+    }
+    @media (max-width: 767.98px) {
+        .header .hero-header {
+            padding-left: 0.65rem !important;
+            padding-right: 0.65rem !important;
+        }
+        .idod-dashboard {
+            max-width: 100%;
+            margin: 0;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 5.25rem;
+        }
+        .idod-dashboard .page-actions {
+            width: 100%;
+        }
+        .idod-dashboard .page-actions .btn {
+            flex: 1 1 0;
+            min-width: 0;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+        .idod-filter-card {
+            border-radius: 0.65rem;
+            padding: 0.85rem !important;
+        }
+        .idod-chart-card {
+            border-radius: 0.65rem;
+        }
+        .idod-stat-card .stat-value {
+            font-size: 1.35rem;
+        }
+        .chart-wrap {
+            height: 240px;
+        }
+        .chart-wrap-sm {
+            height: 220px;
+        }
+        #idodFormModal .modal-dialog {
+            max-width: 100%;
+            width: 100%;
+            max-height: 100dvh;
+            height: 100%;
+            margin: 0;
+        }
+        #idodFormModal .modal-content {
+            max-height: 100dvh;
+            height: 100%;
+            border-radius: 0;
+        }
+        #idodFormModal .idod-modal-body-scroll {
+            max-height: none;
+            padding-left: 0.85rem;
+            padding-right: 0.85rem;
+        }
+        #idodFormModal .modal-header,
+        #idodFormModal .modal-footer {
+            padding-left: 0.85rem;
+            padding-right: 0.85rem;
+        }
+        #idodFormModal .modal-footer .btn {
+            flex: 1 1 0;
+        }
+    }
+    @media (min-width: 768px) and (max-width: 991.98px) {
+        .header .hero-header {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        .idod-dashboard {
+            max-width: 100%;
+            padding-left: 0.25rem !important;
+            padding-right: 0.25rem !important;
+        }
+        #idodFormModal .modal-dialog {
+            max-width: calc(100% - 1.25rem);
+            width: calc(100% - 1.25rem);
+            margin: 0.625rem auto;
+        }
+    }
+</style>
+@endpush
+
+@section('content')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if(session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('success')), timer: 1700, showConfirmButton: false });
+    });
+</script>
+@endif
+
+<div class="container-fluid idod-dashboard px-2 px-md-3 px-lg-4">
+    <div class="row mb-4 align-items-center g-2">
+        <div class="col-12 col-md">
+            <h2 class="fw-bold text-dark mb-1">Dashboard Laporan Sidewall</h2>
+            <p class="text-muted mb-0 small">Ringkasan data per hari, bulan, dan tahun — filter langsung tanpa reload halaman.</p>
+        </div>
+        <div class="col-12 col-md-auto d-flex flex-wrap gap-2 page-actions">
+            <button type="button" class="btn btn-success rounded-pill px-4" id="btnExportExcel" title="Unduh data sesuai filter aktif (.xlsx)">
+                <i class="fas fa-file-excel me-1"></i> Export Excel
+            </button>
+            <button type="button" class="btn btn-primary rounded-pill px-4" id="btnTambahData">
+                <i class="fas fa-plus me-1"></i> Tambah Data
+            </button>
+        </div>
+    </div>
+
+    <div class="idod-filter-card p-3 p-md-4 mb-4">
+        <div class="row g-3 align-items-end">
+
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label fw-semibold small">Dari tanggal</label>
+                <input type="date" class="form-control" id="filterFrom">
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label fw-semibold small">Sampai tanggal</label>
+                <input type="date" class="form-control" id="filterTo">
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label fw-semibold small">Size Sidewall</label>
+                <select class="form-select" id="filterSizeSidewall">
+                    <option value="">Semua</option>
+                    @foreach($sizeSidewallOptions as $opt)
+                    <option value="{{ $opt }}">{{ $opt }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label fw-semibold small">Tujuan</label>
+                <select class="form-select" id="filterTujuan">
+                    <option value="">Semua</option>
+                    @foreach($tujuanOptions as $opt)
+                    <option value="{{ $opt }}">{{ $opt }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-lg-2">
+                <label class="form-label fw-semibold small">Shift</label>
+                <select class="form-select" id="filterShift">
+                    <option value="">Semua</option>
+                    @foreach($shiftOptions as $opt)
+                    <option value="{{ $opt }}">{{ $opt }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-12 col-lg-4">
+                <label class="form-label fw-semibold small">Cari</label>
+                <input type="text" class="form-control" id="filterSearch" placeholder="Size Sidewall, tujuan, keterangan…">
+            </div>
+            <div class="col-12 col-lg-2 d-flex gap-2 align-items-end">
+                <button type="button" class="btn btn-outline-secondary flex-grow-1" id="btnResetFilter">Reset</button>
+                <button type="button" class="btn btn-light border flex-shrink-0" id="btnMasterData" title="Kelola Filter (Size Sidewall, Tujuan, Shift)" data-bs-toggle="modal" data-bs-target="#masterDataModal">
+                    <i class="fas fa-cog text-secondary"></i>
+                </button>
+            </div>
+        </div>
+        <div class="mt-2 small text-muted" id="filterSummary">Memuat data…</div>
+    </div>
+
+    <div class="dashboard-panel mb-4">
+        <div class="idod-loading" id="dashboardLoading">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+        <div class="row g-3 mb-4" id="summaryCards">
+            <div class="col-6 col-xl-3">
+                <div class="card idod-stat-card bg-stat-primary h-100">
+                    <div class="card-body">
+                        <div class="stat-label">Total entri</div>
+                        <div class="stat-value" id="statRecords">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card idod-stat-card bg-stat-success h-100">
+                    <div class="card-body">
+                        <div class="stat-label">Total Sadang</div>
+                        <div class="stat-value" id="statJumlahId">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card idod-stat-card bg-stat-warning h-100">
+                    <div class="card-body">
+                        <div class="stat-label">Total Cikarang</div>
+                        <div class="stat-value" id="statJumlahOd">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-xl-3">
+                <div class="card idod-stat-card bg-stat-info h-100">
+                    <div class="card-body">
+                        <div class="stat-label">Total gabungan</div>
+                        <div class="stat-value" id="statJumlah">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-xl-6">
+                <div class="card idod-chart-card h-100">
+                    <div class="card-header py-3">Tren per periode</div>
+                    <div class="card-body">
+                        <div class="chart-wrap">
+                            <canvas id="chartTimeline"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-xl-6">
+                <div class="card idod-chart-card h-100">
+                    <div class="card-header py-3">Tren per periode (Bulanan)</div>
+                    <div class="card-body">
+                        <div class="chart-wrap">
+                            <canvas id="chartTimelineMonthly"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-md-6">
+                <div class="card idod-chart-card h-100">
+                    <div class="card-header py-3">Top tujuan (Sidewall)</div>
+                    <div class="card-body">
+                        <div class="chart-wrap chart-wrap-sm">
+                            <canvas id="chartTujuan"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="card idod-chart-card h-100">
+                    <div class="card-header py-3">Per shift</div>
+                    <div class="card-body">
+                        <div class="chart-wrap chart-wrap-sm">
+                            <canvas id="chartShift"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card idod-chart-card">
+        <div class="card-header py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span>Detail data</span>
+            <span class="badge bg-primary rounded-pill" id="tableCount">0 baris</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="idodTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Size Sidewall</th>
+                            <th>Jumlah</th>
+                            <th>Tujuan</th>
+                            <th>Shift</th>
+                            <th>Keterangan</th>
+                            <th>Dibuat</th>
+                            <th class="text-center" style="width:120px">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="idodTableBody">
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-5">Memuat…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer py-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border-top" id="idodTablePaginationWrap">
+            <div class="small text-muted" id="idodTablePaginationInfo">—</div>
+            <nav aria-label="Paginasi tabel ID OD">
+                <ul class="pagination pagination-sm mb-0" id="idodTablePagination"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Tambah / Edit --}}
+<div class="modal fade" id="idodFormModal" tabindex="-1" aria-labelledby="idodFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-md-down">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="idodFormModalLabel">Tambah Data Sidewall</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <form id="idodForm" novalidate>
+                <div class="modal-body idod-modal-body-scroll">
+                    <div id="idodFormErrors" class="alert alert-danger d-none" role="alert"></div>
+                    <input type="hidden" id="idodRecordId" name="id" value="">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="idodDate">Tanggal <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="date" id="idodDate" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="idodShift">Shift <span class="text-danger">*</span></label>
+                            <select class="form-select" name="shift" id="idodShift" required>
+                                <option value="">— Pilih shift —</option>
+                                @foreach($shiftOptions as $opt)
+                                <option value="{{ $opt }}">{{ $opt }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="idod-form-section idod-section-id">
+                                <div class="idod-section-head">
+                                    <span>Detail Sidewall</span>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold" for="idodSizeSidewall">Size Sidewall <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="size_sidewall" id="idodSizeSidewall" required>
+                                            <option value="">— Pilih Size Sidewall —</option>
+                                            @foreach($sizeSidewallOptions as $opt)
+                                            <option value="{{ $opt }}">{{ $opt }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold" for="idodJumlah">Jumlah <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="jumlah" id="idodJumlah" min="1" value="1" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold" for="idodTujuan">Tujuan <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="tujuan" id="idodTujuan" required>
+                                            <option value="">— Pilih tujuan —</option>
+                                            @foreach($tujuanOptions as $opt)
+                                            <option value="{{ $opt }}">{{ $opt }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" for="idodKeterangan">Keterangan / Catatan</label>
+                            <textarea class="form-control" name="keterangan" id="idodKeterangan" rows="2" placeholder="Opsional"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer flex-nowrap gap-2">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4" id="idodFormSubmit">
+                        <span class="submit-text">Simpan</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Hapus --}}
+<div class="modal fade" id="idodDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Hapus Data</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">Yakin ingin menghapus data berikut?</p>
+                <p class="mb-0 small text-muted" id="idodDeleteSummary">—</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger rounded-pill px-4" id="idodDeleteConfirm">
+                    <span class="delete-text">Hapus</span>
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Kelola Master Data --}}
+<div class="modal fade" id="masterDataModal" tabindex="-1" aria-labelledby="masterDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="masterDataModalLabel">
+                    <i class="fas fa-cog me-2"></i> Kelola Filter
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="masterDataTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-semibold" id="tab-size-sidewall" data-bs-toggle="tab" data-bs-target="#content-size-sidewall" type="button" role="tab">Size Sidewall</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-semibold" id="tab-tujuan" data-bs-toggle="tab" data-bs-target="#content-tujuan" type="button" role="tab">Tujuan</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-semibold" id="tab-shift" data-bs-toggle="tab" data-bs-target="#content-shift" type="button" role="tab">Shift</button>
+                    </li>
+                </ul>
+                <div class="tab-content pt-3" id="masterDataTabContent">
+                    <div class="tab-pane fade show active" id="content-size-sidewall" role="tabpanel">
+                        <form class="master-data-form mb-3 d-flex gap-2" data-type="size_sidewall">
+                            <input type="text" class="form-control" name="value" placeholder="Tambah Size Sidewall baru..." required>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i></button>
+                        </form>
+                        <div class="list-group master-data-list" id="list-size_sidewall">
+                            <div class="text-center text-muted small py-3">Memuat data...</div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="content-tujuan" role="tabpanel">
+                        <form class="master-data-form mb-3 d-flex gap-2" data-type="tujuan">
+                            <input type="text" class="form-control" name="value" placeholder="Tambah Tujuan baru..." required>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i></button>
+                        </form>
+                        <div class="list-group master-data-list" id="list-tujuan">
+                            <div class="text-center text-muted small py-3">Memuat data...</div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="content-shift" role="tabpanel">
+                        <form class="master-data-form mb-3 d-flex gap-2" data-type="shift">
+                            <input type="text" class="form-control" name="value" placeholder="Tambah Shift baru..." required>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i></button>
+                        </form>
+                        <div class="list-group master-data-list" id="list-shift">
+                            <div class="text-center text-muted small py-3">Memuat data...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <span class="text-muted small me-auto"><i class="fas fa-info-circle me-1"></i> Data akan otomatis tampil di pilihan dropdown filter. (Reload halaman diperlukan setelah merubah data)</span>
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const apiUrl = @json(route('sidewall.dashboard-data'));
+    const exportUrl = @json(route('sidewall.export'));
+    const storeUrl = @json(route('sidewall.create'));
+    const updateUrlTemplate = @json(url('sidewall/update/__ID__'));
+    const destroyUrlTemplate = @json(url('sidewall/destroy/__ID__'));
+    const showUrlTemplate = @json(url('sidewall/show/__ID__'));
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+    let currentPage = 1;
+    const perPage = 25;
+    let debounceTimer = null;
+    let charts = { timeline: null, timelineMonthly: null, tujuan: null, shift: null };
+    let deleteTargetId = null;
+
+    const formModalEl = document.getElementById('idodFormModal');
+    const deleteModalEl = document.getElementById('idodDeleteModal');
+    const formModal = formModalEl ? bootstrap.Modal.getOrCreateInstance(formModalEl) : null;
+    const deleteModal = deleteModalEl ? bootstrap.Modal.getOrCreateInstance(deleteModalEl) : null;
+
+    const el = (id) => document.getElementById(id);
+
+    function defaultDates() {
+        const to = new Date();
+        const from = new Date();
+        from.setDate(from.getDate() - 30);
+        el('filterTo').value = to.toISOString().slice(0, 10);
+        el('filterFrom').value = from.toISOString().slice(0, 10);
+    }
+
+    function params() {
+        const p = new URLSearchParams();
+        const from = el('filterFrom').value;
+        if (from) p.set('from', from);
+        if (el('filterTo').value) p.set('to', el('filterTo').value);
+        const sizeSidewall = el('filterSizeSidewall') ? el('filterSizeSidewall').value : '';
+        const tujuan = el('filterTujuan').value;
+        const shift = el('filterShift').value;
+        const search = el('filterSearch').value.trim();
+        if (sizeSidewall) p.set('size_sidewall', sizeSidewall);
+        if (tujuan) p.set('tujuan', tujuan);
+        if (shift) p.set('shift', shift);
+        if (search) p.set('search', search);
+        p.set('page', String(currentPage));
+        return p;
+    }
+
+    function exportParams() {
+        const p = params();
+        return p;
+    }
+
+    function setLoading(on) {
+        el('dashboardLoading').classList.toggle('show', on);
+    }
+
+    function destroyChart(key) {
+        if (charts[key]) {
+            charts[key].destroy();
+            charts[key] = null;
+        }
+    }
+
+    function formatNumber(n) {
+        return new Intl.NumberFormat('id-ID').format(n);
+    }
+
+    function updateSummary(s, filters) {
+        el('statRecords').textContent = formatNumber(s.total_records);
+        el('statJumlahId').textContent = formatNumber(s.total_sadang);
+        el('statJumlahOd').textContent = formatNumber(s.total_cikarang);
+        el('statJumlah').textContent = formatNumber(s.total_gabungan);
+        el('filterSummary').textContent = `Rentang ${filters.from} s/d ${filters.to}`;
+    }
+
+    function renderPagination(pg) {
+        const info = el('idodTablePaginationInfo');
+        const ul = el('idodTablePagination');
+        if (!pg || !pg.total) {
+            info.textContent = 'Tidak ada data';
+            ul.innerHTML = '';
+            return;
+        }
+        info.textContent = `Menampilkan ${formatNumber(pg.from)}–${formatNumber(pg.to)} dari ${formatNumber(pg.total)} data (terbaru di atas)`;
+
+        if (pg.last_page <= 1) {
+            ul.innerHTML = '';
+            return;
+        }
+
+        const pages = [];
+        const addPage = (n, label = null, active = false, disabled = false) => {
+            pages.push({ n, label: label ?? String(n), active, disabled });
+        };
+
+        addPage(pg.current_page - 1, '‹', false, pg.current_page <= 1);
+
+        let start = Math.max(1, pg.current_page - 2);
+        let end = Math.min(pg.last_page, pg.current_page + 2);
+        if (pg.current_page <= 3) end = Math.min(5, pg.last_page);
+        if (pg.current_page >= pg.last_page - 2) start = Math.max(1, pg.last_page - 4);
+
+        if (start > 1) {
+            addPage(1);
+            if (start > 2) pages.push({ n: null, label: '…', disabled: true });
+        }
+        for (let i = start; i <= end; i++) {
+            addPage(i, String(i), i === pg.current_page);
+        }
+        if (end < pg.last_page) {
+            if (end < pg.last_page - 1) pages.push({ n: null, label: '…', disabled: true });
+            addPage(pg.last_page);
+        }
+
+        addPage(pg.current_page + 1, '›', false, pg.current_page >= pg.last_page);
+
+        ul.innerHTML = pages.map((p) => {
+            if (p.n === null) {
+                return `<li class="page-item disabled"><span class="page-link">${p.label}</span></li>`;
+            }
+            const cls = ['page-item'];
+            if (p.active) cls.push('active');
+            if (p.disabled) cls.push('disabled');
+            return `<li class="${cls.join(' ')}">
+                <button type="button" class="page-link" data-page="${p.n}" ${p.disabled ? 'disabled' : ''}>${p.label}</button>
+            </li>`;
+        }).join('');
+    }
+
+    function renderTable(rows, pagination) {
+        const tbody = el('idodTableBody');
+        const pg = pagination || {};
+        if (pg.total) {
+            el('tableCount').textContent = formatNumber(pg.total) + ' data';
+        } else {
+            el('tableCount').textContent = '0 data';
+        }
+        renderPagination(pg);
+
+        if (!rows.length) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-5">Tidak ada data untuk filter ini.</td></tr>';
+            return;
+        }
+
+        const rowOffset = ((pg.current_page || 1) - 1) * (pg.per_page || perPage);
+        tbody.innerHTML = rows.map((r, i) => `
+            <tr data-id="${r.id}">
+                <td>${rowOffset + i + 1}</td>
+                <td>${escapeHtml(r.date)}</td>
+                <td class="fw-semibold">${escapeHtml(r.size_sidewall)}</td>
+                <td class="fw-semibold">${escapeHtml(r.jumlah)}</td>
+                <td>${escapeHtml(r.tujuan)}</td>
+                <td>${escapeHtml(r.shift)}</td>
+                <td class="small">${escapeHtml(r.keterangan)}</td>
+                <td class="small text-muted">${escapeHtml(r.created_at)}</td>
+                <td class="text-center text-nowrap">
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-edit-idod" title="Edit"
+                            data-id="${r.id}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-delete-idod" title="Hapus"
+                            data-id="${r.id}"
+                            data-label="${escapeAttr(r.size_sidewall + ' · ' + r.date)}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function escapeAttr(str) {
+        return String(str ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function urlWithId(template, id) {
+        return template.replace('__ID__', id);
+    }
+
+    function showFormErrors(errors) {
+        const box = el('idodFormErrors');
+        if (!errors || (typeof errors === 'object' && !Object.keys(errors).length)) {
+            box.classList.add('d-none');
+            box.innerHTML = '';
+            return;
+        }
+        let html = '';
+        if (typeof errors === 'string') {
+            html = errors;
+        } else {
+            Object.values(errors).forEach((msgs) => {
+                (Array.isArray(msgs) ? msgs : [msgs]).forEach((m) => { html += `<div>${escapeHtml(m)}</div>`; });
+            });
+        }
+        box.innerHTML = html;
+        box.classList.remove('d-none');
+    }
+
+    function setFormSubmitting(on) {
+        const btn = el('idodFormSubmit');
+        btn.disabled = on;
+        btn.querySelector('.submit-text').classList.toggle('d-none', on);
+        btn.querySelector('.spinner-border').classList.toggle('d-none', !on);
+    }
+
+    function resetIdodForm() {
+        el('idodForm').reset();
+        el('idodRecordId').value = '';
+        el('idodDate').value = new Date().toISOString().slice(0, 10);
+        el('idodShift').value = '';
+        el('idodTujuan').value = '';
+        el('idodSizeSidewall').value = '';
+        el('idodJumlah').value = '1';
+        el('idodForm')?.querySelectorAll('.is-invalid').forEach((f) => f.classList.remove('is-invalid'));
+    }
+
+    function validateIdodFormClient() {
+        const errors = [];
+        
+        if (!el('idodDate').value) errors.push('Tanggal wajib diisi.');
+        if (!el('idodShift').value) errors.push('Shift wajib dipilih.');
+        if (!el('idodTujuan').value) errors.push('Tujuan wajib dipilih.');
+        if (!el('idodSizeSidewall').value.trim()) errors.push('Size Sidewall wajib dipilih.');
+        if (!el('idodJumlah').value || el('idodJumlah').value < 1) errors.push('Jumlah tidak valid.');
+
+        if (errors.length) {
+            showFormErrors(errors.map((m) => `<div>${escapeHtml(m)}</div>`).join(''));
+            return false;
+        }
+        showFormErrors(null);
+        return true;
+    }
+
+    function openAddModal() {
+        el('idodFormModalLabel').textContent = 'Tambah Data Sidewall';
+        resetIdodForm();
+        showFormErrors(null);
+        formModal?.show();
+    }
+
+    function fillForm(row) {
+        el('idodRecordId').value = row.id;
+        el('idodDate').value = row.date || '';
+        el('idodSizeSidewall').value = row.size_sidewall || '';
+        el('idodJumlah').value = row.jumlah || 1;
+        el('idodTujuan').value = row.tujuan || '';
+        el('idodShift').value = row.shift || '';
+        el('idodKeterangan').value = row.keterangan || '';
+        el('idodForm')?.querySelectorAll('.is-invalid').forEach((f) => f.classList.remove('is-invalid'));
+    }
+
+    function setFormFieldsDisabled(on) {
+        el('idodForm')?.querySelectorAll('input, textarea, select').forEach((field) => {
+            field.disabled = on;
+        });
+    }
+
+    async function openEditModal(id) {
+        el('idodFormModalLabel').textContent = 'Edit Data Sidewall';
+        showFormErrors(null);
+        formModal?.show();
+        setFormFieldsDisabled(true);
+        try {
+            const res = await fetch(urlWithId(showUrlTemplate, id), {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Gagal memuat data');
+            fillForm(data.record);
+        } catch (err) {
+            formModal?.hide();
+            Swal.fire({ icon: 'error', title: 'Gagal', text: err.message || 'Data tidak ditemukan.' });
+        } finally {
+            setFormFieldsDisabled(false);
+        }
+    }
+
+    async function submitForm(e) {
+        e.preventDefault();
+        if (!validateIdodFormClient()) return;
+
+        const id = el('idodRecordId').value;
+        const isEdit = !!id;
+        const url = isEdit ? urlWithId(updateUrlTemplate, id) : storeUrl;
+        const method = isEdit ? 'PUT' : 'POST';
+
+        const payload = {
+            date: el('idodDate').value,
+            size_sidewall: el('idodSizeSidewall').value.trim(),
+            jumlah: el('idodJumlah').value,
+            tujuan: el('idodTujuan').value.trim(),
+            shift: el('idodShift').value.trim(),
+            keterangan: el('idodKeterangan').value.trim(),
+        };
+
+        setFormSubmitting(true);
+        showFormErrors(null);
+
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                if (data.errors) showFormErrors(data.errors);
+                else showFormErrors(data.message || 'Gagal menyimpan data.');
+                return;
+            }
+            formModal?.hide();
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message || 'Data tersimpan.', timer: 1700, showConfirmButton: false });
+            loadDashboard();
+        } catch (err) {
+            console.error(err);
+            showFormErrors('Terjadi kesalahan jaringan. Coba lagi.');
+        } finally {
+            setFormSubmitting(false);
+        }
+    }
+
+    function openDeleteModal(id, label) {
+        deleteTargetId = id;
+        el('idodDeleteSummary').textContent = label || ('ID #' + id);
+        deleteModal?.show();
+    }
+
+    async function confirmDelete() {
+        if (!deleteTargetId) return;
+        const btn = el('idodDeleteConfirm');
+        btn.disabled = true;
+        btn.querySelector('.delete-text').classList.toggle('d-none', true);
+        btn.querySelector('.spinner-border').classList.toggle('d-none', false);
+
+        try {
+            const res = await fetch(urlWithId(destroyUrlTemplate, deleteTargetId), {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Tidak dapat menghapus data.' });
+                return;
+            }
+            deleteModal?.hide();
+            deleteTargetId = null;
+            Swal.fire({ icon: 'success', title: 'Terhapus', text: data.message || 'Data dihapus.', timer: 1500, showConfirmButton: false });
+            loadDashboard();
+        } catch (err) {
+            console.error(err);
+            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Terjadi kesalahan jaringan.' });
+        } finally {
+            btn.disabled = false;
+            btn.querySelector('.delete-text').classList.toggle('d-none', false);
+            btn.querySelector('.spinner-border').classList.toggle('d-none', true);
+        }
+    }
+
+    function escapeHtml(str) {
+        const d = document.createElement('div');
+        d.textContent = str ?? '';
+        return d.innerHTML;
+    }
+
+    function timelineSeries(data, key, labelCount, source = 'timeline') {
+        const arr = data[source]?.[key];
+        if (arr && arr.length) return arr;
+        return Array(Math.max(labelCount, 1)).fill(0);
+    }
+
+    const CHART_STACK_COLORS = {
+        idOk: 'rgba(37, 99, 235, 0.9)',
+        idNg: 'rgba(248, 113, 113, 0.9)',
+        odOk: 'rgba(5, 150, 105, 0.9)',
+        odNg: 'rgba(251, 146, 60, 0.9)',
+    };
+
+    function groupSeries(group, key) {
+        const arr = group?.[key];
+        const n = group?.labels?.length || 0;
+        if (arr && arr.length) return arr.map((v) => Number(v) || 0);
+        return Array(Math.max(n, 1)).fill(0);
+    }
+
+    function stackedQuantityDatasets(group, stackId) {
+        return [
+            { label: 'Total Sadang', data: groupSeries(group, 'total_sadang'), stack: stackId, backgroundColor: 'rgba(37, 99, 235, 0.9)', borderRadius: 4 },
+            { label: 'Total Cikarang', data: groupSeries(group, 'total_cikarang'), stack: stackId, backgroundColor: 'rgba(251, 146, 60, 0.9)', borderRadius: 4 },
+        ];
+    }
+
+    function buildCharts(data) {
+        const tlLabels = data.timeline?.labels?.length ? data.timeline.labels : ['Tidak ada data'];
+        const n = tlLabels.length;
+        const tlSadang = timelineSeries(data, 'total_sadang', n);
+        const tlCikarang = timelineSeries(data, 'total_cikarang', n);
+
+        destroyChart('timeline');
+        charts.timeline = new Chart(el('chartTimeline'), {
+            type: 'bar',
+            data: {
+                labels: tlLabels,
+                datasets: [
+                    {
+                        label: 'Total Sadang',
+                        data: tlSadang,
+                        stack: 'jumlah',
+                        backgroundColor: 'rgba(37, 99, 235, 0.9)',
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Total Cikarang',
+                        data: tlCikarang,
+                        stack: 'jumlah',
+                        backgroundColor: 'rgba(251, 146, 60, 0.9)',
+                        borderRadius: 4,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            footer: (items) => {
+                                const sum = items.reduce((a, i) => a + (i.parsed.y || 0), 0);
+                                return 'Total: ' + new Intl.NumberFormat('id-ID').format(sum);
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: { display: true, text: 'Jumlah' },
+                        ticks: { precision: 0 },
+                    },
+                },
+            },
+        });
+
+        destroyChart('timelineMonthly');
+        const tlmLabels = data.timeline_monthly?.labels?.length ? data.timeline_monthly.labels : ['Tidak ada data'];
+        const m = tlmLabels.length;
+        const tlmSadang = timelineSeries(data, 'total_sadang', m, 'timeline_monthly');
+        const tlmCikarang = timelineSeries(data, 'total_cikarang', m, 'timeline_monthly');
+
+        charts.timelineMonthly = new Chart(el('chartTimelineMonthly'), {
+            type: 'bar',
+            data: {
+                labels: tlmLabels,
+                datasets: [
+                    {
+                        label: 'Total Sadang',
+                        data: tlmSadang,
+                        stack: 'jumlah',
+                        backgroundColor: 'rgba(37, 99, 235, 0.9)',
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Total Cikarang',
+                        data: tlmCikarang,
+                        stack: 'jumlah',
+                        backgroundColor: 'rgba(251, 146, 60, 0.9)',
+                        borderRadius: 4,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+                },
+                scales: {
+                    x: { grid: { display: false }, stacked: true },
+                    y: { beginAtZero: true, border: { display: false }, stacked: true },
+                },
+            },
+        });
+
+        destroyChart('tujuan');
+        const byTujuan = data.by_tujuan || {};
+        const tujuanLabels = byTujuan.labels?.length ? byTujuan.labels : ['Tidak ada data'];
+        charts.tujuan = new Chart(el('chartTujuan'), {
+            type: 'bar',
+            data: {
+                labels: tujuanLabels,
+                datasets: stackedQuantityDatasets(byTujuan, 'tujuan'),
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12 } } },
+                scales: {
+                    x: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: { display: true, text: 'Jumlah' },
+                        ticks: { precision: 0 },
+                    },
+                    y: { stacked: true },
+                },
+            },
+        });
+
+        destroyChart('shift');
+        const byShift = data.by_shift || {};
+        const shiftLabels = byShift.labels?.length ? byShift.labels : ['Tidak ada data'];
+        charts.shift = new Chart(el('chartShift'), {
+            type: 'bar',
+            data: {
+                labels: shiftLabels,
+                datasets: stackedQuantityDatasets(byShift, 'shift'),
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12 } } },
+                scales: {
+                    x: { stacked: true },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: { display: true, text: 'Jumlah' },
+                        ticks: { precision: 0 },
+                    },
+                },
+            },
+        });
+    }
+
+    async function loadDashboard(options = {}) {
+        if (options.resetPage) currentPage = 1;
+        setLoading(true);
+        try {
+            const res = await fetch(apiUrl + '?' + params().toString(), {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            if (!res.ok) throw new Error('Gagal memuat data');
+            const data = await res.json();
+            if (data.pagination?.current_page) {
+                currentPage = data.pagination.current_page;
+            }
+            updateSummary(data.summary, data.filters);
+            buildCharts(data);
+            renderTable(data.rows, data.pagination);
+        } catch (e) {
+            console.error(e);
+            el('filterSummary').textContent = 'Gagal memuat data. Periksa koneksi atau coba lagi.';
+            el('idodTableBody').innerHTML =
+                '<tr><td colspan="14" class="text-center text-danger py-4">Gagal memuat data.</td></tr>';
+            renderPagination(null);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function scheduleLoad() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => loadDashboard({ resetPage: true }), 350);
+    }
+
+    function goToPage(page) {
+        currentPage = Math.max(1, page);
+        loadDashboard();
+        el('idodTable')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    ['filterFrom', 'filterTo', 'filterSizeSidewall', 'filterTujuan', 'filterShift'].forEach((id) => {
+        el(id)?.addEventListener('change', scheduleLoad);
+    });
+    el('filterSearch').addEventListener('input', scheduleLoad);
+
+    el('btnResetFilter')?.addEventListener('click', function () {
+        defaultDates();
+        if(el('filterSizeSidewall')) el('filterSizeSidewall').value = '';
+        el('filterTujuan').value = '';
+        el('filterShift').value = '';
+        el('filterSearch').value = '';
+        loadDashboard({ resetPage: true });
+    });
+
+    el('idodTablePagination')?.addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-page]');
+        if (!btn || btn.disabled) return;
+        const page = parseInt(btn.dataset.page, 10);
+        if (!Number.isNaN(page)) goToPage(page);
+    });
+
+    el('btnExportExcel')?.addEventListener('click', function () {
+        window.location.href = exportUrl + '?' + exportParams().toString();
+    });
+
+    el('btnTambahData')?.addEventListener('click', openAddModal);
+    document.getElementById('navTambahIdod')?.addEventListener('click', function (e) {
+        if (window.location.pathname.includes('idod')) {
+            e.preventDefault();
+            openAddModal();
+        }
+    });
+    el('idodForm')?.addEventListener('submit', submitForm);
+    el('idodDeleteConfirm')?.addEventListener('click', confirmDelete);
+
+    el('idodTableBody')?.addEventListener('click', function (e) {
+        const editBtn = e.target.closest('.btn-edit-idod');
+        const deleteBtn = e.target.closest('.btn-delete-idod');
+        if (editBtn?.dataset.id) {
+            openEditModal(editBtn.dataset.id);
+        }
+        if (deleteBtn) {
+            openDeleteModal(deleteBtn.dataset.id, deleteBtn.dataset.label);
+        }
+    });
+
+    if (window.location.hash === '#tambah-data') {
+        setTimeout(openAddModal, 400);
+    }
+
+    const editParam = new URLSearchParams(window.location.search).get('edit');
+    if (editParam) {
+        setTimeout(() => openEditModal(editParam), 500);
+        history.replaceState(null, '', window.location.pathname);
+    }
+
+    defaultDates();
+    loadDashboard({ resetPage: true });
+
+    // --- Master Data Logic ---
+    const masterDataModalEl = document.getElementById('masterDataModal');
+    if (masterDataModalEl) {
+        masterDataModalEl.addEventListener('show.bs.modal', function () {
+            loadMasterData();
+        });
+    }
+
+    function loadMasterData() {
+        fetch(@json(route('sidewall.master.get')))
+            .then(res => res.json())
+            .then(data => {
+                const groups = { size_sidewall: [], tujuan: [], shift: [] };
+                data.forEach(item => {
+                    if (groups[item.type]) groups[item.type].push(item);
+                });
+                ['size_sidewall', 'tujuan', 'shift'].forEach(type => {
+                    const listEl = document.getElementById(`list-${type}`);
+                    if (!groups[type].length) {
+                        listEl.innerHTML = `<div class="text-center text-muted small py-3 border rounded bg-light">Tidak ada data.</div>`;
+                    } else {
+                        listEl.innerHTML = groups[type].map(item => `
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="fw-medium">${escapeHtml(item.value)}</span>
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-delete-master" data-id="${item.id}" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `).join('');
+                    }
+                });
+
+                // Update UI selects and datalists dynamically
+                const updateOptions = (id, dataArr) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    if (el.tagName === 'SELECT') {
+                        const currentVal = el.value;
+                        const firstOpt = el.options[0]?.outerHTML || '';
+                        el.innerHTML = firstOpt + dataArr.map(item => `<option value="${escapeHtml(item.value)}">${escapeHtml(item.value)}</option>`).join('');
+                        el.value = currentVal;
+                    } else if (el.tagName === 'DATALIST') {
+                        el.innerHTML = dataArr.map(item => `<option value="${escapeHtml(item.value)}"></option>`).join('');
+                    }
+                };
+
+                updateOptions('idodSizeSidewall', groups.size_sidewall);
+                updateOptions('filterSizeSidewall', groups.size_sidewall);
+                updateOptions('idodTujuan', groups.tujuan);
+                updateOptions('filterTujuan', groups.tujuan);
+                updateOptions('idodShift', groups.shift);
+                updateOptions('filterShift', groups.shift);
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire({ icon: 'error', title: 'Gagal memuat master data' });
+            });
+    }
+
+    document.querySelectorAll('.master-data-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const type = this.dataset.type;
+            const valueInput = this.querySelector('input[name="value"]');
+            const value = valueInput.value.trim();
+            if (!value) return;
+
+            const btn = this.querySelector('button');
+            btn.disabled = true;
+
+            fetch(@json(route('sidewall.master.store')), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ type, value })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    valueInput.value = '';
+                    loadMasterData();
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal menyimpan', text: res.message || 'Terjadi kesalahan.' });
+                }
+            })
+            .catch(err => console.error(err))
+            .finally(() => { btn.disabled = false; });
+        });
+    });
+
+    document.getElementById('masterDataTabContent')?.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-delete-master');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        
+        Swal.fire({
+            title: 'Hapus data?',
+            text: "Opsi ini akan hilang dari filter dropdown.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`{{ url('sidewall/master') }}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        loadMasterData();
+                    } else {
+                        Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus data', 'error');
+                    }
+                });
+            }
+        });
+    });
+
+})();
+</script>
+@endpush
