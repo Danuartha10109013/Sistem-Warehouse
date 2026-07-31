@@ -18,7 +18,7 @@ class DatabMImportExcel implements ToCollection,ToModel
     /**
     * @param Collection $collection
     */
-    
+
     public function collection(Collection $collection)
     {
         $this->current++;
@@ -39,14 +39,14 @@ class DatabMImportExcel implements ToCollection,ToModel
                 $data->panjang = $row[9];
 
                 // Convert Excel date format to 'Y-m-d'
-                $data->date = is_numeric($row[10]) 
-                    ? Date::excelToDateTimeObject($row[10])->format('Y-m-d') 
+                $data->date = is_numeric($row[10])
+                    ? Date::excelToDateTimeObject($row[10])->format('Y-m-d')
                     : null;
 
                 $data->user_id = Auth::user()->id;
                 $data->save();
             }
-            
+
         }
     }
 }
