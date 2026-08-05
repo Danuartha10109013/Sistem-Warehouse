@@ -2,8 +2,12 @@
 @section('title')
     REPORT OPEN PACK
 @endsection
-@section('content')
+
+@push('head')
     @livewireStyles
+@endpush
+
+@section('content')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -70,6 +74,8 @@
             </div>
         </div>
     </div>
-    
-    @livewireScripts
 @endsection
+
+@push('scripts')
+    @livewireScripts
+@endpush
