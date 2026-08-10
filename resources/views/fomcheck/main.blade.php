@@ -29,6 +29,8 @@
         <!-- Template Stylesheet -->
         <link href="{{ asset('sac') }}/css/style.css" rel="stylesheet">
 
+        @stack('head')
+
     </head>
 
     <body>
