@@ -81,6 +81,7 @@ class KapasitasStockController extends Controller
             'WH-TATASENTOSA' => 1,
             'JASPER' => 2,
             'TATALOGAM' => 3,
+            'WH-LO3-PK_COIL IN' => 4,
         ];
 
         return view('modul_kapasitas.user.V_input_harian', compact('pivot', 'daysInMonth', 'month', 'year', 'sources'));
@@ -109,6 +110,7 @@ class KapasitasStockController extends Controller
             'WH-TATASENTOSA' => 1,
             'JASPER' => 2,
             'TATALOGAM' => 3,
+            'WH-LO3-PK_COIL IN' => 4,
         ];
 
         $format = $sourcesMap[$source] ?? 1;
@@ -272,6 +274,52 @@ class KapasitasStockController extends Controller
                     }
                 }
             }
+        } elseif ($format == 4) {
+            // 'Kategori' and 'Stok Awal'
+            $catCol = -1;
+            $qtyCol = -1;
+            $startRow = 0;
+
+            for ($i = 0; $i < 10; $i++) {
+                if (!isset($sheet[$i]))
+                    continue;
+                foreach ($sheet[$i] as $colIdx => $val) {
+                    $v = strtolower(trim((string) $val));
+                    if (str_contains($v, 'kategori'))
+                        $catCol = $colIdx;
+                    if (str_contains($v, 'stok awal') || str_contains($v, 'quantity') || str_contains($v, 'qty'))
+                        $qtyCol = $colIdx;
+                }
+                if ($catCol != -1 && $qtyCol != -1) {
+                    $startRow = $i + 1;
+                    break;
+                }
+            }
+
+            if ($catCol != -1 && $qtyCol != -1) {
+                for ($i = $startRow; $i < count($sheet); $i++) {
+                    $row = $sheet[$i];
+                    $cat = trim((string) ($row[$catCol] ?? ''));
+                    $qtyStr = str_replace(',', '', (string) ($row[$qtyCol] ?? '0'));
+                    $qty = (float) $qtyStr;
+
+                    if ($cat && !empty($cat) && strtolower($cat) !== 'total') {
+                        // NO FILTERING (no $ignoredCategories check)
+                        $mapped = $this->mapCategoryAndGroup($source, $cat);
+                        if ($mapped) {
+                            $key = $mapped['kategori'] . '|' . $mapped['grup'];
+                            if (!isset($aggregated[$key])) {
+                                $aggregated[$key] = [
+                                    'kategori' => $mapped['kategori'],
+                                    'grup' => $mapped['grup'],
+                                    'qty' => 0
+                                ];
+                            }
+                            $aggregated[$key]['qty'] += $qty;
+                        }
+                    }
+                }
+            }
         }
 
         // Insert to DB
@@ -359,7 +407,12 @@ class KapasitasStockController extends Controller
                 $group = 'BARANG JADI';
             }
 
-            // === ATURAN 3: UNTUK SUMBER EXCEL LAINNYA ===
+            // === ATURAN 3: KHUSUS UNTUK SUMBER "WH-LO3-PK_COIL IN" ===
+        } elseif ($source === 'WH-LO3-PK_COIL IN') {
+            $mappedCat = 'COIL TATALOGAM';
+            $group = 'BARANG JADI';
+
+            // === ATURAN 4: UNTUK SUMBER EXCEL LAINNYA ===
         } else {
             if ($source === 'LO3-BB' || $source === 'L3-BB') {
                 // Sumber LO3-BB adalah khusus bahan mentah, jadi semuanya masuk ke BAHAN BAKU.
