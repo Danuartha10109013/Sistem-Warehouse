@@ -472,31 +472,39 @@
                         
                         <div class="col-12">
                             <div class="idod-form-section idod-section-id">
-                                <div class="idod-section-head">
+                                <div class="idod-section-head d-flex justify-content-between align-items-center">
                                     <span>Detail Sidewall</span>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddDetailSidewall" title="Tambah Detail">
+                                        <i class="fas fa-plus"></i> Tambah Item
+                                    </button>
                                 </div>
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-semibold" for="idodSizeSidewall">Size Sidewall <span class="text-danger">*</span></label>
-                                        <select class="form-select" name="size_sidewall" id="idodSizeSidewall" required>
-                                            <option value="">— Pilih Size Sidewall —</option>
-                                            @foreach($sizeSidewallOptions as $opt)
-                                            <option value="{{ $opt }}">{{ $opt }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-semibold" for="idodJumlah">Jumlah <span class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" name="jumlah" id="idodJumlah" min="1" value="1" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-semibold" for="idodTujuan">Tujuan <span class="text-danger">*</span></label>
-                                        <select class="form-select" name="tujuan" id="idodTujuan" required>
-                                            <option value="">— Pilih tujuan —</option>
-                                            @foreach($tujuanOptions as $opt)
-                                            <option value="{{ $opt }}">{{ $opt }}</option>
-                                            @endforeach
-                                        </select>
+                                <div id="detailSidewallContainer">
+                                    <div class="row g-2 g-md-3 detail-sidewall-item mb-3 pb-3 border-bottom position-relative align-items-end">
+                                        <div class="col-4 col-md-4">
+                                            <label class="form-label fw-semibold mb-1" style="font-size: 0.85rem;">Size<span class="d-none d-md-inline"> Sidewall</span> <span class="text-danger">*</span></label>
+                                            <select class="form-select size-sidewall-input px-1 px-md-3" id="idodSizeSidewall" style="font-size: 0.85rem;" required>
+                                                <option value="">— Pilih<span class="d-none d-md-inline"> Size</span> —</option>
+                                                @foreach($sizeSidewallOptions as $opt)
+                                                <option value="{{ $opt }}">{{ $opt }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-3 col-md-3">
+                                            <label class="form-label fw-semibold mb-1" style="font-size: 0.85rem;">Qty <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control jumlah-input px-1 px-md-3" id="idodJumlah" min="1" value="1" style="font-size: 0.85rem;" required>
+                                        </div>
+                                        <div class="col-4 col-md-4">
+                                            <label class="form-label fw-semibold mb-1" style="font-size: 0.85rem;">Tujuan <span class="text-danger">*</span></label>
+                                            <select class="form-select tujuan-input px-1 px-md-3" id="idodTujuan" style="font-size: 0.85rem;" required>
+                                                <option value="">— Pilih<span class="d-none d-md-inline"> Tujuan</span> —</option>
+                                                @foreach($tujuanOptions as $opt)
+                                                <option value="{{ $opt }}">{{ $opt }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-1 col-md-1 d-flex justify-content-end action-col ps-0">
+                                            <button type="button" class="btn btn-outline-danger btn-remove-detail d-none px-1 px-md-2" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -827,8 +835,17 @@
         if (!el('idodDate').value) errors.push('Tanggal wajib diisi.');
         if (!el('idodShift').value) errors.push('Shift wajib dipilih.');
         if (!el('idodTujuan').value) errors.push('Tujuan wajib dipilih.');
-        if (!el('idodSizeSidewall').value.trim()) errors.push('Size Sidewall wajib dipilih.');
-        if (!el('idodJumlah').value || el('idodJumlah').value < 1) errors.push('Jumlah tidak valid.');
+        const details = document.querySelectorAll('.detail-sidewall-item');
+        let detailValid = true;
+        details.forEach((item, index) => {
+            const size = item.querySelector('.size-sidewall-input').value.trim();
+            const jml = item.querySelector('.jumlah-input').value;
+            const tujuan = item.querySelector('.tujuan-input').value.trim();
+            
+            if (!size) { errors.push(`Size Sidewall pada item ${index+1} wajib dipilih.`); detailValid = false; }
+            if (!jml || jml < 1) { errors.push(`Jumlah pada item ${index+1} tidak valid.`); detailValid = false; }
+            if (!tujuan) { errors.push(`Tujuan pada item ${index+1} wajib dipilih.`); detailValid = false; }
+        });
 
         if (errors.length) {
             showFormErrors(errors.map((m) => `<div>${escapeHtml(m)}</div>`).join(''));
@@ -846,13 +863,23 @@
     }
 
     function fillForm(row) {
+        resetIdodForm();
         el('idodRecordId').value = row.id;
         el('idodDate').value = row.date || '';
-        el('idodSizeSidewall').value = row.size_sidewall || '';
-        el('idodJumlah').value = row.jumlah || 1;
-        el('idodTujuan').value = row.tujuan || '';
         el('idodShift').value = row.shift || '';
         el('idodKeterangan').value = row.keterangan || '';
+        
+        // Hide add button on edit (edit is single record only)
+        if(el('btnAddDetailSidewall')) el('btnAddDetailSidewall').classList.add('d-none');
+        
+        // Fill the first detail item
+        const firstDetail = document.querySelector('.detail-sidewall-item');
+        if (firstDetail) {
+            firstDetail.querySelector('.size-sidewall-input').value = row.size_sidewall || '';
+            firstDetail.querySelector('.jumlah-input').value = row.jumlah || 1;
+            firstDetail.querySelector('.tujuan-input').value = row.tujuan || '';
+        }
+        
         el('idodForm')?.querySelectorAll('.is-invalid').forEach((f) => f.classList.remove('is-invalid'));
     }
 
@@ -891,13 +918,20 @@
         const url = isEdit ? urlWithId(updateUrlTemplate, id) : storeUrl;
         const method = isEdit ? 'PUT' : 'POST';
 
+        let details = [];
+        document.querySelectorAll('.detail-sidewall-item').forEach(item => {
+            details.push({
+                size_sidewall: item.querySelector('.size-sidewall-input').value.trim(),
+                jumlah: item.querySelector('.jumlah-input').value,
+                tujuan: item.querySelector('.tujuan-input').value.trim(),
+            });
+        });
+
         const payload = {
             date: el('idodDate').value,
-            size_sidewall: el('idodSizeSidewall').value.trim(),
-            jumlah: el('idodJumlah').value,
-            tujuan: el('idodTujuan').value.trim(),
             shift: el('idodShift').value.trim(),
             keterangan: el('idodKeterangan').value.trim(),
+            details: details,
         };
 
         setFormSubmitting(true);
@@ -1302,6 +1336,20 @@
                 updateOptions('filterSizeSidewall', groups.size_sidewall);
                 updateOptions('idodTujuan', groups.tujuan);
                 updateOptions('filterTujuan', groups.tujuan);
+                
+                // Update all dynamically added selects if any
+                document.querySelectorAll('.size-sidewall-input').forEach(el => {
+                    const currentVal = el.value;
+                    const firstOpt = el.options[0]?.outerHTML || '';
+                    el.innerHTML = firstOpt + groups.size_sidewall.map(item => `<option value="${escapeHtml(item.value)}">${escapeHtml(item.value)}</option>`).join('');
+                    el.value = currentVal;
+                });
+                document.querySelectorAll('.tujuan-input').forEach(el => {
+                    const currentVal = el.value;
+                    const firstOpt = el.options[0]?.outerHTML || '';
+                    el.innerHTML = firstOpt + groups.tujuan.map(item => `<option value="${escapeHtml(item.value)}">${escapeHtml(item.value)}</option>`).join('');
+                    el.value = currentVal;
+                });
                 updateOptions('idodShift', groups.shift);
                 updateOptions('filterShift', groups.shift);
             })
@@ -1310,6 +1358,63 @@
                 Swal.fire({ icon: 'error', title: 'Gagal memuat master data' });
             });
     }
+
+    // --- Dynamic Detail Sidewall Logic ---
+    el('btnAddDetailSidewall')?.addEventListener('click', function() {
+        const container = el('detailSidewallContainer');
+        const items = container.querySelectorAll('.detail-sidewall-item');
+        const firstItem = items[0];
+        if(!firstItem) return;
+
+        const newItem = firstItem.cloneNode(true);
+        // Clear values
+        newItem.querySelector('.size-sidewall-input').value = '';
+        newItem.querySelector('.jumlah-input').value = '1';
+        newItem.querySelector('.tujuan-input').value = '';
+        
+        // Remove IDs to avoid duplicates
+        newItem.querySelector('.size-sidewall-input').removeAttribute('id');
+        newItem.querySelector('.jumlah-input').removeAttribute('id');
+        newItem.querySelector('.tujuan-input').removeAttribute('id');
+        
+        // Show remove button
+        const removeBtn = newItem.querySelector('.btn-remove-detail');
+        if(removeBtn) {
+            removeBtn.classList.remove('d-none');
+            removeBtn.addEventListener('click', function() {
+                newItem.remove();
+            });
+        }
+        
+        container.appendChild(newItem);
+    });
+
+    // Handle form reset correctly
+    function resetIdodForm() {
+        el('idodForm')?.reset();
+        el('idodRecordId').value = '';
+        el('idodDate').value = new Date().toISOString().slice(0, 10); // Otomatis hari ini
+        if(el('btnAddDetailSidewall')) el('btnAddDetailSidewall').classList.remove('d-none');
+        
+        const container = el('detailSidewallContainer');
+        if(container) {
+            const items = container.querySelectorAll('.detail-sidewall-item');
+            // Remove all items except the first one
+            items.forEach((item, index) => {
+                if(index > 0) item.remove();
+            });
+            // Reset the first one and make sure remove button is hidden
+            if(items[0]) {
+                items[0].querySelector('.size-sidewall-input').value = '';
+                items[0].querySelector('.jumlah-input').value = '1';
+                items[0].querySelector('.tujuan-input').value = '';
+                const removeBtn = items[0].querySelector('.btn-remove-detail');
+                if(removeBtn) removeBtn.classList.add('d-none');
+            }
+        }
+        el('idodForm')?.querySelectorAll('.is-invalid').forEach((f) => f.classList.remove('is-invalid'));
+    }
+
 
     document.querySelectorAll('.master-data-form').forEach(form => {
         form.addEventListener('submit', function (e) {

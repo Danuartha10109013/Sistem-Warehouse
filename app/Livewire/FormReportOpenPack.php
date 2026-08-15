@@ -99,6 +99,36 @@ class FormReportOpenPack extends Component
         $this->suggestions = array_slice($matched, 0, 10);
     }
 
+    public function handleEnter()
+    {
+        $this->updatedSearchQuery();
+        
+        if (empty($this->searchQuery) || empty($this->suggestions)) {
+            $this->dispatch('scan-not-found', message: 'Attribute / Coil ID tidak ditemukan!');
+            $this->searchQuery = '';
+            $this->suggestions = [];
+            return;
+        }
+
+        foreach ($this->suggestions as $index => $sug) {
+            // Jika ada yang persis sama dengan scan barcode
+            if (strcasecmp($sug['attribute'], trim($this->searchQuery)) === 0) {
+                $this->selectAttribute($index);
+                return;
+            }
+        }
+
+        // Jika hanya 1 suggestion, langsung pilih
+        if (count($this->suggestions) === 1) {
+            $this->selectAttribute(0);
+        } else {
+            // Jika lebih dari 1 dan tidak ada match persis, kosongkan agar tidak membingungkan
+            // (atau biarkan list suggestion terbuka)
+            $this->searchQuery = '';
+            $this->suggestions = [];
+        }
+    }
+
     public function selectAttribute($index)
     {
         $item = $this->suggestions[$index];

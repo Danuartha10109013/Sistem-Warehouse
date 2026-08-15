@@ -168,9 +168,20 @@ class SidewallController extends Controller
     public function create_idod(Request $request)
     {
         $data = $this->validatedPayload($request);
-        $record = SidewallModel::create($data);
+        
+        $records = [];
+        foreach ($data['details'] as $detail) {
+            $records[] = SidewallModel::create([
+                'date' => $data['date'],
+                'shift' => $data['shift'],
+                'keterangan' => $data['keterangan'],
+                'size_sidewall' => $detail['size_sidewall'],
+                'jumlah' => $detail['jumlah'],
+                'tujuan' => $detail['tujuan'],
+            ]);
+        }
 
-        return $this->crudResponse($request, 'Data berhasil ditambahkan.', $record, 201);
+        return $this->crudResponse($request, 'Data berhasil ditambahkan.', $records[0] ?? null, 201);
     }
 
     public function show_idod(Request $request, $id)
@@ -185,7 +196,19 @@ class SidewallController extends Controller
     public function update_idod(Request $request, $id)
     {
         $record = SidewallModel::findOrFail($id);
-        $record->update($this->validatedPayload($request));
+        $data = $this->validatedPayload($request);
+        
+        // Since edit only edits a single item, we take the first detail
+        $detail = $data['details'][0];
+        
+        $record->update([
+            'date' => $data['date'],
+            'shift' => $data['shift'],
+            'keterangan' => $data['keterangan'],
+            'size_sidewall' => $detail['size_sidewall'],
+            'jumlah' => $detail['jumlah'],
+            'tujuan' => $detail['tujuan'],
+        ]);
 
         return $this->crudResponse($request, 'Data berhasil diperbarui.', $record->fresh());
     }
@@ -237,11 +260,12 @@ class SidewallController extends Controller
     {
         $validated = $request->validate([
             'date' => 'required|date',
-            'size_sidewall' => 'required|string|max:191',
-            'jumlah' => 'required|integer|min:1',
-            'tujuan' => ['required', 'string', 'max:191'],
             'shift' => ['required', 'string', 'max:191'],
             'keterangan' => 'nullable|string|max:500',
+            'details' => 'required|array|min:1',
+            'details.*.size_sidewall' => 'required|string|max:191',
+            'details.*.jumlah' => 'required|integer|min:1',
+            'details.*.tujuan' => ['required', 'string', 'max:191'],
         ]);
 
         $validated['date'] = Carbon::parse($validated['date'])->format('Y-m-d');

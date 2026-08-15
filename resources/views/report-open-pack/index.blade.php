@@ -15,6 +15,12 @@
             margin-bottom: 2rem;
             text-align: center;
         }
+        @media (max-width: 767.98px) {
+            .header .hero-header {
+                padding-left: 0.65rem !important;
+                padding-right: 0.65rem !important;
+            }
+        }
     </style>
 
     <div class="container-fluid mt-4">
