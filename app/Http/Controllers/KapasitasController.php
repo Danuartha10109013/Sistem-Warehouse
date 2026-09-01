@@ -84,13 +84,17 @@ class KapasitasController extends Controller
 
         for ($d = 1; $d <= $daysInMonth; $d++) {
             if (\Carbon\Carbon::create($year, $month, $d)->isSunday()) continue;
-            $validDaysCount++;
             
             // Rumus: dibagi 1000
             $wh = $dataCrc[$d]['wh'] / 1000;
             $prdQa = $dataCrc[$d]['prd_qa'] / 1000;
             
             $totalStock = $wh + $prdQa;
+            
+            // SKIP TANGGAL JIKA TOTAL STOK 0 (Hari Libur / Belum ada input)
+            if ($totalStock == 0) continue;
+
+            $validDaysCount++;
             
             // Trend = Total Stock dibagi Kapasitas (kemudian dijadikan persen di view, di sini dikali 100)
             $trend = $kapasitasValue > 0 ? ($totalStock / $kapasitasValue) * 100 : 0;
@@ -232,13 +236,17 @@ class KapasitasController extends Controller
 
         for ($d = 1; $d <= $daysInMonth; $d++) {
             if (\Carbon\Carbon::create($year, $month, $d)->isSunday()) continue;
-            $validDaysCount++;
             
             // Rumus: dibagi 1000
             $wh = $dataBj[$d]['wh'] / 1000;
             $prdQa = $dataBj[$d]['prd_qa'] / 1000;
             
             $totalStock = $wh + $prdQa;
+            
+            // SKIP TANGGAL JIKA TOTAL STOK 0 (Hari Libur / Belum ada input)
+            if ($totalStock == 0) continue;
+
+            $validDaysCount++;
             
             // Trend = Total Stock dibagi Kapasitas
             $trend = $kapasitasValue > 0 ? ($totalStock / $kapasitasValue) * 100 : 0;

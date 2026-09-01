@@ -40,6 +40,7 @@ use App\Http\Controllers\SACController;
 use App\Http\Controllers\FomController;
 use App\Http\Controllers\IdOdController;
 use App\Http\Controllers\SidewallController;
+use App\Http\Controllers\RekapPrdController;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -132,8 +133,20 @@ Route::middleware([AutoLogout::class])->group(function () {
 
     Route::get('/welcome', [LoginController::class, 'welcome'])->name('welcome');
 
+    Route::prefix('rekap-prd')->group(function () {
+        Route::get('/', [RekapPrdController::class, 'index'])->name('rekap-prd.dashboard');
+        Route::get('/input', [RekapPrdController::class, 'input'])->name('rekap-prd.input');
+        Route::post('/store', [RekapPrdController::class, 'store'])->name('rekap-prd.store');
+        Route::post('/export', [RekapPrdController::class, 'exportExcel'])->name('rekap-prd.export');
+        Route::delete('/{id}', [RekapPrdController::class, 'destroy'])->name('rekap-prd.destroy');
+    });
+
     Route::prefix('stock')->group(function () {
         Route ::get('/',[StockController::class,'index'])->name('stock');
+        Route::get('/crc-rekap-masuk', [StockController::class, 'rekapCrcMasuk'])->name('stock.crc.rekap_masuk');
+        Route::get('/crc/{type}', [StockController::class, 'crcIndex'])->name('stock.crc');
+        Route::post('/crc/import', [StockController::class, 'importCrc'])->name('stock.crc.import');
+        Route::delete('/crc/batch-delete', [StockController::class, 'deleteCrcBatch'])->name('stock.crc.batch_delete');
         Route ::get('/add',[StockController::class,'add'])->name('stock.add');
         Route ::post('/store',[StockController::class,'store'])->name('stock.store');
         Route ::post('/excel',[StockController::class,'excel'])->name('stock.excel');

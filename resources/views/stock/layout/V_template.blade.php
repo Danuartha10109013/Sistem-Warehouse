@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'Modul Stock')</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('images/Logo_TML.png') }}" />
+    <!-- Compiled CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/css/template.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                fontFamily: {
+                    sans: ['Manrope', 'system-ui', 'serif'],
+                },
+                extend: {
+                    borderRadius: {
+                        bb: "20px",
+                    },
+                    colors: {
+                        primary: "var(--color-primary)",
+                        secondary: "var(--color-secondary)",
+                        info: "var(--color-info)",
+                        success: "var(--color-success)",
+                        warning: "var(--color-warning)",
+                        error: "var(--color-error)",
+                        lightprimary: "var(--color-lightprimary)",
+                        lightsecondary: "var(--color-lightsecondary)",
+                        lightsuccess: "var(--color-lightsuccess)",
+                        lighterror: "var(--color-lighterror)",
+                        lightinfo: "var(--color-lightinfo)",
+                        lightwarning: "var(--color-lightwarning)",
+                        border: "var(--color-border)",
+                        bordergray: "var(--color-bordergray)",
+                        lightgray: "var(--color-lightgray)",
+                        muted: "var(--color-muted)",
+                        lighthover: "var(--color-lighthover)",
+                        surface: "var(--color-surface-ld)",
+                        sky: "var(--color-sky)",
+                        bodytext: "var(--color-bodytext)",
+                        dark: "var(--color-dark)",
+                        link: "var(--color-link)",
+                        darklink: "var(--color-darklink)",
+                        darkborder: "var(--color-darkborder)",
+                        darkgray: "var(--color-darkgray)",
+                        darkmuted: "var(--color-darkmuted)",
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    @stack('styles')
+</head>
+<body class="text-sm text-bodytext bg-white dark:bg-darkgray overflow-x-hidden">
+    <div class="flex w-full min-h-screen dark:bg-darkgray overflow-x-hidden min-w-0">
+        <div class="page-wrapper flex w-full xl:w-[calc(100%-256px)] min-w-0">
+            
+            <!-- Sidebar / V_nav -->
+            @include('stock.layout.V_nav')
+
+            <!-- Main Content Area -->
+            <div class="page-wrapper-sub flex flex-col w-full min-w-0 dark:bg-darkgray">
+                
+                <!-- Top Header -->
+                @include('stock.layout.V_header')
+
+                <div class="bg-lightgray dark:bg-dark h-full rounded-bb min-w-0">
+                    <!-- Body Content -->
+                    <div class="w-full min-w-0 overflow-x-hidden">
+                        <div class="w-full 2xl:container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-w-0">
+                            @yield('content')
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @stack('scripts')
+</body>
+</html>

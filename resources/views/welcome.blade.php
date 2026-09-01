@@ -414,6 +414,13 @@
                      <div class="menu-title">Modul Kapasitas</div>
                   </div>
                </a>
+               
+               <a href="{{ route('rekap-prd.dashboard') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-file-chart"></i>
+                     <div class="menu-title">Rekap Hasil PRD & Pengeluaran</div>
+                  </div>
+               </a>
 
             @endif
 

@@ -43,23 +43,25 @@
             
             <!-- Chart Section -->
             <div class="mb-8 p-6 bg-white dark:bg-darkgray border-t-4 border-t-primary rounded-lg shadow-md">
-            <div class="text-center mb-4">
-                <h3 class="text-xl font-bold text-gray-800 dark:text-white uppercase">KAPASITAS CRC (layout + transit)</h3>
-                <h4 class="text-lg font-bold text-gray-700 dark:text-gray-300 uppercase">{{ $months[$month] ?? '' }} {{ $year }}</h4>
-            </div>
             <div class="relative w-full h-80">
                 <canvas id="kapasitasChart"></canvas>
             </div>
             
             @php
-                $lastDayWithValue = 1;
-                foreach($processedData as $d => $val) {
-                    if($val['total_stock'] > 0) {
-                        $lastDayWithValue = $d;
+                $lastDayWithValue = !empty($processedData) ? array_key_first($processedData) : 1;
+                $lastStock = 0;
+                $lastTrend = 0;
+                
+                if (!empty($processedData)) {
+                    foreach($processedData as $d => $val) {
+                        if($val['total_stock'] > 0) {
+                            $lastDayWithValue = $d;
+                        }
                     }
+                    $lastStock = $processedData[$lastDayWithValue]['total_stock'];
+                    $lastTrend = $processedData[$lastDayWithValue]['trend'];
                 }
-                $lastStock = $processedData[$lastDayWithValue]['total_stock'];
-                $lastTrend = $processedData[$lastDayWithValue]['trend'];
+
                 $tersisa = $kapasitasValue - $lastStock;
                 $tersisaPersen = $kapasitasValue > 0 ? ($tersisa / $kapasitasValue) * 100 : 0;
             @endphp
@@ -220,6 +222,7 @@
                 ]
             },
             options: {
+                devicePixelRatio: 4,
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: {
@@ -232,7 +235,11 @@
                             color: 'rgba(148, 163, 184, 0.25)'
                         },
                         ticks: {
-                            color: '#64748b'
+                            color: '#64748b',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
                         }
                     },
                     y: {
@@ -242,6 +249,10 @@
                         },
                         ticks: {
                             color: '#64748b',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
                             callback: function(value) {
                                 return value.toLocaleString('id-ID');
                             }
@@ -249,12 +260,25 @@
                     }
                 },
                 plugins: {
+                    title: {
+                        display: true,
+                        text: ['KAPASITAS CRC (LAYOUT + TRANSIT)', '{{ $months[$month] ?? "" }} {{ $year }}'.toUpperCase()],
+                        font: {
+                            size: 18,
+                            weight: 'bold'
+                        },
+                        padding: {
+                            top: 5,
+                            bottom: 25
+                        },
+                        color: '#1f2937'
+                    },
                     legend: {
                         position: 'bottom',
                         labels: {
                             font: {
-                                size: 13,
-                                weight: '600'
+                                size: 15,
+                                weight: 'bold'
                             },
                             color: '#334155',
                             usePointStyle: true,
@@ -293,13 +317,6 @@
         sheet.getColumn(5).width = 12;
         sheet.getColumn(6).width = 12;
 
-        // Add Title
-        sheet.mergeCells('A1:F1');
-        sheet.getCell('A1').value = 'KAPASITAS CRC (layout + transit) - {{ $months[$month] ?? '' }} {{ $year }}';
-        sheet.getCell('A1').font = { size: 14, bold: true };
-        sheet.getCell('A1').alignment = { horizontal: 'center' };
-        sheet.getRow(1).height = 22;
-
         // Convert Chart to Base64 Image
         const canvas = document.getElementById('kapasitasChart');
         const imageId = workbook.addImage({
@@ -307,9 +324,9 @@
             extension: 'png',
         });
 
-        const chartTopRow0 = 1.05; // 0-indexed, tepat di bawah judul
-        const chartWidth = 680;
-        const chartHeight = 240;
+        const chartTopRow0 = 0.2; // Mulai langsung dari atas karena judul sudah di dalam grafik
+        const chartWidth = 1000; // Ukuran diperbesar 1.5x lipat
+        const chartHeight = 350; // Ukuran diperbesar 1.5x lipat
         const pxPerRow = 18;
 
         sheet.addImage(imageId, {
