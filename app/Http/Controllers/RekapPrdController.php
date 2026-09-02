@@ -8,8 +8,8 @@ class RekapPrdController extends Controller
 {
     public function index(Request $request)
     {
-        // [TAG: FILTER AWAL] Mengambil filter dari URL, secara default menampilkan grafik 'bulanan'
-        $filter = $request->query('filter', 'bulanan'); 
+        // [TAG: FILTER AWAL] Mengambil filter dari URL, secara default menampilkan grafik 'harian'
+        $filter = $request->query('filter', 'harian'); 
         
         if ($filter == 'bulanan') {
             // [TAG: QUERY BULANAN] Mengelompokkan semua data (tanpa memandang tahun spesifik) menjadi per Bulan

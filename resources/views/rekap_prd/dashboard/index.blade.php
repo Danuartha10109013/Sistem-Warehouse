@@ -12,10 +12,10 @@
 
 <!-- Summary Cards -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white dark:bg-darkgray p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+    <div class="bg-white dark:bg-darkgray p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
         <div class="flex items-center justify-between">
             <h5 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Hasil PRD (Terkini)</h5>
-            <div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+            <div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shadow-inner">
                 <i class="mdi mdi-arrow-up-bold text-xl"></i>
             </div>
         </div>
@@ -23,10 +23,10 @@
         <p class="text-xs text-gray-400 mt-2">Update Terakhir: {{ $latest ? \Carbon\Carbon::parse($latest->tanggal)->format('d M Y') : '-' }}</p>
     </div>
     
-    <div class="bg-white dark:bg-darkgray p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+    <div class="bg-white dark:bg-darkgray p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
         <div class="flex items-center justify-between">
             <h5 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Pengeluaran</h5>
-            <div class="h-10 w-10 rounded-full bg-red-50 flex items-center justify-center text-red-500">
+            <div class="h-10 w-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 shadow-inner">
                 <i class="mdi mdi-arrow-down-bold text-xl"></i>
             </div>
         </div>
@@ -34,10 +34,10 @@
         <p class="text-xs text-gray-400 mt-2">Update Terakhir</p>
     </div>
 
-    <div class="bg-white dark:bg-darkgray p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+    <div class="bg-white dark:bg-darkgray p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
         <div class="flex items-center justify-between">
             <h5 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Sisa Stock</h5>
-            <div class="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center text-green-500">
+            <div class="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center text-green-500 shadow-inner">
                 <i class="mdi mdi-package-variant text-xl"></i>
             </div>
         </div>
@@ -47,31 +47,18 @@
 </div>
 
 <!-- Chart Keseluruhan -->
-<div class="bg-white dark:bg-darkgray p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+<div class="bg-white dark:bg-darkgray p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8 hover:shadow-md transition-shadow duration-300">
     <div class="flex justify-between items-center mb-4">
         <h4 class="text-lg font-bold text-gray-800 dark:text-white">Grafik Keseluruhan</h4>
         
-        <div class="flex items-center gap-2">
-            <!-- Dropdown Filter -->
-            <form action="{{ route('rekap-prd.dashboard') }}" method="GET" class="flex items-center gap-2">
-                <select name="filter" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                    <option value="harian" {{ $filter == 'harian' ? 'selected' : '' }}>Harian</option>
-                    <option value="bulanan" {{ $filter == 'bulanan' ? 'selected' : '' }}>Bulanan</option>
-                    <option value="tahunan" {{ $filter == 'tahunan' ? 'selected' : '' }}>Tahunan</option>
-                </select>
-            </form>
-
-            <!-- Export Form -->
-            <form id="exportForm" action="{{ route('rekap-prd.export') }}" method="POST" class="hidden">
-                @csrf
-                <input type="hidden" name="filter" value="{{ $filter }}">
-                <input type="hidden" name="chart_image" id="chart_image">
-            </form>
-            <button type="button" onclick="exportExcel()" class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-green-600 dark:hover:bg-green-700 transition-colors flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Export Excel
-            </button>
-        </div>
+        <!-- Modern Segmented Control Filter -->
+        <form action="{{ route('rekap-prd.dashboard') }}" method="GET">
+            <div class="inline-flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                <button type="submit" name="filter" value="harian" class="px-4 py-1.5 text-xs font-medium rounded-md transition-all {{ $filter == 'harian' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' }}">Harian</button>
+                <button type="submit" name="filter" value="bulanan" class="px-4 py-1.5 text-xs font-medium rounded-md transition-all {{ $filter == 'bulanan' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' }}">Bulanan</button>
+                <button type="submit" name="filter" value="tahunan" class="px-4 py-1.5 text-xs font-medium rounded-md transition-all {{ $filter == 'tahunan' ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-600 dark:text-white' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' }}">Tahunan</button>
+            </div>
+        </form>
     </div>
     
     <div class="relative h-[400px] w-full">
@@ -122,35 +109,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const sisaStock = chartData.map(item => item.sisa_stock);
 
     const ctx = document.getElementById('overallChart').getContext('2d');
+    
+    const gradientStock = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientStock.addColorStop(0, 'rgba(16, 185, 129, 0.2)'); // Emerald Green transparent
+    gradientStock.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
     new Chart(ctx, {
-        type: 'line',
         data: {
             labels: labels,
             datasets: [
                 {
-                    label: 'Total Pengeluaran (Akumulasi)',
+                    type: 'bar',
+                    label: 'Total Pengeluaran',
                     data: pengeluaran,
-                    borderColor: 'rgba(239, 68, 68, 1)',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
+                    backgroundColor: '#E5E7EB',
+                    hoverBackgroundColor: '#111827',
+                    borderRadius: 4,
+                    barThickness: 8,
+                    order: 2
                 },
                 {
-                    label: 'Sisa Stock (Akumulasi)',
+                    type: 'line',
+                    label: 'Sisa Stock',
                     data: sisaStock,
-                    borderColor: 'rgba(34, 197, 94, 1)',
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    borderWidth: 3,
+                    borderColor: '#10B981',
+                    backgroundColor: gradientStock,
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#10B981',
+                    pointBorderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    order: 1
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            devicePixelRatio: 4,
             interaction: {
                 mode: 'index',
                 intersect: false,
@@ -158,15 +156,26 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: {
                 legend: {
                     position: 'top',
+                    align: 'end',
                     labels: {
                         usePointStyle: true,
-                        font: { family: "'Plus Jakarta Sans', sans-serif", weight: '600' }
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        font: {
+                            family: "'Inter', sans-serif",
+                            size: 12,
+                            weight: '500'
+                        },
+                        color: '#6B7280'
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
-                    titleFont: { family: "'Plus Jakarta Sans', sans-serif" },
-                    bodyFont: { family: "'Plus Jakarta Sans', sans-serif" },
+                    backgroundColor: '#111827',
+                    padding: 12,
+                    titleFont: { family: "'Inter', sans-serif", size: 13, weight: '600' },
+                    bodyFont: { family: "'Inter', sans-serif", size: 12 },
+                    cornerRadius: 8,
+                    displayColors: true,
                     callbacks: {
                         label: function(context) {
                             return context.dataset.label + ': ' + new Intl.NumberFormat('id-ID').format(context.parsed.y);
@@ -175,10 +184,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             },
             scales: {
+                x: {
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: { family: "'Inter', sans-serif", size: 11 },
+                        color: '#9CA3AF'
+                    }
+                },
                 y: {
                     beginAtZero: true,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    border: { display: false },
+                    grid: {
+                        color: '#F3F4F6',
+                        drawBorder: false,
+                        tickLength: 0,
+                    },
                     ticks: {
+                        padding: 10,
+                        font: { family: "'Inter', sans-serif", size: 11 },
+                        color: '#9CA3AF',
                         callback: function(value) {
                             if (value >= 1000000) return (value / 1000000) + 'M';
                             else if (value >= 1000) return (value / 1000) + 'k';
@@ -190,22 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-function exportExcel() {
-    const canvas = document.getElementById('overallChart');
-    if (canvas) {
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCtx.fillStyle = '#ffffff';
-        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-        tempCtx.drawImage(canvas, 0, 0);
-        
-        document.getElementById('chart_image').value = tempCanvas.toDataURL('image/png');
-    }
-    document.getElementById('exportForm').submit();
-}
 </script>
 @endif
 @endpush
