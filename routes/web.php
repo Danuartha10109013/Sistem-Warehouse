@@ -136,6 +136,7 @@ Route::middleware([AutoLogout::class])->group(function () {
     Route::prefix('rekap-prd')->group(function () {
         Route::get('/', [RekapPrdController::class, 'index'])->name('rekap-prd.dashboard');
         Route::get('/input', [RekapPrdController::class, 'input'])->name('rekap-prd.input');
+        Route::get('/data', [RekapPrdController::class, 'data'])->name('rekap-prd.data');
         Route::post('/store', [RekapPrdController::class, 'store'])->name('rekap-prd.store');
         Route::post('/export', [RekapPrdController::class, 'exportExcel'])->name('rekap-prd.export');
         Route::delete('/{id}', [RekapPrdController::class, 'destroy'])->name('rekap-prd.destroy');
@@ -1039,4 +1040,14 @@ Route::group(['prefix' => 'modul-kapasitas', 'as' => 'modul-kapasitas.'], functi
     // Kelola Kapasitas
     Route::get('/kelola/kapasitas', [KelolaKapasitasController::class, 'index'])->name('kelola-kapasitas');
     Route::post('/kelola/kapasitas', [KelolaKapasitasController::class, 'store'])->name('kelola-kapasitas.store');
+});
+
+// Modul Verifikasi Timbangan Open Pack
+use App\Http\Controllers\VerifikasiTimbanganController;
+
+Route::group(['prefix' => 'verifikasi-timbangan', 'as' => 'verifikasi-timbangan.'], function () {
+    Route::get('/', [VerifikasiTimbanganController::class, 'index'])->name('index');
+    Route::post('/store', [VerifikasiTimbanganController::class, 'store'])->name('store');
+    Route::put('/update/{id}', [VerifikasiTimbanganController::class, 'update'])->name('update');
+    Route::delete('/destroy/{id}', [VerifikasiTimbanganController::class, 'destroy'])->name('destroy');
 });

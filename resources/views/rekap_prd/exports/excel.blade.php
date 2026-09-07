@@ -1,5 +1,8 @@
 <table>
     @foreach($data as $item)
+    @if($item->tanggal == '2026-08-31')
+        @continue
+    @endif
     <tr>
         <td style="font-weight: bold;">
             @if($filter == 'harian' || $filter == 'bulanan')

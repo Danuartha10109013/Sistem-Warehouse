@@ -422,6 +422,12 @@
                   </div>
                </a>
 
+               <a href="{{ route('verifikasi-timbangan.index') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-scale-balance"></i>
+                     <div class="menu-title">Verifikasi Timbangan</div>
+                  </div>
+               </a>
             @endif
 
             @if (Auth::user()->username == "danuartha")

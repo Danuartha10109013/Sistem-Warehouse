@@ -1,51 +1,83 @@
-<header class="sticky top-0 z-[60] bg-white dark:bg-dark w-full">
-    <nav class="px-4 sm:px-30 py-4 rounded-none bg-transparent dark:bg-transparent w-full">
-        <div class="flex gap-3 items-center justify-between w-full">
-            <div class="flex gap-2 items-center">
-                <span data-drawer-target="sidebar" data-drawer-toggle="sidebar" aria-controls="sidebar" class="h-10 w-10 flex text-black dark:text-white text-opacity-65 xl:hidden hover:text-primary hover:bg-lightprimary rounded-full justify-center items-center cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+<header class="app-header">
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <ul class="navbar-nav">
+      <li class="nav-item d-block d-xl-none">
+        <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+          <i class="ti ti-menu-2 fs-6" style="font-size: 24px;"></i>
+        </a>
+      </li>
+    </ul>
+    <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+      <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+        <li class="nav-item dropdown">
+          <a class="nav-link nav-icon-hover d-flex align-items-center gap-2" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 4px 8px; border-radius: 30px; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9';" onmouseout="this.style.backgroundColor='transparent';">
+            
+            <!-- Info Nama & Role -->
+            <div class="d-none d-md-flex flex-column align-items-end justify-content-center me-1">
+                <span class="fw-bold" style="font-size: 14px; color: #1e293b; line-height: 1;">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</span>
+                <span class="text-muted mt-1" style="font-size: 11px; font-weight: 500; line-height: 1;">
+                    @if(Auth::check())
+                        @if(Auth::user()->role == 5) Super Admin
+                        @elseif(Auth::user()->role == 0) Admin
+                        @else Pegawai @endif
+                    @else Guest @endif
                 </span>
-                <div class="hidden md:flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm">
-                    <svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span id="headerDate">Memuat tanggal...</span>
-                </div>
             </div>
 
-            <div class="flex gap-4 items-center">
-                <a href="{{ route('welcome') }}" class="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary transition-colors flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-lg shadow-sm hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                    <span class="hidden sm:inline">Menu Utama</span>
-                </a>
-                
-                <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 p-1.5 pr-4 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <div class="h-9 w-9 rounded-full flex justify-center items-center bg-primary text-white">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    </div>
-                    <div class="flex flex-col hidden sm:flex">
+            <!-- Avatar -->
+            @if(Auth::check() && Auth::user()->profile)
+                <img src="{{ asset('storage/'.Auth::user()->profile) }}" alt="Profile" width="40" height="40" class="rounded-circle shadow-sm" style="object-fit: cover;" onerror="this.outerHTML='<span class=\'rounded-circle text-white d-flex align-items-center justify-content-center shadow-sm\' style=\'width:40px;height:40px;font-size:16px;font-weight:700;background: linear-gradient(135deg, #135b9f 0%, #0f4a85 100%);\'>{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>'">
+            @else
+                <span class="rounded-circle text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; font-size: 16px; font-weight: 700; background: linear-gradient(135deg, #135b9f 0%, #0f4a85 100%);">
+                    {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 1)) : 'G' }}
+                </span>
+            @endif
+
+            <i class="ti ti-chevron-down text-muted d-none d-md-block ms-1" style="font-size: 16px;"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2" style="width: 260px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 40px rgba(0,0,0,0.08); padding: 8px;">
+            <div class="message-body">
+              
+              <!-- Info Teks & Avatar -->
+              <div class="d-flex align-items-center p-3 mb-2" style="background-color: #f8fafc; border-radius: 12px; margin: 4px;">
+                @if(Auth::check() && Auth::user()->profile)
+                    <img src="{{ asset('storage/'.Auth::user()->profile) }}" alt="Profile" class="rounded-circle flex-shrink-0" style="width: 48px; height: 48px; object-fit: cover;" onerror="this.outerHTML='<span class=\'rounded-circle text-white d-flex align-items-center justify-content-center flex-shrink-0\' style=\'width:48px;height:48px;min-width:48px;font-size:20px; background: linear-gradient(135deg, #135b9f 0%, #0f4a85 100%);\'>{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>'">
+                @else
+                    <span class="rounded-circle text-white d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; min-width: 48px; font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #135b9f 0%, #0f4a85 100%);">
+                        {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 1)) : 'G' }}
+                    </span>
+                @endif
+                <div class="ms-3 overflow-hidden">
+                  <h6 class="mb-1 fw-bold text-truncate" style="color: #1e293b; font-size: 15px;" title="{{ Auth::check() ? Auth::user()->name : 'Guest' }}">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</h6>
+                  <span class="text-muted d-block" style="font-size: 12px; font-weight: 600;">
                         @if(Auth::check())
-                            <span class="text-sm font-bold text-gray-800 dark:text-white leading-none">{{ Auth::user()->name }}</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                {{ Auth::user()->role == '1' ? 'Admin' : (Auth::user()->role == '2' ? 'Pegawai' : (Auth::user()->role == '0' ? 'Super Admin' : 'User')) }}
-                            </span>
-                        @else
-                            <span class="text-sm font-bold text-gray-800 dark:text-white leading-none">Guest</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">Not logged in</span>
-                        @endif
-                    </div>
+                            @if(Auth::user()->role == 5) Super Admin
+                            @elseif(Auth::user()->role == 0) Admin
+                            @else Pegawai @endif
+                        @else Guest @endif
+                  </span>
                 </div>
+              </div>
+
+              <!-- Link My Profile -->
+              <a href="{{ Auth::check() ? url('/profile/' . Auth::user()->id) : '#' }}" class="d-flex align-items-center gap-2 dropdown-item py-2 px-3 mt-1" style="border-radius: 8px; margin: 0 4px; font-weight: 500; color: #334155; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#135b9f';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#334155';">
+                <i class="ti ti-user-circle fs-5"></i>
+                <p class="mb-0 fs-3">Detail Profile</p>
+              </a>
+              
+              <hr class="dropdown-divider" style="margin: 8px 4px; border-color: #f1f5f9;">
+
+              <!-- Link Logout -->
+              <a href="{{ route('logout') }}" class="d-flex align-items-center gap-2 dropdown-item py-2 px-3 text-danger" style="border-radius: 8px; margin: 0 4px; font-weight: 500; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#fef2f2';" onmouseout="this.style.backgroundColor='transparent';" id="header-logout-btn">
+                <i class="ti ti-logout fs-5"></i>
+                <p class="mb-0 fs-3">Sign Out</p>
+              </a>
             </div>
-        </div>
-    </nav>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
 </header>
 
-<script>
-    // Script untuk menampilkan tanggal hari ini secara otomatis
-    document.addEventListener("DOMContentLoaded", function() {
-        const dateElement = document.getElementById('headerDate');
-        if (dateElement) {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const today = new Date();
-            dateElement.innerText = today.toLocaleDateString('id-ID', options);
-        }
-    });
-</script>
+

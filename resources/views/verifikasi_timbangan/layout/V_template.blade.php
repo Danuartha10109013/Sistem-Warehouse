@@ -238,17 +238,15 @@
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
     
-    <!-- Sidebar Start -->
-    @include('rekap_prd.layout.V_nav')
-    <!--  Sidebar End -->
+    <!-- Sidebar Removed -->
     
     <!--  Main wrapper -->
-    <div class="body-wrapper">
+    <div class="body-wrapper" style="margin-left: 0 !important; width: 100% !important;">
       <!--  Header Start -->
-      @include('rekap_prd.layout.V_header')
+      @include('verifikasi_timbangan.layout.V_header')
       <!--  Header End -->
       
-      <div class="container-fluid" style="max-width: 1400px; padding-top: 100px;">
+      <div class="container-fluid" style="max-width: 100%; padding: 100px 30px 30px 30px;">
         
         <!-- Flash Messages -->
         @if (session('success'))
@@ -475,6 +473,7 @@
 </body>
 
 </html>
+
 
 
 

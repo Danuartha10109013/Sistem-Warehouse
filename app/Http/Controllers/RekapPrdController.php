@@ -12,34 +12,41 @@ class RekapPrdController extends Controller
         $filter = $request->query('filter', 'harian'); 
         
         if ($filter == 'bulanan') {
-            // [TAG: QUERY BULANAN] Mengelompokkan semua data (tanpa memandang tahun spesifik) menjadi per Bulan
-            // DATE_FORMAT mengubah tanggal menjadi 'YYYY-MM' untuk dijadikan acuan group by
+            // [TAG: QUERY BULANAN] Mengelompokkan semua data menjadi per Bulan
             $data = \App\Models\RekapPrd::selectRaw('
                 DATE_FORMAT(tanggal, "%Y-%m") as periode, 
                 SUM(hasil_prd) as hasil_prd,
                 SUM(pengeluaran_tml) as pengeluaran_tml,
                 SUM(pengeluaran_ttl) as pengeluaran_ttl,
-                SUM(total_pengeluaran) as total_pengeluaran,
-                SUM(sisa_stock) as sisa_stock
+                SUM(total_pengeluaran) as total_pengeluaran
             ')
             ->groupBy('periode')
             ->orderBy('periode', 'desc')
             ->get();
+
+            foreach ($data as $item) {
+                $latest = \App\Models\RekapPrd::whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$item->periode])->orderBy('tanggal', 'desc')->first();
+                $item->sisa_stock = $latest ? $latest->sisa_stock : 0;
+            }
         } elseif ($filter == 'tahunan') {
-            // [TAG: QUERY TAHUNAN] Mengelompokkan semua data ke total Per Tahun (YYYY)
+            // [TAG: QUERY TAHUNAN] Mengelompokkan semua data ke total Per Tahun
             $data = \App\Models\RekapPrd::selectRaw('
                 YEAR(tanggal) as periode, 
                 SUM(hasil_prd) as hasil_prd,
                 SUM(pengeluaran_tml) as pengeluaran_tml,
                 SUM(pengeluaran_ttl) as pengeluaran_ttl,
-                SUM(total_pengeluaran) as total_pengeluaran,
-                SUM(sisa_stock) as sisa_stock
+                SUM(total_pengeluaran) as total_pengeluaran
             ')
             ->groupBy('periode')
             ->orderBy('periode', 'desc')
             ->get();
+
+            foreach ($data as $item) {
+                $latest = \App\Models\RekapPrd::whereYear('tanggal', $item->periode)->orderBy('tanggal', 'desc')->first();
+                $item->sisa_stock = $latest ? $latest->sisa_stock : 0;
+            }
         } else {
-            // [TAG: QUERY HARIAN] Mengambil semua data secara harian (tidak di grouping)
+            // [TAG: QUERY HARIAN] Mengambil semua data secara harian
             $data = \App\Models\RekapPrd::orderBy('tanggal', 'desc')->get();
         }
 
@@ -51,18 +58,34 @@ class RekapPrdController extends Controller
 
     public function input(Request $request)
     {
+        $latestInput = \App\Models\RekapPrd::orderBy('tanggal', 'desc')->first();
+        
+        // Akumulasi 1 bulan terakhir berdasarkan bulan dari latest input
+        $akumulasiBulanIni = null;
+        if ($latestInput) {
+            $month = date('m', strtotime($latestInput->tanggal));
+            $year = date('Y', strtotime($latestInput->tanggal));
+            
+            $akumulasiBulanIni = \App\Models\RekapPrd::whereYear('tanggal', $year)
+                                                    ->whereMonth('tanggal', $month)
+                                                    ->selectRaw('SUM(hasil_prd) as total_prd, SUM(total_pengeluaran) as total_pengeluaran, SUM(pengeluaran_tml) as pengeluaran_tml, SUM(pengeluaran_ttl) as pengeluaran_ttl')
+                                                    ->first();
+        }
+
+        return view('rekap_prd.dashboard.input', compact('latestInput', 'akumulasiBulanIni'));
+    }
+
+    public function data(Request $request)
+    {
         // [TAG: FILTER SPESIFIK] Mengambil nilai filter dan inputan spesifik tanggal dari halaman
-        $filter = $request->query('filter', 'harian'); 
+        $filter = $request->query('filter', 'bulanan'); 
         $filter_date = $request->query('filter_date', date('Y-m-d'));
         $filter_month = $request->query('filter_month', date('Y-m'));
         $filter_year = $request->query('filter_year', date('Y'));
         
         if ($filter == 'harian') {
-            // Jika mode Harian: Filter hanya untuk 1 tanggal spesifik secara persis
             $data = \App\Models\RekapPrd::whereDate('tanggal', $filter_date)->orderBy('tanggal', 'asc')->get();
         } elseif ($filter == 'bulanan') {
-            // Jika mode Bulanan: Filter hanya untuk bulan dan tahun spesifik
-            // Hasilnya akan berupa rincian setiap tanggal di bulan tersebut
             $year = substr($filter_month, 0, 4);
             $month = substr($filter_month, 5, 2);
             $data = \App\Models\RekapPrd::whereYear('tanggal', $year)
@@ -70,24 +93,30 @@ class RekapPrdController extends Controller
                                         ->orderBy('tanggal', 'asc')
                                         ->get();
         } elseif ($filter == 'tahunan') {
-            // Jika mode Tahunan: Filter untuk tahun spesifik, lalu dikelompokkan (SUM) berdasarkan Nomor Bulan (1-12)
             $data = \App\Models\RekapPrd::selectRaw('
                 MONTH(tanggal) as periode, 
                 SUM(hasil_prd) as hasil_prd,
                 SUM(pengeluaran_tml) as pengeluaran_tml,
                 SUM(pengeluaran_ttl) as pengeluaran_ttl,
-                SUM(total_pengeluaran) as total_pengeluaran,
-                SUM(sisa_stock) as sisa_stock
+                SUM(total_pengeluaran) as total_pengeluaran
             ')
             ->whereYear('tanggal', $filter_year)
             ->groupBy('periode')
             ->orderBy('periode', 'asc')
             ->get();
+
+            foreach ($data as $item) {
+                $latest = \App\Models\RekapPrd::whereYear('tanggal', $filter_year)
+                                              ->whereMonth('tanggal', $item->periode)
+                                              ->orderBy('tanggal', 'desc')
+                                              ->first();
+                $item->sisa_stock = $latest ? $latest->sisa_stock : 0;
+            }
         } else {
             $data = \App\Models\RekapPrd::orderBy('tanggal', 'desc')->get();
         }
 
-        return view('rekap_prd.dashboard.input', compact('data', 'filter', 'filter_date', 'filter_month', 'filter_year'));
+        return view('rekap_prd.dashboard.data', compact('data', 'filter', 'filter_date', 'filter_month', 'filter_year'));
     }
 
     public function store(Request $request)
@@ -193,13 +222,20 @@ class RekapPrdController extends Controller
                 SUM(hasil_prd) as hasil_prd,
                 SUM(pengeluaran_tml) as pengeluaran_tml,
                 SUM(pengeluaran_ttl) as pengeluaran_ttl,
-                SUM(total_pengeluaran) as total_pengeluaran,
-                SUM(sisa_stock) as sisa_stock
+                SUM(total_pengeluaran) as total_pengeluaran
             ')
             ->whereYear('tanggal', $filter_year)
             ->groupBy('periode')
             ->orderBy('periode', 'asc')
             ->get();
+            
+            foreach ($data as $item) {
+                $latest = \App\Models\RekapPrd::whereYear('tanggal', $filter_year)
+                                              ->whereMonth('tanggal', $item->periode)
+                                              ->orderBy('tanggal', 'desc')
+                                              ->first();
+                $item->sisa_stock = $latest ? $latest->sisa_stock : 0;
+            }
             $exportName = 'Tahunan_' . $filter_year;
         } else {
             $data = \App\Models\RekapPrd::orderBy('tanggal', 'asc')->get();

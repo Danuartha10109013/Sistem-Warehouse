@@ -262,7 +262,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: ['KAPASITAS BARANG JADI', '{{ $months[$month] ?? "" }} {{ $year }}'.toUpperCase()],
+                        text: ['KAPASITAS BARANG JADI', '{{ $months[(int)$month] ?? "" }} {{ $year }}'.toUpperCase()],
                         font: {
                             size: 18,
                             weight: 'bold'
@@ -489,7 +489,7 @@
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = "Kapasitas_Barang_Jadi_Lengkap_{{ $months[$month] ?? '' }}_{{ $year }}.xlsx";
+        link.download = "Kapasitas_Barang_Jadi_Lengkap_{{ $months[(int)$month] ?? '' }}_{{ $year }}.xlsx";
         link.click();
     }
 
@@ -503,7 +503,7 @@
 
         const opt = {
             margin:       0.3,
-            filename:     'Kapasitas_Barang_Jadi_{{ $months[$month] ?? '' }}_{{ $year }}.pdf',
+            filename:     'Kapasitas_Barang_Jadi_{{ $months[(int)$month] ?? '' }}_{{ $year }}.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
             jsPDF:        { unit: 'in', format: 'a3', orientation: 'landscape' },
