@@ -19,5 +19,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Seed verifikasi timbangan data
+        $this->call(VerifikasiTimbanganSeeder::class);
     }
 }
