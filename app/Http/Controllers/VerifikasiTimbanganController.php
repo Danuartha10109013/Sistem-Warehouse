@@ -10,7 +10,7 @@ class VerifikasiTimbanganController extends Controller
 {
     public function index()
     {
-        $data = VerifikasiTimbangan::orderBy('tanggal', 'asc')->paginate(15);
+        $data = VerifikasiTimbangan::orderBy('tanggal', 'desc')->paginate(15);
         return view('verifikasi_timbangan.index', compact('data'));
     }
 

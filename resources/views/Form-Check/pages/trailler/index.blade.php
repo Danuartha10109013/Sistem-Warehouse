@@ -107,7 +107,7 @@
                             @endphp
                             {{ $nama }}
                         </td>
-                        <td> {{ $d->created_at }} </td>
+                        <td> {{ $d->date }} </td>
                         
                         <td class="text-nowrap">
                           <div class="d-flex justify-content-between align-items-center">
