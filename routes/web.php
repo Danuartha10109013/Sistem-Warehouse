@@ -1050,4 +1050,5 @@ Route::group(['prefix' => 'verifikasi-timbangan', 'as' => 'verifikasi-timbangan.
     Route::post('/store', [VerifikasiTimbanganController::class, 'store'])->name('store');
     Route::put('/update/{id}', [VerifikasiTimbanganController::class, 'update'])->name('update');
     Route::delete('/destroy/{id}', [VerifikasiTimbanganController::class, 'destroy'])->name('destroy');
+    Route::get('/export', [VerifikasiTimbanganController::class, 'export'])->name('export');
 });

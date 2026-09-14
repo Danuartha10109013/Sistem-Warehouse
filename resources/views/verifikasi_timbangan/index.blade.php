@@ -114,9 +114,14 @@
         <!-- Card Header -->
         <div class="card-header bg-white border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2" style="padding: 20px 24px;">
             <h5 class="fw-bold mb-0" style="color: #1e293b; font-size: 16px;">Verifikasi Timbangan Open Pack</h5>
-            <button class="btn btn-primary fw-semibold text-nowrap" style="background-color: #135b9f; border: none; border-radius: 6px; padding: 10px 20px; font-size: 13.5px;" data-bs-toggle="modal" data-bs-target="#modalTambah">
-                <i class="fas fa-plus me-1"></i> Tambah Data
-            </button>
+            <div class="d-flex gap-2">
+                <a href="{{ route('verifikasi-timbangan.export') }}" class="btn btn-success fw-semibold text-nowrap" style="background-color: #059669; border: none; border-radius: 6px; padding: 10px 20px; font-size: 13.5px;">
+                    <i class="fas fa-file-excel me-1"></i> Export Excel
+                </a>
+                <button class="btn btn-primary fw-semibold text-nowrap" style="background-color: #135b9f; border: none; border-radius: 6px; padding: 10px 20px; font-size: 13.5px;" data-bs-toggle="modal" data-bs-target="#modalTambah">
+                    <i class="fas fa-plus me-1"></i> Tambah Data
+                </button>
+            </div>
         </div>
         
         <!-- Card Body -->

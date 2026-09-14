@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\VerifikasiTimbanganExportExcel;
 use App\Models\VerifikasiTimbangan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class VerifikasiTimbanganController extends Controller
 {
@@ -73,5 +75,10 @@ class VerifikasiTimbanganController extends Controller
         $timbangan->delete();
 
         return redirect()->back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    public function export()
+    {
+        return Excel::download(new VerifikasiTimbanganExportExcel(), 'verifikasi_timbangan_' . date('Y-m-d') . '.xlsx');
     }
 }
