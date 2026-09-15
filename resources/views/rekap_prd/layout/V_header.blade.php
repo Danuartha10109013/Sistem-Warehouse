@@ -9,6 +9,13 @@
     </ul>
     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
       <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+        <!-- Tombol Menu Utama -->
+        <li class="nav-item d-none d-md-block me-3">
+            <a href="{{ url('/welcome') }}" class="btn btn-sm d-flex align-items-center gap-2" style="background-color: #f1f5f9; color: #475569; border-radius: 8px; font-weight: 600; padding: 8px 16px; border: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#e2e8f0'; this.style.color='#1e293b';" onmouseout="this.style.backgroundColor='#f1f5f9'; this.style.color='#475569';">
+                <i class="ti ti-home fs-5"></i>
+                Menu Utama
+            </a>
+        </li>
         <li class="nav-item dropdown">
           <a class="nav-link nav-icon-hover d-flex align-items-center gap-2" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 4px 8px; border-radius: 30px; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9';" onmouseout="this.style.backgroundColor='transparent';">
             

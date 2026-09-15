@@ -25,7 +25,7 @@
                         @csrf
                         <div class="mb-2">
                             <label class="form-label fw-semibold" style="color: #475569; font-size: 13px; margin-bottom: 4px;">Pilih Tanggal</label>
-                            <input type="date" name="tanggal" required class="form-control form-control-sm" style="border-radius: 6px;">
+                            <input type="date" name="tanggal" value="{{ date('Y-m-d') }}" required class="form-control form-control-sm" style="border-radius: 6px;">
                         </div>
                         <div class="mb-2">
                             <label class="form-label fw-semibold" style="color: #475569; font-size: 13px; margin-bottom: 4px;">File Hasil PRD (.xlsx)</label>
