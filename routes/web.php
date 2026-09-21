@@ -148,6 +148,11 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::get('/crc/{type}', [StockController::class, 'crcIndex'])->name('stock.crc');
         Route::post('/crc/import', [StockController::class, 'importCrc'])->name('stock.crc.import');
         Route::delete('/crc/batch-delete', [StockController::class, 'deleteCrcBatch'])->name('stock.crc.batch_delete');
+        Route::get('/kode-bahan-baku', [StockController::class, 'indexKodeBahanBaku'])->name('stock.kode_bb.index');
+        Route::post('/kode-bahan-baku', [StockController::class, 'storeKodeBahanBaku'])->name('stock.kode_bb.store');
+        Route::put('/kode-bahan-baku/{id}', [StockController::class, 'updateKodeBahanBaku'])->name('stock.kode_bb.update');
+        Route::delete('/kode-bahan-baku/{id}', [StockController::class, 'destroyKodeBahanBaku'])->name('stock.kode_bb.destroy');
+        Route::get('/material/{type}', [StockController::class, 'crcIndex'])->name('stock.material');
         Route ::get('/add',[StockController::class,'add'])->name('stock.add');
         Route ::post('/store',[StockController::class,'store'])->name('stock.store');
         Route ::post('/excel',[StockController::class,'excel'])->name('stock.excel');

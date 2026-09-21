@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        if (Schema::hasTable('kode_produk_bb') && !Schema::hasColumn('kode_produk_bb', 'nama_produk')) {
+            Schema::table('kode_produk_bb', function (Blueprint $table) {
+                $table->string('nama_produk')->nullable()->after('kode_produk');
+            });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        if (Schema::hasTable('kode_produk_bb') && Schema::hasColumn('kode_produk_bb', 'nama_produk')) {
+            Schema::table('kode_produk_bb', function (Blueprint $table) {
+                $table->dropColumn('nama_produk');
+            });
+        }
+    }
+};

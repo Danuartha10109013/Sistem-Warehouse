@@ -21,27 +21,73 @@ class StockController extends Controller
         $key = 'Stock';
         $kategori = KodeBahanBaku::all();
         
-        $query = Stock::where('kategori_produk', 'CRC');
-        
-        if ($type === 'ks') {
-            $query->where(function($q) {
+        $typeLower = strtolower($type);
+        $matched = KodeBahanBaku::whereRaw('LOWER(kode_supplier) = ?', [$typeLower])
+            ->orWhereRaw('LOWER(attribute_code) = ?', [$typeLower])
+            ->orWhereRaw('LOWER(REPLACE(supplier, " ", "_")) = ?', [$typeLower])
+            ->orWhere('id', $type)
+            ->first();
+
+        if ($typeLower === 'ks') {
+            $query = Stock::where('kategori_produk', 'CRC')->where(function($q) {
                 $q->where('attribute_set_value', 'like', 'CR\_A\_%')
                   ->orWhere('attribute_set_value', 'like', 'CR\_AG\_%');
             });
-        } elseif ($type === 'hanwa') {
-            $query->where('attribute_set_value', 'like', 'CR\_BE\_%');
-        } elseif ($type === 'grp') {
-            $query->where('attribute_set_value', 'like', 'CR\_B\_%');
-        } elseif ($type === 'grp_tl') {
-            $query->where('attribute_set_value', 'like', 'CR\_BTL\_%');
-        } elseif ($type === 'essar_ina') {
-            $query->where('attribute_set_value', 'like', 'CR\_G\_%');
-        } elseif ($type === 'posco_vnm') {
-            $query->where('attribute_set_value', 'like', 'CR\_AY\_%');
-        } elseif ($type === 'posco_kor') {
-            $query->where('attribute_set_value', 'like', 'CR\_AH\_%');
-        } elseif ($type === 'nai_ina') {
-            $query->where('attribute_set_value', 'like', 'CR\_AZ\_%');
+        } elseif ($typeLower === 'hanwa') {
+            $query = Stock::where('kategori_produk', 'CRC')->where('attribute_set_value', 'like', 'CR\_BE\_%');
+        } elseif ($typeLower === 'grp') {
+            $query = Stock::where('kategori_produk', 'CRC')->where('attribute_set_value', 'like', 'CR\_B\_%');
+        } elseif ($typeLower === 'grp_tl') {
+            $query = Stock::where('kategori_produk', 'CRC')->where('attribute_set_value', 'like', 'CR\_BTL\_%');
+        } elseif ($typeLower === 'essar_ina') {
+            $query = Stock::where('kategori_produk', 'CRC')->where('attribute_set_value', 'like', 'CR\_G\_%');
+        } elseif ($typeLower === 'posco_vnm') {
+            $query = Stock::where('kategori_produk', 'CRC')->where('attribute_set_value', 'like', 'CR\_AY\_%');
+        } elseif ($typeLower === 'posco_kor') {
+            $query = Stock::where('kategori_produk', 'CRC')->where('attribute_set_value', 'like', 'CR\_AH\_%');
+        } elseif ($typeLower === 'nai_ina') {
+            $query = Stock::where('kategori_produk', 'CRC')->where('attribute_set_value', 'like', 'CR\_AZ\_%');
+        } elseif ($matched) {
+            $jenis = strtoupper($matched->jenis ?? 'CRC');
+            $query = Stock::query();
+            if ($jenis === 'CRC') {
+                $query->where('kategori_produk', 'CRC');
+            } elseif ($jenis === 'RESIN') {
+                $query->where('kategori_produk', 'RESIN');
+            } elseif ($jenis === 'INGOT') {
+                $query->where(function($q) {
+                    $q->where('kategori_produk', 'like', '%INGOT%')
+                      ->orWhere('kategori_produk', 'like', '%ZINC%')
+                      ->orWhere('kategori_produk', 'like', '%ALUMINIUM%')
+                      ->orWhere('kategori_produk', 'like', '%ANTIMON%');
+                });
+            } else {
+                $query->where('kategori_produk', $jenis);
+            }
+
+            $query->where(function($q) use ($matched) {
+                $hasCondition = false;
+                if (!empty($matched->attribute_code)) {
+                    $prefix = str_replace('_', '\_', $matched->attribute_code);
+                    $q->where('attribute_set_value', 'like', $prefix . '%');
+                    $hasCondition = true;
+                }
+                if (!empty($matched->kode_produk)) {
+                    if ($hasCondition) {
+                        $q->orWhere('kode_produk', $matched->kode_produk);
+                    } else {
+                        $q->where('kode_produk', $matched->kode_produk);
+                        $hasCondition = true;
+                    }
+                }
+                if (!empty($matched->supplier)) {
+                    if ($hasCondition) {
+                        $q->orWhere('nama_produk', 'like', '%' . $matched->supplier . '%');
+                    } else {
+                        $q->where('nama_produk', 'like', '%' . $matched->supplier . '%');
+                    }
+                }
+            });
         } else {
             abort(404);
         }
@@ -451,5 +497,114 @@ class StockController extends Controller
             ->delete();
 
         return back()->with('success', 'Riwayat upload pada ' . $request->batch_time . ' berhasil dihapus!');
+    }
+
+    public function indexKodeBahanBaku()
+    {
+        $key = 'Master Data';
+        $items = KodeBahanBaku::orderBy('jenis')->orderBy('supplier')->get();
+        return view('stock.kode_bb.index', compact('key', 'items'));
+    }
+
+    public function storeKodeBahanBaku(Request $request)
+    {
+        $request->validate([
+            'supplier'      => 'required|string|max:255',
+            'kode_produk'   => 'nullable|string|max:255',
+            'nama_produk'   => 'nullable|string|max:255',
+            'kode_supplier' => 'nullable|string|max:255',
+            'jenis'         => 'required|string|max:100',
+        ]);
+
+        $supplier = strtoupper(trim($request->supplier));
+        $kodeSupplier = $request->kode_supplier
+            ? strtoupper(trim($request->kode_supplier))
+            : strtoupper(str_replace(' ', '_', trim($request->supplier)));
+        $kodeProduk = $request->kode_produk ? strtoupper(trim($request->kode_produk)) : null;
+        $namaProduk = $request->nama_produk ? strtoupper(trim($request->nama_produk)) : null;
+        $attributeCode = $request->attribute_code ? strtoupper(trim($request->attribute_code)) : $kodeSupplier;
+        $jenis = strtoupper(trim($request->jenis));
+        $origin = strtoupper(trim($request->origin ?? 'LOKAL'));
+
+        // Additional validation: nama_produk required for RESIN
+        if ($jenis === 'RESIN' && empty($namaProduk)) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['nama_produk' => 'Nama Produk wajib diisi untuk RESIN']);
+        }
+
+        // If jenis is not RESIN, clear nama_produk
+        if ($jenis !== 'RESIN') {
+            $namaProduk = null;
+        }
+
+        KodeBahanBaku::create([
+            'supplier'       => $supplier,
+            'kode_produk'   => $kodeProduk,
+            'nama_produk'   => $namaProduk,
+            'kode_supplier' => $kodeSupplier,
+            'attribute_code'=> $attributeCode,
+            'jenis'         => $jenis,
+            'kategori'      => $jenis,
+            'origin'        => $origin,
+        ]);
+
+        return redirect()->route('stock.kode_bb.index')->with('success', 'Data Master Bahan Baku berhasil ditambahkan!');
+    }
+
+    public function updateKodeBahanBaku(Request $request, $id)
+    {
+        $item = KodeBahanBaku::findOrFail($id);
+
+        $request->validate([
+            'supplier'      => 'required|string|max:255',
+            'kode_produk'   => 'nullable|string|max:255',
+            'nama_produk'   => 'nullable|string|max:255',
+            'kode_supplier' => 'nullable|string|max:255',
+            'jenis'         => 'required|string|max:100',
+        ]);
+
+        $supplier = strtoupper(trim($request->supplier));
+        $kodeSupplier = $request->kode_supplier
+            ? strtoupper(trim($request->kode_supplier))
+            : strtoupper($item->kode_supplier);
+        $kodeProduk = $request->kode_produk ? strtoupper(trim($request->kode_produk)) : null;
+        $namaProduk = $request->nama_produk ? strtoupper(trim($request->nama_produk)) : null;
+        $attributeCode = $request->attribute_code ? strtoupper(trim($request->attribute_code)) : ($item->attribute_code ?? $kodeSupplier);
+        $jenis = strtoupper(trim($request->jenis));
+        $origin = strtoupper(trim($request->origin ?? $item->origin ?? 'LOKAL'));
+
+        // Additional validation: nama_produk required for RESIN
+        if ($jenis === 'RESIN' && empty($namaProduk)) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['nama_produk' => 'Nama Produk wajib diisi untuk RESIN']);
+        }
+
+        // If jenis is not RESIN, clear nama_produk
+        if ($jenis !== 'RESIN') {
+            $namaProduk = null;
+        }
+
+        $item->update([
+            'supplier'       => $supplier,
+            'kode_produk'   => $kodeProduk,
+            'nama_produk'   => $namaProduk,
+            'kode_supplier' => $kodeSupplier,
+            'attribute_code'=> $attributeCode,
+            'jenis'         => $jenis,
+            'kategori'      => $jenis,
+            'origin'        => $origin,
+        ]);
+
+        return redirect()->route('stock.kode_bb.index')->with('success', 'Data Master Bahan Baku berhasil diperbarui!');
+    }
+
+    public function destroyKodeBahanBaku($id)
+    {
+        $item = KodeBahanBaku::findOrFail($id);
+        $item->delete();
+
+        return redirect()->route('stock.kode_bb.index')->with('success', 'Data Master Bahan Baku berhasil dihapus!');
     }
 }
