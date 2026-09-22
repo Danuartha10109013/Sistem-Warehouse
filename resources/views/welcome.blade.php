@@ -428,6 +428,13 @@
                      <div class="menu-title">Verifikasi Timbangan</div>
                   </div>
                </a>
+               
+               <a href="{{ route('scan-koil-eup.index') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-barcode-scan"></i>
+                     <div class="menu-title">Scan Koil EUP</div>
+                  </div>
+               </a>
             @endif
 
             @if (Auth::user()->username == "danuartha")

@@ -70,6 +70,17 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/scan', [ScanController::class, 'index']);
 Route::post('/api/run-scan', [ScanController::class, 'scan'])->name('laravel.scan');
 
+Route::prefix('scan-koil-eup')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ScanKoilEupController::class, 'index'])->name('scan-koil-eup.index');
+    Route::post('/store', [\App\Http\Controllers\ScanKoilEupController::class, 'store'])->name('scan-koil-eup.store');
+    Route::delete('/destroy/{id}', [\App\Http\Controllers\ScanKoilEupController::class, 'destroy'])->name('scan-koil-eup.destroy');
+    
+    Route::post('/layout/store', [\App\Http\Controllers\ScanKoilEupController::class, 'storeLayout'])->name('scan-koil-eup.layout.store');
+    Route::delete('/layout/destroy/{id}', [\App\Http\Controllers\ScanKoilEupController::class, 'destroyLayout'])->name('scan-koil-eup.layout.destroy');
+    
+    Route::post('/palet/store', [\App\Http\Controllers\ScanKoilEupController::class, 'storePalet'])->name('scan-koil-eup.palet.store');
+    Route::delete('/palet/destroy/{id}', [\App\Http\Controllers\ScanKoilEupController::class, 'destroyPalet'])->name('scan-koil-eup.palet.destroy');
+});
 Route::prefix('Laporan-packing')->group(function () {
     Route::get('/',[PackingController::class,'index'])->name('pac');
     Route::get('/add',[PackingController::class,'add'])->name('pac.add');
