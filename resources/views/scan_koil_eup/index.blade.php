@@ -93,19 +93,29 @@
     .tabs-container {
         border-bottom: 1px solid #dee2e6;
         margin-bottom: 1.25rem;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
+    .tabs-container::-webkit-scrollbar {
+        height: 4px;
+    }
+    .tabs-container::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 4px;
     }
     .tabs-container .nav-tabs {
         border-bottom: none;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        display: flex;
+        width: max-content;
     }
     .tabs-container .nav-item {
-        flex-grow: 1;
-        text-align: center;
+        flex: 0 0 auto;
     }
     .tabs-container .nav-link {
         margin-bottom: -1px;
-        width: 100%;
-        justify-content: center;
     }
     
     /* Table Responsive Enhancements */
@@ -278,11 +288,12 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">No Coil EUP <span class="text-primary">*</span></label>
                             <div class="input-group">
-                                <input type="text" name="no_coil_eup" class="form-control" required placeholder="Scan atau Ketik..." style="font-size: 14px; border-radius: 6px 0 0 6px; padding: 10px 12px; border: 1px solid #cbd5e1; border-right: none;" autofocus>
-                                <button type="button" class="input-group-text bg-white text-primary" style="border-radius: 0 6px 6px 0; border: 1px solid #cbd5e1; cursor: pointer;" title="Scan Barcode/QR" onclick="alert('Membuka Kamera untuk Scan...')">
+                                <input type="text" id="no_coil_eup" name="no_coil_eup" class="form-control" required placeholder="Scan atau Ketik..." style="font-size: 14px; border-radius: 6px 0 0 6px; padding: 10px 12px; border: 1px solid #cbd5e1; border-right: none;" autofocus>
+                                <button type="button" id="btn-scan" class="input-group-text bg-white text-primary" style="border-radius: 0 6px 6px 0; border: 1px solid #cbd5e1; cursor: pointer;" title="Scan Barcode/QR">
                                     <i class="fas fa-qrcode"></i>
                                 </button>
                             </div>
+                            <div id="qr-reader" style="width: 100%; display: none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1;"></div>
                         </div>
                     </div>
                     
@@ -312,8 +323,14 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Berat <span class="text-primary">*</span></label>
-                        <input type="number" step="any" name="berat" class="form-control" required placeholder="0" style="font-size: 14px; border-radius: 6px; padding: 10px 12px; border: 1px solid #cbd5e1;">
+                        <label class="form-label" style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Berat (kg) <span class="text-primary">*</span></label>
+                        <div class="input-group">
+                            <input type="number" step="any" id="berat" name="berat" class="form-control" required placeholder="0" style="font-size: 14px; border-radius: 6px 0 0 6px; padding: 10px 12px; border: 1px solid #cbd5e1; border-right: none;">
+                            <button type="button" id="btn-scan-berat" class="input-group-text bg-white text-primary" style="border-radius: 0 6px 6px 0; border: 1px solid #cbd5e1; cursor: pointer;" title="Scan Barcode/QR">
+                                <i class="fas fa-qrcode"></i>
+                            </button>
+                        </div>
+                        <div id="qr-reader-berat" style="width: 100%; display: none; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1;"></div>
                     </div>
 
                     <div class="mb-2">
@@ -430,6 +447,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
     function showErrorPopup(titleText, messageText) {
         Swal.fire({
@@ -475,7 +493,83 @@
                     inputCoil.focus();
                 }
             });
+            
+            // Matikan kamera jika modal ditutup
+            modalTambah.addEventListener('hidden.bs.modal', function () {
+                // Untuk Coil EUP
+                const qrReader = document.getElementById('qr-reader');
+                const btnScan = document.getElementById('btn-scan');
+                if (qrReader && qrReader.style.display === 'block') {
+                    btnScan.click(); // Trigger click untuk mematikan dan reset UI
+                }
+                
+                // Untuk Berat
+                const qrReaderBerat = document.getElementById('qr-reader-berat');
+                const btnScanBerat = document.getElementById('btn-scan-berat');
+                if (qrReaderBerat && qrReaderBerat.style.display === 'block') {
+                    btnScanBerat.click(); 
+                }
+            });
         }
+
+        // Generic QR Code Scanner Logic
+        function initScanner(btnId, readerId, inputId) {
+            const btnScan = document.getElementById(btnId);
+            const qrReader = document.getElementById(readerId);
+            const inputField = document.getElementById(inputId);
+            let html5QrCode = null;
+
+            if (btnScan) {
+                btnScan.addEventListener('click', function() {
+                    if (qrReader.style.display === 'block') {
+                        if (html5QrCode) {
+                            html5QrCode.stop().then(() => {
+                                qrReader.style.display = 'none';
+                                btnScan.innerHTML = '<i class="fas fa-qrcode"></i>';
+                            }).catch(err => console.error(err));
+                        }
+                        return;
+                    }
+
+                    qrReader.style.display = 'block';
+                    btnScan.innerHTML = '<i class="fas fa-times text-danger"></i>'; 
+                    
+                    if (!html5QrCode) {
+                        html5QrCode = new Html5Qrcode(readerId);
+                    }
+                    
+                    html5QrCode.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        (decodedText, decodedResult) => {
+                            if (inputId === 'berat') {
+                                // Ekstrak hanya angka untuk berat
+                                const num = decodedText.replace(/[^0-9.]/g, '');
+                                inputField.value = num;
+                            } else {
+                                inputField.value = decodedText;
+                            }
+                            
+                            html5QrCode.stop().then(() => {
+                                qrReader.style.display = 'none';
+                                btnScan.innerHTML = '<i class="fas fa-qrcode"></i>';
+                            });
+                        },
+                        (errorMessage) => {}
+                    ).catch((err) => {
+                        console.error("Error starting camera", err);
+                        showErrorPopup('Akses Kamera Gagal', 'Browser tidak memiliki izin atau tidak ada kamera yang terdeteksi.');
+                        qrReader.style.display = 'none';
+                        btnScan.innerHTML = '<i class="fas fa-qrcode"></i>';
+                    });
+                });
+            }
+            
+            return html5QrCode;
+        }
+
+        const scannerCoil = initScanner('btn-scan', 'qr-reader', 'no_coil_eup');
+        const scannerBerat = initScanner('btn-scan-berat', 'qr-reader-berat', 'berat');
         
         // AJAX Kelola Layout
         const formLayout = document.getElementById('form-layout');
