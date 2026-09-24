@@ -1,12 +1,20 @@
 <header class="app-header" style="width: 100% !important; max-width: 100% !important; left: 0 !important;">
-  <nav class="navbar navbar-expand-lg navbar-light px-4">
+  <style>
+    @media (max-width: 576px) {
+      .header-brand-text { font-size: 14px !important; letter-spacing: 0 !important; }
+      .app-header .navbar { padding-left: 12px !important; padding-right: 12px !important; }
+      .app-header .logo-img { margin-left: 0 !important; gap: 6px !important; }
+      .app-header .logo-img img { height: 32px !important; }
+    }
+  </style>
+  <nav class="navbar navbar-expand-lg navbar-light px-2 px-md-4">
     <ul class="navbar-nav">
       <li class="nav-item d-flex align-items-center">
         <a href="{{ url('/welcome') }}" class="text-nowrap logo-img d-flex align-items-center text-decoration-none"
           style="gap: 10px; margin-left: 10px;">
           <img src="{{ asset('template_v2/bahan_logo_v2/logobg-ic.png') }}" style="height: 38px; width: auto;"
             alt="Logo" />
-          <span
+          <span class="header-brand-text"
             style="font-weight: 800; font-size: 18px; color: #1a569d; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">TATA
             METAL LESTARI</span>
         </a>

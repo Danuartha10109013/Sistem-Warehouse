@@ -122,14 +122,27 @@
                 </form>
             </div>
             
-            <div style="height: 400px; width: 100%; position: relative;">
-                @if($data->count() > 0)
-                    <canvas id="overallChart"></canvas>
-                @else
-                    <div class="h-100 w-100 d-flex align-items-center justify-content-center text-muted">
-                        Belum ada data untuk ditampilkan.
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <h6 class="text-center fw-bold">POSISI STOCK WH TML CIK - 2026</h6>
+                    <div style="height: 400px; width: 100%; position: relative;">
+                        @if($data->count() > 0)
+                            <canvas id="overallChart"></canvas>
+                        @else
+                            <div class="h-100 w-100 d-flex align-items-center justify-content-center text-muted">
+                                Belum ada data untuk ditampilkan.
+                            </div>
+                        @endif
                     </div>
-                @endif
+                </div>
+                <div class="col-12">
+                    <h6 class="text-center fw-bold mt-4">POSISI STOCK WH TML CIK - 2026</h6>
+                    <div style="height: 400px; width: 100%; position: relative;">
+                        @if($data->count() > 0)
+                            <canvas id="overallChart2"></canvas>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -169,67 +182,59 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    const pengeluaran = chartData.map(item => item.total_pengeluaran);
-    const sisaStock = chartData.map(item => item.sisa_stock);
+    const pengeluaran = chartData.map(item => Number(item.total_pengeluaran));
+    const saldoAkhir = chartData.map(item => Number(item.sisa_stock));
+    const hasilPrd = chartData.map(item => Number(item.hasil_prd));
+    const saldoAwal = chartData.map(item => Number(item.sisa_stock) - Number(item.hasil_prd) + Number(item.total_pengeluaran));
 
     const ctx = document.getElementById('overallChart').getContext('2d');
-    
-    const gradientStock = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientStock.addColorStop(0, 'rgba(19, 91, 159, 0.2)'); // Corporate Blue transparent
-    gradientStock.addColorStop(1, 'rgba(19, 91, 159, 0.0)');
-
     new Chart(ctx, {
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [
                 {
-                    type: 'bar',
-                    label: 'Total Pengeluaran',
-                    data: pengeluaran,
-                    backgroundColor: '#A22C29', // Corporate Red
-                    hoverBackgroundColor: '#8B2523',
-                    borderRadius: 6,
-                    barThickness: 10,
-                    order: 2
+                    label: 'Saldo Awal',
+                    data: saldoAwal,
+                    backgroundColor: '#4e73df', // Blue
+                    borderRadius: 2,
                 },
                 {
-                    type: 'line',
-                    label: 'Sisa Stock',
-                    data: sisaStock,
-                    borderColor: '#135b9f', // Corporate Blue
-                    backgroundColor: gradientStock,
-                    borderWidth: 3,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#135b9f',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    fill: true,
-                    tension: 0.4,
-                    order: 1
+                    label: 'Hasil Prod CGL',
+                    data: hasilPrd,
+                    backgroundColor: '#e74a3b', // Red
+                    borderRadius: 2,
+                },
+                {
+                    label: 'Pengeluaran',
+                    data: pengeluaran,
+                    backgroundColor: '#1cc88a', // Green
+                    borderRadius: 2,
+                },
+                {
+                    label: 'Saldo Akhir',
+                    data: saldoAkhir,
+                    backgroundColor: '#f6c23e', // Yellow
+                    borderRadius: 2,
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            devicePixelRatio: 4,
             interaction: {
                 mode: 'index',
                 intersect: false,
             },
             plugins: {
                 legend: {
-                    position: 'top',
-                    align: 'end',
+                    position: 'right',
                     labels: {
                         usePointStyle: true,
                         boxWidth: 8,
                         boxHeight: 8,
-                        font: {
-                            family: "'Plus Jakarta Sans', sans-serif",
-                            size: 12,
-                            weight: '600'
-                        },
+                        font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
                         color: '#64748b'
                     }
                 },
@@ -249,22 +254,90 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             scales: {
                 x: {
-                    grid: {
-                        display: false,
-                        drawBorder: false
-                    },
-                    ticks: {
-                        font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },
-                        color: '#94a3b8'
-                    }
+                    grid: { display: false, drawBorder: false },
+                    ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#94a3b8' }
                 },
                 y: {
                     beginAtZero: true,
                     border: { display: false },
-                    grid: {
-                        color: '#f1f5f9',
-                        drawBorder: false,
-                    },
+                    grid: { color: '#f1f5f9', drawBorder: false },
+                    ticks: {
+                        padding: 10,
+                        font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },
+                        color: '#94a3b8',
+                        callback: function(value) {
+                            if (value >= 1000000) return (value / 1000000) + 'M';
+                            else if (value >= 1000) return (value / 1000) + 'k';
+                            return value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const ctx2 = document.getElementById('overallChart2').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Hasil Prod CGL',
+                    data: hasilPrd,
+                    backgroundColor: '#e74a3b', // Red
+                    borderRadius: 2,
+                },
+                {
+                    label: 'Pengeluaran',
+                    data: pengeluaran,
+                    backgroundColor: '#1cc88a', // Green
+                    borderRadius: 2,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            devicePixelRatio: 4,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
+                        color: '#64748b'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    padding: 12,
+                    titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
+                    bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+                    cornerRadius: 8,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + new Intl.NumberFormat('id-ID').format(context.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false, drawBorder: false },
+                    ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#94a3b8' }
+                },
+                y: {
+                    beginAtZero: true,
+                    border: { display: false },
+                    grid: { color: '#f1f5f9', drawBorder: false },
                     ticks: {
                         padding: 10,
                         font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },

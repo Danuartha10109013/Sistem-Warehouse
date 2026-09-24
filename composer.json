@@ -7,10 +7,13 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.0",
+        "intervention/image": "3.0",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "league/flysystem-aws-s3-v3": "~3.0",
         "livewire/livewire": "*",
-        "maatwebsite/excel": "^3.1"
+        "maatwebsite/excel": "^3.1",
+        "maennchen/zipstream-php": "2.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

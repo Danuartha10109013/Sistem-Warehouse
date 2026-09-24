@@ -435,6 +435,13 @@
                      <div class="menu-title">Scan Koil EUP</div>
                   </div>
                </a>
+
+               <a href="{{ route('master-product.index') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-cube-outline"></i>
+                     <div class="menu-title">Master Product</div>
+                  </div>
+               </a>
             @endif
 
             @if (Auth::user()->username == "danuartha")

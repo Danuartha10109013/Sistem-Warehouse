@@ -22,7 +22,6 @@ class RekapPrdExport implements FromView, WithCharts, ShouldAutoSize
     {
         $this->data = $data;
         $this->filter = $filter;
-        // imagePath is no longer needed since we use native charts
     }
 
     public function view(): View
@@ -35,86 +34,109 @@ class RekapPrdExport implements FromView, WithCharts, ShouldAutoSize
 
     public function charts()
     {
-        $charts = [];
-        $row = 1;
+        $dataCount = count($this->data);
+        if ($dataCount == 0) return [];
 
-        foreach ($this->data as $item) {
-            if ($item->tanggal == '2026-08-31') {
-                continue;
-            }
+        // Data begins at row 3 in the Excel sheet because header spans 2 rows
+        $startRow = 3;
+        $endRow = $startRow + $dataCount - 1;
+        
+        // --- CHART 1: POSISI STOCK WH TML CIK - SEPTEMBER 2026 ---
+        // Labels: Saldo Awal (B), Hasil Prod CGL (C), Total Pengeluaran (F), Saldo Akhir (G)
+        $dataSeriesLabels1 = [
+            new DataSeriesValues('String', 'Worksheet!$B$1', null, 1),
+            new DataSeriesValues('String', 'Worksheet!$C$1', null, 1),
+            new DataSeriesValues('String', 'Worksheet!$F$1', null, 1),
+            new DataSeriesValues('String', 'Worksheet!$G$1', null, 1),
+        ];
 
-            // Define Data Series Labels
-            $dataSeriesLabels = [
-                new DataSeriesValues('String', 'Worksheet!$A$' . ($row + 5), null, 1), // Sisa Stock
-                new DataSeriesValues('String', 'Worksheet!$A$' . ($row + 4), null, 1), // Total pengeluaran
-            ];
-            
-            // We use the date string as the X-axis category
-            $xAxisTickValues = [
-                new DataSeriesValues('String', 'Worksheet!$A$' . $row, null, 1),
-            ];
+        // X-Axis values: Tgl (A3:A$endRow)
+        $xAxisTickValues1 = [
+            new DataSeriesValues('String', 'Worksheet!$A$' . $startRow . ':$A$' . $endRow, null, $dataCount),
+        ];
 
-            // Define Values
-            $dataSeriesValues = [
-                new DataSeriesValues('Number', 'Worksheet!$B$' . ($row + 5), null, 1),
-                new DataSeriesValues('Number', 'Worksheet!$B$' . ($row + 4), null, 1),
-            ];
+        // Y-Axis values for Chart 1
+        $dsVal1_0 = new DataSeriesValues('Number', 'Worksheet!$B$' . $startRow . ':$B$' . $endRow, null, $dataCount);
+        $dsVal1_0->setFillColor('4472C4'); // Blue
+        
+        $dsVal1_1 = new DataSeriesValues('Number', 'Worksheet!$C$' . $startRow . ':$C$' . $endRow, null, $dataCount);
+        $dsVal1_1->setFillColor('C0504D'); // Red
+        
+        $dsVal1_2 = new DataSeriesValues('Number', 'Worksheet!$F$' . $startRow . ':$F$' . $endRow, null, $dataCount);
+        $dsVal1_2->setFillColor('9BBB59'); // Green
+        
+        $dsVal1_3 = new DataSeriesValues('Number', 'Worksheet!$G$' . $startRow . ':$G$' . $endRow, null, $dataCount);
+        $dsVal1_3->setFillColor('F79646'); // Orange
 
-            // Build the dataseries
-            $series = new DataSeries(
-                DataSeries::TYPE_BARCHART,       // plotType
-                DataSeries::GROUPING_CLUSTERED,  // plotGrouping
-                range(0, count($dataSeriesValues) - 1), // plotOrder
-                $dataSeriesLabels,               // plotLabel
-                $xAxisTickValues,                // plotCategory
-                $dataSeriesValues                // plotValues
-            );
-            $series->setPlotDirection(DataSeries::DIRECTION_COL);
+        $dataSeriesValues1 = [
+            $dsVal1_0,
+            $dsVal1_1,
+            $dsVal1_2,
+            $dsVal1_3,
+        ];
 
-            // Add data labels (values) to the chart
-            $layout = new \PhpOffice\PhpSpreadsheet\Chart\Layout();
-            $layout->setShowVal(true);
-            $layout->setShowLegendKey(false);
-            $layout->setShowCatName(false);
-            $layout->setShowSerName(false);
+        $series1 = new DataSeries(
+            DataSeries::TYPE_BARCHART,
+            DataSeries::GROUPING_CLUSTERED,
+            range(0, count($dataSeriesValues1) - 1),
+            $dataSeriesLabels1,
+            $xAxisTickValues1,
+            $dataSeriesValues1
+        );
+        $series1->setPlotDirection(DataSeries::DIRECTION_COL);
 
-            // Set the series in the plot area with the layout
-            $plotArea = new PlotArea($layout, [$series]);
+        $plotArea1 = new PlotArea(null, [$series1]);
+        $legend1 = new Legend(Legend::POSITION_RIGHT, null, false);
+        $title1 = new Title('POSISI STOCK WH TML CIK - SEPTEMBER 2026');
+        $chart1 = new Chart('chart1', $title1, $legend1, $plotArea1, true, 0, null, null);
 
-            // Set the chart legend
-            $legend = new Legend(Legend::POSITION_BOTTOM, null, false);
+        // Position Chart 1 below the table
+        $chart1StartRow = $endRow + 3;
+        $chart1->setTopLeftPosition('B' . $chart1StartRow);
+        $chart1->setBottomRightPosition('K' . ($chart1StartRow + 20));
 
-            if ($this->filter == 'harian' || $this->filter == 'bulanan') {
-                $titleText = \Carbon\Carbon::parse($item->tanggal)->format('d M Y');
-            } elseif ($this->filter == 'tahunan') {
-                $titleText = date('F', mktime(0, 0, 0, $item->periode, 1));
-            } else {
-                $titleText = 'Grafik';
-            }
 
-            $title = new Title($titleText);
+        // --- CHART 2: POSISI STOCK WH TML CIK - 2026 (Hasil Prod CGL & Total Pengeluaran) ---
+        $dataSeriesLabels2 = [
+            new DataSeriesValues('String', 'Worksheet!$C$1', null, 1),
+            new DataSeriesValues('String', 'Worksheet!$F$1', null, 1),
+        ];
 
-            // Create the chart
-            $chart = new Chart(
-                'chart_' . $row, 
-                $title, 
-                $legend, 
-                $plotArea, 
-                true, 
-                0, 
-                null, 
-                null  
-            );
+        $xAxisTickValues2 = [
+            new DataSeriesValues('String', 'Worksheet!$A$' . $startRow . ':$A$' . $endRow, null, $dataCount),
+        ];
 
-            // Position chart from Col D to J alongside its data block
-            $chart->setTopLeftPosition('D' . $row);
-            $chart->setBottomRightPosition('J' . ($row + 6));
+        $dsVal2_0 = new DataSeriesValues('Number', 'Worksheet!$C$' . $startRow . ':$C$' . $endRow, null, $dataCount);
+        $dsVal2_0->setFillColor('C0504D'); // Red
+        
+        $dsVal2_1 = new DataSeriesValues('Number', 'Worksheet!$F$' . $startRow . ':$F$' . $endRow, null, $dataCount);
+        $dsVal2_1->setFillColor('9BBB59'); // Green
 
-            $charts[] = $chart;
+        $dataSeriesValues2 = [
+            $dsVal2_0,
+            $dsVal2_1,
+        ];
 
-            $row += 7; // Move to the next block (6 data rows + 1 empty row)
-        }
+        $series2 = new DataSeries(
+            DataSeries::TYPE_BARCHART,
+            DataSeries::GROUPING_CLUSTERED,
+            range(0, count($dataSeriesValues2) - 1),
+            $dataSeriesLabels2,
+            $xAxisTickValues2,
+            $dataSeriesValues2
+        );
+        $series2->setPlotDirection(DataSeries::DIRECTION_COL);
 
-        return $charts;
+        $plotArea2 = new PlotArea(null, [$series2]);
+        $legend2 = new Legend(Legend::POSITION_RIGHT, null, false);
+        $title2 = new Title('POSISI STOCK WH TML CIK - 2026');
+        $chart2 = new Chart('chart2', $title2, $legend2, $plotArea2, true, 0, null, null);
+
+        // Position Chart 2 below Chart 1
+        $chart2StartRow = $chart1StartRow + 22;
+        $chart2->setTopLeftPosition('B' . $chart2StartRow);
+        $chart2->setBottomRightPosition('K' . ($chart2StartRow + 20));
+
+        return [$chart1, $chart2];
     }
 }

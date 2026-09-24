@@ -87,14 +87,27 @@
                         </div>
                     </div>
                     
-                    <div style="height: 350px; width: 100%; position: relative;">
-                        @if($data->count() > 0)
-                            <canvas id="rekapChart"></canvas>
-                        @else
-                            <div class="h-100 w-100 d-flex align-items-center justify-content-center text-muted">
-                                Belum ada data untuk ditampilkan di grafik.
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <h6 class="text-center fw-bold">POSISI STOCK WH TML CIK - SEPTEMBER 2026</h6>
+                            <div style="height: 350px; width: 100%; position: relative;">
+                                @if($data->count() > 0)
+                                    <canvas id="rekapChart"></canvas>
+                                @else
+                                    <div class="h-100 w-100 d-flex align-items-center justify-content-center text-muted">
+                                        Belum ada data untuk ditampilkan di grafik.
+                                    </div>
+                                @endif
                             </div>
-                        @endif
+                        </div>
+                        <div class="col-12">
+                            <h6 class="text-center fw-bold mt-4">POSISI STOCK WH TML CIK - 2026</h6>
+                            <div style="height: 350px; width: 100%; position: relative;">
+                                @if($data->count() > 0)
+                                    <canvas id="rekapChart2"></canvas>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -109,12 +122,13 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light text-uppercase text-muted" style="font-size: 12px; letter-spacing: 0.5px;">
                         <tr>
-                            <th class="py-3 px-4 rounded-start">Periode</th>
-                            <th class="py-3 px-4">Hasil PRD CGL</th>
+                            <th class="py-3 px-4 rounded-start">Tgl</th>
+                            <th class="py-3 px-4 fw-bold" style="color: #135b9f;">Saldo Awal</th>
+                            <th class="py-3 px-4">Hasil Prod CGL</th>
                             <th class="py-3 px-4" style="color: #A22C29;">Pengeluaran TML</th>
                             <th class="py-3 px-4" style="color: #A22C29;">Pengeluaran TTL</th>
                             <th class="py-3 px-4 fw-bold" style="color: #A22C29;">Total Pengeluaran</th>
-                            <th class="py-3 px-4 fw-bold" style="color: #135b9f;">Sisa Stock</th>
+                            <th class="py-3 px-4 fw-bold" style="color: #135b9f;">Saldo Akhir</th>
                             <th class="py-3 px-4 rounded-end">Aksi</th>
                         </tr>
                     </thead>
@@ -126,11 +140,15 @@
                         <tr>
                             <td class="py-3 px-4 fw-medium text-dark">
                                 @if($filter == 'harian' || $filter == 'bulanan')
-                                    {{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}
+                                    {{ \Carbon\Carbon::parse($item->tanggal)->format('d-M-y') }}
                                 @elseif($filter == 'tahunan')
                                     {{ date('F', mktime(0, 0, 0, $item->periode, 1)) }} {{ $filter_year }}
                                 @endif
                             </td>
+                            @php
+                                $saldoAwal = $item->sisa_stock - $item->hasil_prd + $item->total_pengeluaran;
+                            @endphp
+                            <td class="py-3 px-4 fw-bold" style="color: #135b9f;">{{ number_format($saldoAwal, 0, ',', '.') }}</td>
                             <td class="py-3 px-4">{{ number_format($item->hasil_prd, 0, ',', '.') }}</td>
                             <td class="py-3 px-4" style="color: #A22C29;">{{ number_format($item->pengeluaran_tml, 0, ',', '.') }}</td>
                             <td class="py-3 px-4" style="color: #A22C29;">{{ number_format($item->pengeluaran_ttl, 0, ',', '.') }}</td>
@@ -195,8 +213,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    const pengeluaran = chartData.map(item => item.total_pengeluaran);
-    const sisaStock = chartData.map(item => item.sisa_stock);
+    const pengeluaran = chartData.map(item => Number(item.total_pengeluaran));
+    const saldoAkhir = chartData.map(item => Number(item.sisa_stock));
+    const hasilPrd = chartData.map(item => Number(item.hasil_prd));
+    const saldoAwal = chartData.map(item => Number(item.sisa_stock) - Number(item.hasil_prd) + Number(item.total_pengeluaran));
 
     const ctx = document.getElementById('rekapChart').getContext('2d');
     new Chart(ctx, {
@@ -205,18 +225,105 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: labels,
             datasets: [
                 {
-                    label: 'Sisa Stock',
-                    data: sisaStock,
-                    backgroundColor: '#135b9f', // Corporate Blue
-                    hoverBackgroundColor: '#0f4880',
-                    borderRadius: 4,
+                    label: 'Saldo Awal',
+                    data: saldoAwal,
+                    backgroundColor: '#4e73df', // Blue
+                    borderRadius: 2,
                 },
                 {
-                    label: 'Total Pengeluaran',
+                    label: 'Hasil Prod CGL',
+                    data: hasilPrd,
+                    backgroundColor: '#e74a3b', // Red
+                    borderRadius: 2,
+                },
+                {
+                    label: 'Pengeluaran',
                     data: pengeluaran,
-                    backgroundColor: '#A22C29', // Corporate Red
-                    hoverBackgroundColor: '#8B2523',
-                    borderRadius: 4,
+                    backgroundColor: '#1cc88a', // Green
+                    borderRadius: 2,
+                },
+                {
+                    label: 'Saldo Akhir',
+                    data: saldoAkhir,
+                    backgroundColor: '#f6c23e', // Yellow
+                    borderRadius: 2,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            devicePixelRatio: 4,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
+                        color: '#64748b'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    padding: 12,
+                    titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
+                    bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+                    cornerRadius: 8,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + new Intl.NumberFormat('id-ID').format(context.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false, drawBorder: false },
+                    ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#94a3b8' }
+                },
+                y: {
+                    beginAtZero: true,
+                    border: { display: false },
+                    grid: { color: '#f1f5f9', drawBorder: false },
+                    ticks: {
+                        padding: 10,
+                        font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },
+                        color: '#94a3b8',
+                        callback: function(value) {
+                            if (value >= 1000000) return (value / 1000000) + 'M';
+                            else if (value >= 1000) return (value / 1000) + 'k';
+                            return value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const ctx2 = document.getElementById('rekapChart2').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Hasil Prod CGL',
+                    data: hasilPrd,
+                    backgroundColor: '#e74a3b', // Red
+                    borderRadius: 2,
+                },
+                {
+                    label: 'Pengeluaran',
+                    data: pengeluaran,
+                    backgroundColor: '#1cc88a', // Green
+                    borderRadius: 2,
                 }
             ]
         },
@@ -292,11 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function exportExcel() {
-    const canvas = document.getElementById('rekapChart');
-    if (canvas) {
-        const imageData = canvas.toDataURL('image/png');
-        document.getElementById('chart_image').value = imageData;
-    }
+    // Since we are using native charts in Excel now, we don't need to pass the image base64
     document.getElementById('exportForm').submit();
 }
 

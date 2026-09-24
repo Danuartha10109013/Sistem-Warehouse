@@ -41,6 +41,7 @@ use App\Http\Controllers\FomController;
 use App\Http\Controllers\IdOdController;
 use App\Http\Controllers\SidewallController;
 use App\Http\Controllers\RekapPrdController;
+use App\Http\Controllers\MasterProductController;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -151,6 +152,16 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::post('/store', [RekapPrdController::class, 'store'])->name('rekap-prd.store');
         Route::post('/export', [RekapPrdController::class, 'exportExcel'])->name('rekap-prd.export');
         Route::delete('/{id}', [RekapPrdController::class, 'destroy'])->name('rekap-prd.destroy');
+    });
+
+    Route::prefix('master-product')->group(function () {
+        Route::get('/', [MasterProductController::class, 'index'])->name('master-product.index');
+        Route::post('/store', [MasterProductController::class, 'store'])->name('master-product.store');
+        Route::post('/update/{id}', [MasterProductController::class, 'update'])->name('master-product.update');
+        Route::post('/import', [MasterProductController::class, 'import'])->name('master-product.import');
+        Route::delete('/destroy/{id}', [MasterProductController::class, 'destroy'])->name('master-product.destroy');
+        Route::post('/check-search-key', [MasterProductController::class, 'checkSearchKey'])->name('master-product.check-key');
+        Route::post('/upload-foto', [MasterProductController::class, 'uploadFoto'])->name('master-product.upload-foto');
     });
 
     Route::prefix('stock')->group(function () {
