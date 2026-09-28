@@ -7,9 +7,32 @@
     <div class="card-body">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h4 class="text-lg font-semibold text-gray-800 dark:text-white">Kelola Kapasitas</h4>
-                <p class="text-sm text-gray-500 mt-1">Atur nilai kapasitas stok yang akan digunakan untuk perhitungan bulanan.</p>
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-white">Kelola Kapasitas Bulanan</h4>
+                <p class="text-sm text-gray-500 mt-1">Atur nilai kapasitas stok untuk bulan dan tahun spesifik.</p>
             </div>
+        </div>
+
+        <!-- Form Filter (Pilih Bulan & Tahun untuk diedit) -->
+        <div class="mb-6 max-w-4xl bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+            <form action="{{ route('modul-kapasitas.kelola-kapasitas') }}" method="GET" class="flex flex-wrap items-end gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bulan</label>
+                    <select name="bulan" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        @for($i=1; $i<=12; $i++)
+                            <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>
+                                {{ date('F', mktime(0,0,0,$i,1)) }}
+                            </option>
+                        @endfor
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tahun</label>
+                    <input type="number" name="tahun" value="{{ $tahun }}" min="2020" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" style="width: 100px;">
+                </div>
+                <div>
+                    <button type="submit" class="text-white bg-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center">Tampilkan</button>
+                </div>
+            </form>
         </div>
 
         @if(session('success'))
@@ -29,6 +52,8 @@
 
         <form action="{{ route('modul-kapasitas.kelola-kapasitas.store') }}" method="POST">
             @csrf
+            <input type="hidden" name="bulan" value="{{ $bulan }}">
+            <input type="hidden" name="tahun" value="{{ $tahun }}">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
                 <!-- Card CRC -->
                 <div class="bg-white dark:bg-darkgray p-6 rounded-xl shadow-sm border-t-4 border-t-primary border-gray-100 dark:border-gray-700">
@@ -74,6 +99,41 @@
                 </button>
             </div>
         </form>
+
+        <!-- Tabel Riwayat Kapasitas -->
+        <div class="mt-10 max-w-4xl">
+            <h5 class="text-md font-bold text-gray-800 dark:text-white mb-4">Riwayat Kapasitas yang Tersimpan</h5>
+            <div class="overflow-x-auto relative shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="py-3 px-6">Bulan & Tahun</th>
+                            <th scope="col" class="py-3 px-6 text-right">Kapasitas CRC</th>
+                            <th scope="col" class="py-3 px-6 text-right">Kapasitas Barang Jadi</th>
+                            <th scope="col" class="py-3 px-6 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($histories as $h)
+                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            <td class="py-4 px-6 font-medium text-gray-900 dark:text-white">
+                                {{ date('F', mktime(0,0,0,$h->bulan,1)) }} {{ $h->tahun }}
+                            </td>
+                            <td class="py-4 px-6 text-right">{{ number_format($h->kapasitas_crc, 0, ',', '.') }} Ton</td>
+                            <td class="py-4 px-6 text-right">{{ number_format($h->kapasitas_barang_jadi, 0, ',', '.') }} Ton</td>
+                            <td class="py-4 px-6 text-center">
+                                <a href="{{ route('modul-kapasitas.kelola-kapasitas', ['bulan' => $h->bulan, 'tahun' => $h->tahun]) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr class="bg-white dark:bg-gray-800">
+                            <td colspan="4" class="py-4 px-6 text-center text-gray-500">Belum ada data riwayat yang tersimpan.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

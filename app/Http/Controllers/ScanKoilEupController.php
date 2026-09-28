@@ -7,6 +7,8 @@ use App\Models\ScanKoilEup;
 use App\Models\ScanKoilLayout;
 use App\Models\ScanKoilPalet;
 use Illuminate\Support\Facades\DB;
+use App\Exports\ScanKoilEupExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ScanKoilEupController extends Controller
 {
@@ -108,5 +110,10 @@ class ScanKoilEupController extends Controller
         }
         
         return redirect()->back()->with('success', 'Palet berhasil dihapus');
+    }
+
+    public function exportExcel()
+    {
+        return Excel::download(new ScanKoilEupExport, 'Data_Scan_Koil_EUP_' . date('Ymd_His') . '.xlsx');
     }
 }

@@ -129,8 +129,12 @@
             flex-direction: column !important;
             align-items: flex-start !important;
         }
-        .card-header-mobile button {
+        .card-header-mobile .button-group-mobile {
             width: 100%;
+        }
+        .card-header-mobile .button-group-mobile > a, 
+        .card-header-mobile .button-group-mobile > button {
+            flex: 1;
             justify-content: center;
         }
     }
@@ -142,9 +146,14 @@
         <!-- Card Header -->
         <div class="card-header bg-white border-bottom d-flex flex-wrap justify-content-between align-items-center gap-3 card-header-mobile" style="padding: 20px 24px;">
             <h5 class="mb-0 text-dark font-weight-bold" style="font-size: 18px; letter-spacing: 0.3px;">Manajemen Scan Koil EUP</h5>
-            <button type="button" class="btn btn-primary shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalTambah" style="background-color: #135b9f; border: none; font-weight: 500; padding: 8px 16px; border-radius: 6px;">
-                <i class="fas fa-plus"></i> Input Data
-            </button>
+            <div class="d-flex flex-wrap gap-2 button-group-mobile">
+                <a href="{{ route('scan-koil-eup.export') }}" class="btn btn-success shadow-sm d-flex align-items-center gap-2" style="background-color: #107c41; border: none; font-weight: 500; padding: 8px 16px; border-radius: 6px;">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </a>
+                <button type="button" class="btn btn-primary shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalTambah" style="background-color: #135b9f; border: none; font-weight: 500; padding: 8px 16px; border-radius: 6px;">
+                    <i class="fas fa-plus"></i> Input Data
+                </button>
+            </div>
         </div>
         
         <!-- Navigation Tabs -->

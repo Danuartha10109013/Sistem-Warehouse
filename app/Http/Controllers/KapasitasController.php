@@ -28,10 +28,20 @@ class KapasitasController extends Controller
         // 2. Tentukan jumlah hari dalam bulan dan tahun yang dipilih
         $daysInMonth = Carbon::create($year, $month)->daysInMonth;
 
-        // 3. Ambil nilai Kapasitas (KAP) dari pengaturan (tabel settings)
-        // Kita menggunakan key 'kapasitas_crc' dengan nilai default 6760 (sesuai contoh gambar)
-        $kapasitasSetting = Setting::where('key', 'kapasitas_crc')->first();
-        $kapasitasValue = $kapasitasSetting ? (float)$kapasitasSetting->value : 6760;
+        // 3. Ambil nilai Kapasitas (KAP) dari riwayat terbaru (berlaku ke depan) atau fallback ke settings
+        $history = \App\Models\KapasitasHistory::where(function($query) use ($month, $year) {
+            $query->where('tahun', '<', $year)
+                  ->orWhere(function($q) use ($month, $year) {
+                      $q->where('tahun', $year)->where('bulan', '<=', $month);
+                  });
+        })->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')->first();
+        
+        if ($history) {
+            $kapasitasValue = (float)$history->kapasitas_crc;
+        } else {
+            $kapasitasSetting = Setting::where('key', 'kapasitas_crc')->first();
+            $kapasitasValue = $kapasitasSetting ? (float)$kapasitasSetting->value : 6760;
+        }
 
         // 4. Ambil data stok harian berdasarkan bulan dan tahun yang dipilih
         // Filter kategori 'CRC', 'PRD', dan 'QA' saja agar query lebih cepat
@@ -185,9 +195,20 @@ class KapasitasController extends Controller
         // 2. Tentukan jumlah hari
         $daysInMonth = Carbon::create($year, $month)->daysInMonth;
 
-        // 3. Ambil nilai Kapasitas Barang Jadi
-        $kapasitasSetting = Setting::where('key', 'kapasitas_barang_jadi')->first();
-        $kapasitasValue = $kapasitasSetting ? (float)$kapasitasSetting->value : 10000;
+        // 3. Ambil nilai Kapasitas Barang Jadi dari riwayat terbaru (berlaku ke depan) atau fallback ke settings
+        $history = \App\Models\KapasitasHistory::where(function($query) use ($month, $year) {
+            $query->where('tahun', '<', $year)
+                  ->orWhere(function($q) use ($month, $year) {
+                      $q->where('tahun', $year)->where('bulan', '<=', $month);
+                  });
+        })->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')->first();
+        
+        if ($history) {
+            $kapasitasValue = (float)$history->kapasitas_barang_jadi;
+        } else {
+            $kapasitasSetting = Setting::where('key', 'kapasitas_barang_jadi')->first();
+            $kapasitasValue = $kapasitasSetting ? (float)$kapasitasSetting->value : 10000;
+        }
 
         // 4. Ambil data stok harian
         $stocks = DailyStock::whereYear('tanggal', $year)

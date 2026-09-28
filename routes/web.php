@@ -74,6 +74,7 @@ Route::post('/api/run-scan', [ScanController::class, 'scan'])->name('laravel.sca
 Route::prefix('scan-koil-eup')->group(function () {
     Route::get('/', [\App\Http\Controllers\ScanKoilEupController::class, 'index'])->name('scan-koil-eup.index');
     Route::post('/store', [\App\Http\Controllers\ScanKoilEupController::class, 'store'])->name('scan-koil-eup.store');
+    Route::get('/export', [\App\Http\Controllers\ScanKoilEupController::class, 'exportExcel'])->name('scan-koil-eup.export');
     Route::delete('/destroy/{id}', [\App\Http\Controllers\ScanKoilEupController::class, 'destroy'])->name('scan-koil-eup.destroy');
     
     Route::post('/layout/store', [\App\Http\Controllers\ScanKoilEupController::class, 'storeLayout'])->name('scan-koil-eup.layout.store');
