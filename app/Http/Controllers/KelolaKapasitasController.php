@@ -24,12 +24,25 @@ class KelolaKapasitasController extends Controller
             $kapasitasCrc = $history->kapasitas_crc;
             $kapasitasBarangJadi = $history->kapasitas_barang_jadi;
         } else {
-            // Fallback ke setting jika belum di-set di bulan/tahun tersebut
-            $kapasitasCrcSetting = Setting::where('key', 'kapasitas_crc')->first();
-            $kapasitasCrc = $kapasitasCrcSetting ? $kapasitasCrcSetting->value : '6760';
+            // Cari history terdekat sebelumnya
+            $lastHistory = KapasitasHistory::where(function($q) use ($bulan, $tahun) {
+                $q->where('tahun', '<', $tahun)
+                  ->orWhere(function($sq) use ($bulan, $tahun) {
+                      $sq->where('tahun', $tahun)->where('bulan', '<', $bulan);
+                  });
+            })->orderBy('tahun', 'desc')->orderBy('bulan', 'desc')->first();
 
-            $kapasitasBjSetting = Setting::where('key', 'kapasitas_barang_jadi')->first();
-            $kapasitasBarangJadi = $kapasitasBjSetting ? $kapasitasBjSetting->value : '12000';
+            if ($lastHistory) {
+                $kapasitasCrc = $lastHistory->kapasitas_crc;
+                $kapasitasBarangJadi = $lastHistory->kapasitas_barang_jadi;
+            } else {
+                // Fallback ke setting jika belum di-set sama sekali
+                $kapasitasCrcSetting = Setting::where('key', 'kapasitas_crc')->first();
+                $kapasitasCrc = $kapasitasCrcSetting ? $kapasitasCrcSetting->value : '6760';
+
+                $kapasitasBjSetting = Setting::where('key', 'kapasitas_barang_jadi')->first();
+                $kapasitasBarangJadi = $kapasitasBjSetting ? $kapasitasBjSetting->value : '12000';
+            }
         }
 
         // Ambil daftar riwayat untuk ditampilkan di tabel
@@ -50,7 +63,7 @@ class KelolaKapasitasController extends Controller
             'kapasitas_barang_jadi' => 'required|numeric'
         ]);
 
-        // Update atau create riwayat per bulan
+        // Update atau create riwayat per bulan yang dipilih
         KapasitasHistory::updateOrCreate(
             ['bulan' => $request->bulan, 'tahun' => $request->tahun],
             [
@@ -58,6 +71,17 @@ class KelolaKapasitasController extends Controller
                 'kapasitas_barang_jadi' => $request->kapasitas_barang_jadi
             ]
         );
+
+        // Update riwayat bulan-bulan berikutnya (masa depan) agar ikut berubah
+        KapasitasHistory::where(function($query) use ($request) {
+            $query->where('tahun', '>', $request->tahun)
+                  ->orWhere(function($q) use ($request) {
+                      $q->where('tahun', $request->tahun)->where('bulan', '>', $request->bulan);
+                  });
+        })->update([
+            'kapasitas_crc' => $request->kapasitas_crc,
+            'kapasitas_barang_jadi' => $request->kapasitas_barang_jadi
+        ]);
 
         return redirect()->route('modul-kapasitas.kelola-kapasitas', ['bulan' => $request->bulan, 'tahun' => $request->tahun])->with('success', 'Nilai kapasitas berhasil diperbarui.');
     }
