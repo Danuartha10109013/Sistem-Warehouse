@@ -11,23 +11,13 @@ use Illuminate\Support\Facades\Validator;
 
 class KUserController extends Controller
 {
-    public function index (Request $request){
-        $search = $request->input('search');
-        if($search){
-            $data = User::when($search, function($query) use ($search) {
-                return $query->where('name', 'like', '%' . $search . '%');
-            })->paginate(10);
-        }else{
-            $data= User::paginate(10);
-        }
-
-        $data->setCollection(
-            $data->getCollection()->reject(function ($item) {
-                return $item->id == 14;
-            })
-        );
-       
-        return view('user.index',compact('data','search'));
+    public function index(Request $request)
+    {
+        // Get all users except id 14, let DataTables handle search and pagination
+        $data = User::where('id', '!=', 14)->get();
+        $search = null; // Passed to avoid undefined variable error if still used in view
+        
+        return view('user.index', compact('data', 'search'));
     }
 
    public function store(Request $request)

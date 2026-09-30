@@ -359,7 +359,7 @@
                @endif
             @endforeach
 
-            {{-- Tambahan menu SIK --}}
+            {{-- Tambahan menu SIK dkk --}}
             @if (in_array('all', $akses) || in_array('SIK', $akses))
                <a href="{{ route('sik') }}" class="menu-item">
                   <div>
@@ -367,75 +367,86 @@
                      <div class="menu-title">Surat Izin Keluar</div>
                   </div>
                </a>
+            @endif
+            @if (in_array('all', $akses) || in_array('LP', $akses))
                <a href="{{ route('pac') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-note"></i>
                      <div class="menu-title">Laporan Packing</div>
                   </div>
                </a>
+            @endif
+            @if (in_array('all', $akses) || in_array('ID', $akses))
                <a href="{{ route('idod') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-image-filter-tilt-shift"></i>
                      <div class="menu-title">Laporan ID OD</div>
                   </div>
                </a>
+            @endif
+            @if (in_array('all', $akses) || in_array('SW', $akses))
                <a href="{{ route('sidewall') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-chart-donut"></i>
                      <div class="menu-title">Laporan Sidewall</div>
                   </div>
                </a>
+            @endif
+            @if (in_array('all', $akses) || in_array('OP', $akses))
                <a href="{{ route('report-open-pack') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-note"></i>
                      <div class="menu-title">Report Open Pack</div>
                   </div>
                </a>
+            @endif
 
+            @if (in_array('all', $akses) || in_array('LR', $akses))
                <a href="{{ route('laporanrepacking') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-recycle"></i>
                      <div class="menu-title">Laporan Repacking</div>
                   </div>
                </a>
+            @endif
 
-               {{-- [WIP] Disembunyikan sementara sebelum upload hosting
-               <a href="{{ route('suratjalan') }}" class="menu-item">
-                  <div>
-                     <i class="mdi mdi-printer-search"></i>
-                     <div class="menu-title">Scan Surat Jalan</div>
-                  </div>
-               </a>
-               --}}
-
+            @if (in_array('all', $akses) || in_array('MK', $akses))
                <a href="{{ route('modul-kapasitas.dashboard') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-chart-bar"></i>
                      <div class="menu-title">Modul Kapasitas</div>
                   </div>
                </a>
+            @endif
                
+            @if (in_array('all', $akses) || in_array('RP', $akses))
                <a href="{{ route('rekap-prd.dashboard') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-file-chart"></i>
                      <div class="menu-title">Rekap Hasil PRD & Pengeluaran</div>
                   </div>
                </a>
+            @endif
 
+            @if (in_array('all', $akses) || in_array('VT', $akses))
                <a href="{{ route('verifikasi-timbangan.index') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-scale-balance"></i>
                      <div class="menu-title">Verifikasi Timbangan</div>
                   </div>
                </a>
+            @endif
                
+            @if (in_array('all', $akses) || in_array('SKE', $akses))
                <a href="{{ route('scan-koil-eup.index') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-barcode-scan"></i>
                      <div class="menu-title">Scan Koil EUP</div>
                   </div>
                </a>
+            @endif
 
+            @if (in_array('all', $akses) || in_array('MPR', $akses))
                <a href="{{ route('master-product.index') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-cube-outline"></i>
@@ -444,7 +455,7 @@
                </a>
             @endif
 
-            @if (Auth::user()->username == "danuartha")
+            @if (in_array('all', $akses) || in_array('ST', $akses))
                <a href="{{ route('stock') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-database-settings"></i>
@@ -485,13 +496,38 @@
                const logoutUrl = this.href;
 
                Swal.fire({
-                  title: 'Are you sure?',
-                  text: "You will be logged out.",
-                  icon: 'warning',
+                  html: `
+                      <div style="margin-bottom: 24px; margin-top: 10px; text-align: center;">
+                          <div style="width: 80px; height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: #fef2f2; border-radius: 50%;">
+                              <i class="mdi mdi-logout" style="font-size: 40px; color: #b91c1c;"></i>
+                          </div>
+                      </div>
+                      <h2 style="font-weight: 800; color: #1e293b; font-size: 22px; margin-bottom: 12px; font-family: 'Inter', sans-serif; letter-spacing: -0.5px; text-align: center;">Konfirmasi Keluar</h2>
+                      <p style="color: #64748b; font-size: 15px; margin-bottom: 0; line-height: 1.6; font-family: 'Inter', sans-serif; text-align: center;">
+                          Apakah Anda yakin ingin keluar dari sistem?
+                      </p>
+                  `,
+                  showCloseButton: true,
                   showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'Yes, logout'
+                  confirmButtonText: 'Ya, Keluar',
+                  cancelButtonText: 'Batal',
+                  reverseButtons: true,
+                  width: '380px', // Ini yang bikin bentuknya kotak, tidak lebar ke pinggir
+                  customClass: {
+                     confirmButton: 'btn px-4 ms-2 text-white',
+                     cancelButton: 'btn px-4 me-2 border text-dark',
+                     popup: 'rounded-4 shadow-lg border-0'
+                  },
+                  buttonsStyling: false,
+                  didOpen: () => {
+                     // Tambah inline style untuk tombol seperti showCustomConfirm
+                     const confirmBtn = Swal.getConfirmButton();
+                     const cancelBtn = Swal.getCancelButton();
+                     confirmBtn.style.backgroundColor = '#b91c1c';
+                     confirmBtn.style.borderRadius = '8px';
+                     cancelBtn.style.backgroundColor = '#ffffff';
+                     cancelBtn.style.borderRadius = '8px';
+                  }
                }).then((result) => {
                   if (result.isConfirmed) {
                      window.location.href = logoutUrl;

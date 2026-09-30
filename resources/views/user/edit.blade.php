@@ -1,17 +1,56 @@
-@extends('user.layout.main')
+@extends('user.layout.V_template')
 
-@section('title')
-Kelola User @if(Auth::user()->role == 0)
-    Admin
-  @elseif(Auth::user()->role == 1)
-    Pegawai
-  @else
-    Unknown
-  @endif
-@endsection
+@section('title', 'Edit User Superadmin')
+
+@push('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    /* Select2 custom styling for Bootstrap 5 feel */
+    .select2-container--default .select2-selection--single {
+        height: calc(2.8rem + 2px) !important;
+        padding: 0.4rem 0.75rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100%;
+        right: 12px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #1e293b;
+        font-weight: 500;
+        padding-left: 0;
+    }
+    .select2-dropdown {
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+        background-color: #135b9f;
+        color: white;
+    }
+    .select2-results__option {
+        padding: 10px 14px;
+        font-weight: 500;
+    }
+</style>
+@endpush
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid p-0">
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px; background: linear-gradient(to right, #ffffff, #f8f9fa);">
+        <div class="card-body p-4">
+            <h4 class="fw-bolder mb-2" style="color: #1e293b; letter-spacing: -0.5px;">Edit User Superadmin</h4>
+            <div class="text-muted" style="font-size: 14px;">
+                Home <span class="mx-1">/</span> Administrator <span class="mx-1">/</span> Edit User
+            </div>
+        </div>
+    </div>
   <div class="row justify-content-center">
     <div class="col-md-8">
       <form action="{{ route('superadmin.Administrator.kelola-user.update', $data->id) }}" method="POST" enctype="multipart/form-data">
@@ -197,4 +236,22 @@ Kelola User @if(Auth::user()->role == 0)
     </div>
   </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#division, #role').select2({
+            minimumResultsForSearch: Infinity,
+            width: '100%'
+        });
+        
+        // Memastikan fitur filter kita mendengarkan perubahan dari select2
+        $('#role, #division').on('select2:select', function (e) {
+            this.dispatchEvent(new Event('change'));
+        });
+    });
+</script>
+@endpush
+
 @endsection

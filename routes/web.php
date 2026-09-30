@@ -71,7 +71,7 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/scan', [ScanController::class, 'index']);
 Route::post('/api/run-scan', [ScanController::class, 'scan'])->name('laravel.scan');
 
-Route::prefix('scan-koil-eup')->group(function () {
+Route::prefix('scan-koil-eup')->middleware(['Scan-Koil-EUP'])->group(function () {
     Route::get('/', [\App\Http\Controllers\ScanKoilEupController::class, 'index'])->name('scan-koil-eup.index');
     Route::post('/store', [\App\Http\Controllers\ScanKoilEupController::class, 'store'])->name('scan-koil-eup.store');
     Route::get('/export', [\App\Http\Controllers\ScanKoilEupController::class, 'exportExcel'])->name('scan-koil-eup.export');
@@ -83,7 +83,7 @@ Route::prefix('scan-koil-eup')->group(function () {
     Route::post('/palet/store', [\App\Http\Controllers\ScanKoilEupController::class, 'storePalet'])->name('scan-koil-eup.palet.store');
     Route::delete('/palet/destroy/{id}', [\App\Http\Controllers\ScanKoilEupController::class, 'destroyPalet'])->name('scan-koil-eup.palet.destroy');
 });
-Route::prefix('Laporan-packing')->group(function () {
+Route::prefix('Laporan-packing')->middleware(['Laporan-Packing'])->group(function () {
     Route::get('/',[PackingController::class,'index'])->name('pac');
     Route::get('/add',[PackingController::class,'add'])->name('pac.add');
     Route::post('/store',[PackingController::class,'store'])->name('pac.store');
@@ -146,7 +146,7 @@ Route::middleware([AutoLogout::class])->group(function () {
 
     Route::get('/welcome', [LoginController::class, 'welcome'])->name('welcome');
 
-    Route::prefix('rekap-prd')->group(function () {
+    Route::prefix('rekap-prd')->middleware(['Rekap-PRD'])->group(function () {
         Route::get('/', [RekapPrdController::class, 'index'])->name('rekap-prd.dashboard');
         Route::get('/input', [RekapPrdController::class, 'input'])->name('rekap-prd.input');
         Route::get('/data', [RekapPrdController::class, 'data'])->name('rekap-prd.data');
@@ -155,7 +155,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::delete('/{id}', [RekapPrdController::class, 'destroy'])->name('rekap-prd.destroy');
     });
 
-    Route::prefix('master-product')->group(function () {
+    Route::prefix('master-product')->middleware(['Master-Product'])->group(function () {
         Route::get('/', [MasterProductController::class, 'index'])->name('master-product.index');
         Route::post('/store', [MasterProductController::class, 'store'])->name('master-product.store');
         Route::post('/update/{id}', [MasterProductController::class, 'update'])->name('master-product.update');
@@ -165,7 +165,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::post('/upload-foto', [MasterProductController::class, 'uploadFoto'])->name('master-product.upload-foto');
     });
 
-    Route::prefix('stock')->group(function () {
+    Route::prefix('stock')->middleware(['Kelola-Stock'])->group(function () {
         Route ::get('/',[StockController::class,'index'])->name('stock');
         Route::get('/crc-rekap-masuk', [StockController::class, 'rekapCrcMasuk'])->name('stock.crc.rekap_masuk');
         Route::get('/crc/{type}', [StockController::class, 'crcIndex'])->name('stock.crc');
@@ -184,7 +184,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route ::delete('/delete/{id}',[StockController::class,'destroy'])->name('stock.delete');
     });
 
-    Route::prefix('idod')->group(function () {
+    Route::prefix('idod')->middleware(['IDOD'])->group(function () {
         Route::get('/', [IdOdController::class, 'index'])->name('idod');
         Route::get('/dashboard-data', [IdOdController::class, 'dashboardData'])->name('idod.dashboard-data');
         Route::get('/add', [IdOdController::class, 'add_idod'])->name('idod.add');
@@ -197,7 +197,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::delete('/destroy/{id}', [IdOdController::class, 'destroy_idod'])->name('idod.destroy');
     });
 
-    Route::prefix('sidewall')->group(function () {
+    Route::prefix('sidewall')->middleware(['Sidewall'])->group(function () {
         Route::get('/', [SidewallController::class, 'index'])->name('sidewall');
         Route::get('/dashboard-data', [SidewallController::class, 'dashboardData'])->name('sidewall.dashboard-data');
         Route::get('/add', [SidewallController::class, 'add_idod'])->name('sidewall.add');
@@ -213,7 +213,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::delete('/master/{id}', [SidewallController::class, 'destroyMaster'])->name('sidewall.master.destroy');
     });
 
-    Route::prefix('laporan-repacking')->group(function () {
+    Route::prefix('laporan-repacking')->middleware(['Laporan-Repacking'])->group(function () {
         Route::get('/', [LaporanrepController::class, 'index'])->name('laporanrepacking');
         Route::get('/dashboard-data', [LaporanrepController::class, 'dashboardData'])->name('laporanrep.dashboard-data');
         Route::get('/add', [LaporanrepController::class, 'add_laporanrepacking'])->name('laporanrepacking.add');
@@ -230,7 +230,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::post('/store-daftar', [LaporanrepController::class, 'storeDaftarRepacking'])->name('laporanrepacking.store-daftar');
     });
 
-    Route::prefix('surat-jalan')->group(function () {
+    Route::prefix('surat-jalan')->middleware(['Surat-Jalan'])->group(function () {
         Route::get('/', [SuratJalanController::class, 'index'])->name('suratjalan');
         Route::get('/dashboard-data', [SuratJalanController::class, 'dashboardData'])->name('suratjalan.dashboard-data');
         Route::post('/store', [SuratJalanController::class, 'store'])->name('suratjalan.store');
@@ -1048,7 +1048,7 @@ use App\Http\Controllers\KapasitasCategoryFilterController;
 use App\Http\Controllers\KapasitasController;
 use App\Http\Controllers\KelolaKapasitasController;
 
-Route::group(['prefix' => 'modul-kapasitas', 'as' => 'modul-kapasitas.'], function () {
+Route::group(['prefix' => 'modul-kapasitas', 'middleware' => ['Modul-Kapasitas'], 'as' => 'modul-kapasitas.'], function () {
     Route::get('/dashboard', [KapasitasDashboardController::class, 'index'])->name('dashboard');
 
     // Kategori Filter Routes
@@ -1073,7 +1073,7 @@ Route::group(['prefix' => 'modul-kapasitas', 'as' => 'modul-kapasitas.'], functi
 // Modul Verifikasi Timbangan Open Pack
 use App\Http\Controllers\VerifikasiTimbanganController;
 
-Route::group(['prefix' => 'verifikasi-timbangan', 'as' => 'verifikasi-timbangan.'], function () {
+Route::group(['prefix' => 'verifikasi-timbangan', 'middleware' => ['Verifikasi-Timbangan'], 'as' => 'verifikasi-timbangan.'], function () {
     Route::get('/', [VerifikasiTimbanganController::class, 'index'])->name('index');
     Route::post('/store', [VerifikasiTimbanganController::class, 'store'])->name('store');
     Route::put('/update/{id}', [VerifikasiTimbanganController::class, 'update'])->name('update');
