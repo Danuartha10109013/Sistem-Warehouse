@@ -12,8 +12,10 @@ use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
 use PhpOffice\PhpSpreadsheet\Chart\Legend;
 use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Title;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class RekapPrdExport implements FromView, WithCharts, ShouldAutoSize
+class RekapPrdExport implements FromView, WithCharts, ShouldAutoSize, WithColumnFormatting
 {
     protected $data;
     protected $filter;
@@ -138,5 +140,17 @@ class RekapPrdExport implements FromView, WithCharts, ShouldAutoSize
         $chart2->setBottomRightPosition('K' . ($chart2StartRow + 20));
 
         return [$chart1, $chart2];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'B' => '#,##0',
+            'C' => '#,##0',
+            'D' => '#,##0',
+            'E' => '#,##0',
+            'F' => '#,##0',
+            'G' => '#,##0',
+        ];
     }
 }
