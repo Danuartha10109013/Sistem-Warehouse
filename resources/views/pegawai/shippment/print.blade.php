@@ -111,7 +111,7 @@
             <div class="footer">MADE IN INDONESIA</div>
         </div>
     </div>
-    <small style="display: flex; justify-content: flex-end; text-align: right; margin-right: 20px">{{$d->atribute}}</small>
+    <small style="display: flex; justify-content: flex-end; text-align: right; margin-right: 20px">{{$d->atribute}} | X-{{ substr($d->type, -3) }}</small>
     @endforeach
 </body>
 </html>
