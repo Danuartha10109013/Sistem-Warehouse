@@ -25,6 +25,14 @@
             <span class="hide-menu">Kelola User</span>
           </a>
         </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link {{ request()->routeIs('superadmin.activity-log*') ? 'active' : '' }}" href="{{ route('superadmin.activity-log.index') }}" aria-expanded="false">
+            <span>
+              <i class="fas fa-history" style="font-size: 1.1rem;"></i>
+            </span>
+            <span class="hide-menu">Log Aktivitas</span>
+          </a>
+        </li>
       </ul>
     </nav>
   </div>

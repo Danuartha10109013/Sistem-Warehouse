@@ -329,7 +329,8 @@
       </div>
       @if(Auth::check())
          @php
-            $akses = json_decode(Auth::user()->type);
+            $rawAkses = json_decode(Auth::user()->type, true);
+            $akses = is_array($rawAkses) ? $rawAkses : (empty(Auth::user()->type) ? [] : [Auth::user()->type]);
 
             // Daftar semua menu dan route-nya
             $menuItems = [
@@ -475,6 +476,12 @@
                   <div>
                      <i class="mdi mdi-database-settings"></i>
                      <div class="menu-title">Data Master</div>
+                  </div>
+               </a>
+               <a href="{{ route('superadmin.activity-log.index') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-history"></i>
+                     <div class="menu-title">Log Aktivitas</div>
                   </div>
                </a>
             @endif

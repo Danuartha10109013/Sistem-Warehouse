@@ -3,10 +3,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class ForkliftM extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     // Specify the table name if it's not following the Laravel naming convention
     protected $table = 'forklift';

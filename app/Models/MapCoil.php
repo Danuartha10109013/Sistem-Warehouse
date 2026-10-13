@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class MapCoil extends Model
 {
+    use LogsActivity;
     protected $table = 'mapcoil';
     protected $fillable = [
         'no_gs', 'a1', 'a2', 'a3', 'a4', 'a5',

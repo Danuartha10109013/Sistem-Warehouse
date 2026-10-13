@@ -11,10 +11,10 @@ class PegawaiMiddleware
     {
         // Periksa apakah pengguna adalah pegawai (role = 1)
         if (Auth::check()) {
-            if (Auth::user()->role == 1){
+            if (Auth::user()->role == 1 || Auth::user()->role == 5){
                 return $next($request);
             }
-            return response()->view('errors.custom', ['message' => 'Anda Bukan Admin'], 403);
+            return response()->view('errors.custom', ['message' => 'Anda Bukan Pegawai'], 403);
         }
         return redirect('/');; // Ganti dengan kode status atau rute yang sesuai
     }

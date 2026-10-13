@@ -5,9 +5,11 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class IDODModel extends Model
 {
+    use LogsActivity;
     protected $table = 'idod_tabel';
 
     protected $fillable = [

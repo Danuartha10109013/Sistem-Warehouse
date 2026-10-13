@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class PackingM extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     // Specify the table name if it doesn't follow Laravel's naming convention
     protected $table = 'packing';

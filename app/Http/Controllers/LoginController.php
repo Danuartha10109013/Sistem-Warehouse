@@ -46,6 +46,13 @@ class LoginController extends Controller
 
     // Autentikasi berhasil
     Auth::login($user);
+
+    \App\Services\LogActivity::record(
+        action: 'LOGIN',
+        module: 'Autentikasi',
+        description: "User {$user->name} ({$user->username}) berhasil login ke sistem"
+    );
+
     if ($user->role == 0 || $user->role == 5){
 
         return redirect()->route('welcome')->with('success','Hallo Selamat Datang'.Auth::user()->name);
@@ -63,6 +70,13 @@ class LoginController extends Controller
 
 
 public function logout(Request $request) {
+    if (Auth::check()) {
+        \App\Services\LogActivity::record(
+            action: 'LOGOUT',
+            module: 'Autentikasi',
+            description: "User " . Auth::user()->name . " telah logout dari sistem"
+        );
+    }
     Auth::logout();
     // Mengarahkan kembali ke halaman login dengan pesan sukses
     return redirect()->route('login')->with('success', 'Kamu berhasil Logout');

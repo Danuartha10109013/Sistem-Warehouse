@@ -326,6 +326,12 @@ Route::middleware([AutoLogout::class])->group(function () {
             Route::put('k-user/update/{id}',[KUserController::class,'update'])->name('kelola-user.update');
             Route::delete('k-user/delete/{id}',[KUserController::class,'destroy'])->name('kelola-user.delete');
         });
+
+        // Log Aktivitas Pengguna (Superadmin Only)
+        Route::prefix('activity-log')->name('activity-log.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('index');
+            Route::get('/{id}', [\App\Http\Controllers\ActivityLogController::class, 'show'])->name('show');
+        });
         Route::prefix('data-master')->group(function () {
             Route::get('/',[DataMasterController::class,'index'])->name('data-master');
             Route::post('/shifts/store', [DataMasterController::class, 'store'])->name('shifts.store');

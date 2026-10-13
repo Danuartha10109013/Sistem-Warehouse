@@ -5,9 +5,11 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class LaporanrepackingM extends Model
 {
+    use LogsActivity;
     protected $table = 'laporanrepacking';
 
     protected $fillable = [

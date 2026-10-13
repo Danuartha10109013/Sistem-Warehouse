@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 class CraneM extends Model
 {
+    use LogsActivity;
     // Specify the table name if it doesn't follow the Laravel naming convention
     protected $table = 'crane';
 
