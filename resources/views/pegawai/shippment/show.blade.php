@@ -72,6 +72,7 @@ Shippment A || Pegawai
                              <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Atribute</th>
+                                <th scope="col">No SO</th>
                                 <th scope="col">Unique Code</th>
                                 <th scope="col">Size & Grade</th>
                                 <th scope="col">Weight</th>
@@ -90,6 +91,7 @@ Shippment A || Pegawai
                                     <tr>
                                         <th>{{$loop->iteration}}</th>
                                         <td>{{$d->atribute}}</td>
+                                        <td>{{$d->type}}</td>
                                         <td>{{$d->unicode}}</td>
                                         <td>{{$d->size}}</td>
                                         <td>{{$d->weight}}</td>

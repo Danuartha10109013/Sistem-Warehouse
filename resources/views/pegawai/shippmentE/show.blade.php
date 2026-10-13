@@ -50,6 +50,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Attribute</th>
+                                <th>No SO</th>
                                 <th>Name</th>
                                 <th>POD</th>
                                 <th>Product</th>
@@ -63,6 +64,7 @@
                                 <tr>
                                     <th>{{ $loop->iteration }}</th>
                                     <td>{{ $d->attribute }}</td>
+                                    <td>{{ $d->no_so }}</td>
                                     <td>{{ $d->name }}</td>
                                     <td>{{ $d->pod }}</td>
                                     <td>{{ $d->product }}</td>

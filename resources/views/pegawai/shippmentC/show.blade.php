@@ -66,6 +66,7 @@ Shippment C || Pegawai
                              <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Atribute</th>
+                                <th scope="col">No SO</th>
                                 <th scope="col">Unicode</th>
                                 <th scope="col">pod</th>
                                 <th scope="col">Product</th>
@@ -86,6 +87,7 @@ Shippment C || Pegawai
                                     <tr>
                                         <th>{{$loop->iteration}}</th>
                                         <td>{{$d->atribute}}</td>
+                                        <td>{{$d->type}}</td>
                                         <td>{{$d->unicode}}</td>
                                         <td>{{$d->pod}}</td>
                                         <td>{{$d->product}}</td>

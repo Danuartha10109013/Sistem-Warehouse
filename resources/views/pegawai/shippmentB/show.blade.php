@@ -69,6 +69,7 @@ Shippment B || Pegawai
                                 <th scope="col">#</th>
                                 <th scope="col">Manufactur</th>
                                 <th scope="col">Atribute</th>
+                                <th scope="col">No SO</th>
                                 <th scope="col">Destination</th>
                                 <th scope="col">Product</th>
                                 <th scope="col">Size</th>
@@ -89,6 +90,7 @@ Shippment B || Pegawai
                                         <th>{{$loop->iteration}}</th>
                                         <td>{{$d->manufactur}}</td>
                                         <td>{{$d->atribute}}</td>
+                                        <td>{{$d->type}}</td>
                                         <td>{{$d->destination}}</td>
                                         <td>{{$d->product}}</td>
                                         <td>{{$d->size}}</td>
