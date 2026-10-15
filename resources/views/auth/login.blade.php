@@ -1,229 +1,400 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
 
 <head>
-   <!-- Required meta tags -->
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-   <title>Login || Sistem Informasi Digital WH</title>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <title>Masuk | Sistem Informasi Warehouse - PT Tata Metal Lestari</title>
+
    <!-- Favicon -->
-   <link rel="shortcut icon" href="{{asset('Logo TML.png')}}" />
-   <!-- Bootstrap CSS -->
-   <link rel="stylesheet" href="{{asset('vendor')}}/css/bootstrap.min.css">
-   <!-- Typography CSS -->
-   <link rel="stylesheet" href="{{asset('vendor')}}/css/typography.css">
-   <!-- Style CSS -->
-   <link rel="stylesheet" href="{{asset('vendor')}}/css/style.css">
-   <!-- Responsive CSS -->
-   <link rel="stylesheet" href="{{asset('vendor')}}/css/responsive.css">
+   <link rel="shortcut icon" href="{{ asset('Logo TML.png') }}" />
+
+   <!-- Fonts: Plus Jakarta Sans -->
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet">
+
+   <!-- Bootstrap 5 & Icons -->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
    <style>
-      body {
-         background: linear-gradient(to right, #4e54c8, #8f94fb);
-         height: 100vh;
+      :root {
+         --brand-primary: #135b9f;
+         --brand-primary-hover: #0f4a82;
+         --brand-primary-active: #0c3c6a;
+         --brand-dark: #0f172a;
+         --text-main: #1e293b;
+         --text-muted: #64748b;
+         --bg-surface: #ffffff;
+         --bg-app: #f1f5f9;
+         --border-subtle: #e2e8f0;
+         --border-focus: #135b9f;
       }
 
-      .sign-in-page {
+      * {
+         box-sizing: border-box;
+      }
+
+      body {
+         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+         background:
+            radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.22) 0%, transparent 60%),
+            linear-gradient(135deg, #9bb2bf 0%, #689a9e 48%, #4a7d9b 100%);
+         background-attachment: fixed;
+         min-height: 100vh;
+         margin: 0;
          display: flex;
+         flex-direction: column;
          justify-content: center;
          align-items: center;
-         height: 100%;
+         padding: 24px 16px;
+         -webkit-font-smoothing: antialiased;
       }
 
-      .sign-in-from {
-         background: #fff;
-         padding: 40px;
-         border-radius: 10px;
-         box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+      /* Subtle enterprise top accent bar */
+      .top-accent-bar {
+         position: fixed;
+         top: 0;
+         left: 0;
+         right: 0;
+         height: 3px;
+         background: linear-gradient(90deg, #135b9f 0%, #4a9e91 50%, #67a8ce 100%);
+         z-index: 100;
       }
 
-      .sign-in-from h1 {
-         color: #4e54c8;
-         font-size: 36px;
+      .login-container {
+         width: 100%;
+         max-width: 440px;
+         margin: auto;
+      }
+
+      .login-card {
+         background: rgba(255, 255, 255, 0.92);
+         backdrop-filter: blur(24px) saturate(160%);
+         -webkit-backdrop-filter: blur(24px) saturate(160%);
+         border: 1px solid rgba(255, 255, 255, 0.8);
+         border-radius: 18px;
+         padding: 38px 34px;
+         box-shadow:
+            0 20px 40px -10px rgba(15, 38, 55, 0.2),
+            0 4px 14px rgba(0, 0, 0, 0.04),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      .brand-header {
+         text-align: center;
+         margin-bottom: 28px;
+      }
+
+      .brand-logo {
+         height: 72px;
+         width: auto;
+         object-fit: contain;
+         margin-bottom: 16px;
+         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.06));
+      }
+
+      .system-title {
+         font-size: 21.5px;
          font-weight: 700;
-         margin-bottom: 20px;
+         color: var(--brand-dark);
+         margin-bottom: 6px;
+         letter-spacing: -0.3px;
+         line-height: 1.3;
+      }
+
+      .system-subtitle {
+         font-size: 14px;
+         color: var(--text-muted);
+         margin: 0;
+         line-height: 1.4;
+         font-weight: 500;
+      }
+
+      .form-label {
+         font-size: 13.5px;
+         font-weight: 600;
+         color: #334155;
+         margin-bottom: 6px;
+      }
+
+      .input-wrapper {
+         position: relative;
+      }
+
+      .input-icon {
+         position: absolute;
+         left: 14px;
+         top: 50%;
+         transform: translateY(-50%);
+         color: #94a3b8;
+         font-size: 16px;
+         pointer-events: none;
+         transition: color 0.2s ease;
       }
 
       .form-control {
-         border-radius: 50px;
-         padding: 10px 20px;
-         border: 1px solid #d3d3d3;
+         height: 44px;
+         font-size: 14px;
+         border-radius: 8px;
+         border: 1px solid #cbd5e1;
+         padding-left: 40px;
+         padding-right: 14px;
+         color: #1e293b;
+         background-color: #ffffff;
+         transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .form-control::placeholder {
+         color: #94a3b8;
+         font-size: 13.5px;
       }
 
       .form-control:focus {
-         box-shadow: none;
-         border-color: #4e54c8;
+         border-color: var(--border-focus);
+         box-shadow: 0 0 0 3px rgba(19, 91, 159, 0.12);
+         background-color: #ffffff;
       }
 
-      .btn-primary {
-         background-color: #4e54c8;
-         border-color: #4e54c8;
-         border-radius: 50px;
-         padding: 10px 30px;
+      .input-wrapper:focus-within .input-icon {
+         color: var(--brand-primary);
       }
 
-      .btn-primary:hover {
-         background-color: #8f94fb;
-         border-color: #8f94fb;
+      .password-input-wrapper .form-control {
+         padding-right: 42px;
       }
 
-      .sign-in-detail {
-         background: url('{{asset('login-background.jpg')}}') no-repeat center center;
-         background-size: cover;
+      .password-toggle-btn {
+         position: absolute;
+         right: 12px;
+         top: 50%;
+         transform: translateY(-50%);
+         background: none;
+         border: none;
+         padding: 4px;
+         color: #64748b;
+         cursor: pointer;
+         font-size: 16px;
          display: flex;
-         justify-content: center;
          align-items: center;
-         height: 100%;
-         padding: 50px;
-         border-radius: 10px;
+         justify-content: center;
+         transition: color 0.15s ease;
       }
 
-      .sign-in-detail img {
-         max-width: 70%;
-         margin-bottom: 30px;
+      .password-toggle-btn:hover {
+         color: var(--brand-dark);
       }
 
-      .slick-slider11 {
-         color: #fff;
-         text-align: center;
+      .password-toggle-btn:focus {
+         outline: none;
+         color: var(--brand-primary);
+      }
+
+      .btn-submit {
+         height: 48px;
+         background: linear-gradient(135deg, #135b9f 0%, #0d4a82 100%);
+         border: none;
+         color: #ffffff;
+         font-weight: 600;
+         font-size: 14.5px;
+         border-radius: 8px;
+         letter-spacing: 0.1px;
+         box-shadow: 0 4px 14px rgba(19, 91, 159, 0.28);
+         transition: all 0.2s ease;
+      }
+
+      .btn-submit:hover {
+         background: linear-gradient(135deg, #104f8b 0%, #0a3d6d 100%);
+         color: #ffffff;
+         box-shadow: 0 6px 18px rgba(19, 91, 159, 0.35);
+         transform: translateY(-1px);
+      }
+
+      .btn-submit:active {
+         background: #0a3d6d !important;
+         transform: translateY(0);
+         box-shadow: 0 2px 8px rgba(19, 91, 159, 0.2);
+      }
+
+      .btn-submit:focus {
+         outline: none;
+         box-shadow: 0 0 0 3px rgba(19, 91, 159, 0.25);
       }
 
       .alert {
-         border-radius: 50px;
-         padding: 15px;
+         border-radius: 8px;
+         font-size: 13px;
+         padding: 10px 14px;
+         margin-bottom: 20px;
+         display: flex;
+         align-items: flex-start;
+         gap: 10px;
+         line-height: 1.45;
       }
 
-      @media (max-width: 768px) {
-         .sign-in-detail {
-            display: none;
+      .alert-danger {
+         background-color: #fef2f2;
+         border-color: #fecaca;
+         color: #991b1b;
+      }
+
+      .alert-success {
+         background-color: #f0fdf4;
+         border-color: #bbf7d0;
+         color: #166534;
+      }
+
+      .alert .btn-close {
+         padding: 10px;
+         margin-left: auto;
+         font-size: 10px;
+      }
+
+      .login-footer {
+         text-align: center;
+         margin-top: 24px;
+         color: rgba(255, 255, 255, 0.95);
+         font-size: 12.5px;
+         line-height: 1.5;
+         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      }
+
+      .login-footer span {
+         font-weight: 600;
+         color: #ffffff;
+      }
+
+      /* Mobile optimization */
+      @media (max-width: 480px) {
+         body {
+            padding: 16px 12px;
+         }
+
+         .login-card {
+            padding: 30px 20px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+         }
+
+         .brand-logo {
+            height: 60px;
+            margin-bottom: 14px;
+         }
+
+         .system-title {
+            font-size: 19px;
+         }
+
+         .system-subtitle {
+            font-size: 13px;
          }
       }
    </style>
 </head>
 
 <body>
-   <section class="sign-in-page">
-      <div class="container">
-         <div class="row justify-content-center">
-            <div class="col-lg-8">
-               <div class="row">
-                  <div class="col-sm-6 align-self-center">
-                     <div class="sign-in-from">
-                        <h1>Sign in</h1>
-                        @if (session('error'))
-                           <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                              {{ session('error') }}
-                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                           </div>
-                        @elseif (session('success'))
-                           <div class="alert alert-success alert-dismissible fade show" role="alert">
-                              {{ session('success') }}
-                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                           </div>
-                        @endif
-                        <p>Enter your email address and password to access admin panel.</p>
-                        <form method="POST" action="{{route('login-proses')}}" class="mt-4">
-                           @csrf
-                           <div class="form-group">
-                              <label for="exampleInputEmail1">Email address</label>
-                              @if(session('email'))
-                                 <input type="email" name="email" class="form-control mb-3" value="{{ session('email') }}"
-                                    id="exampleInputEmail1" placeholder="Enter email">
-                              @else
-                                 <input type="email" name="email" class="form-control mb-3" id="exampleInputEmail1"
-                                    placeholder="Enter email">
-                              @endif
-                           </div>
-                           <!-- Bootstrap CSS (pastikan sudah dimuat di layout utama) -->
-                           <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-                              rel="stylesheet">
-                           <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-                              rel="stylesheet">
+   <div class="top-accent-bar"></div>
 
-                           <div class="mb-3">
-                              <label for="password" class="form-label">Password</label>
-                              <div class="password-wrapper">
-                                 <input type="password" class="form-control" id="password" name="password"
-                                    placeholder="Password">
-                                 <i class="bi bi-eye-fill toggle-password" id="togglePassword"></i>
-                              </div>
-                           </div>
+   <main class="login-container">
+      <div class="login-card">
+         <header class="brand-header">
+            <img src="{{ asset('template_v2/bahan_logo_v2/logobg-ic.png') }}" alt="Logo PT Tata Metal Lestari"
+               class="brand-logo" onerror="this.src='{{ asset('template_v2/bahan_logo_v2/logobg-ic.png') }}'">
+            <h1 class="system-title">Sistem Informasi Manajemen Operasional</h1>
+            <p class="system-subtitle">PT.Tata Metal Lestari</p>
+         </header>
 
-                           <style>
-                              .password-wrapper {
-                                 position: relative;
-                              }
+         {{-- Alert Notification --}}
+         @if (session('error'))
+            <div class="alert alert-danger" role="alert">
+               <i class="bi bi-exclamation-circle-fill flex-shrink-0 mt-1" style="font-size: 14px;"></i>
+               <div>{{ session('error') }}</div>
+               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+         @elseif (session('success'))
+            <div class="alert alert-success" role="alert">
+               <i class="bi bi-check-circle-fill flex-shrink-0 mt-1" style="font-size: 14px;"></i>
+               <div>{{ session('success') }}</div>
+               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+         @endif
 
-                              .password-wrapper input {
-                                 padding-right: 40px;
-                                 /* space for the eye icon */
-                              }
+         <form method="POST" action="{{ route('login-proses') }}" id="loginForm" autocomplete="on">
+            @csrf
 
-                              .toggle-password {
-                                 position: absolute;
-                                 right: 10px;
-                                 top: 50%;
-                                 transform: translateY(-50%);
-                                 cursor: pointer;
-                                 font-size: 1.2rem;
-                                 color: #6c757d;
-                                 transition: transform 0.2s ease, color 0.2s ease;
-                              }
-
-                              .toggle-password:hover {
-                                 transform: translateY(-50%) scale(1.2);
-                                 color: #000;
-                              }
-                           </style>
-
-                           <script>
-                              document.getElementById("togglePassword").addEventListener("click", function () {
-                                 const passwordInput = document.getElementById("password");
-                                 const icon = this;
-
-                                 if (passwordInput.type === "password") {
-                                    passwordInput.type = "text";
-                                    icon.classList.remove("bi-eye-fill");
-                                    icon.classList.add("bi-eye-slash-fill");
-                                 } else {
-                                    passwordInput.type = "password";
-                                    icon.classList.remove("bi-eye-slash-fill");
-                                    icon.classList.add("bi-eye-fill");
-                                 }
-                              });
-                           </script>
-
-
-
-                           <button type="submit" class="btn btn-primary btn-block mt-4">Sign in</button>
-                        </form>
-                     </div>
-                  </div>
-                  <div class="col-sm-6 text-center">
-                     <div class="sign-in-detail">
-                        <div class="slick-slider11">
-                           <div class="item">
-                              <p
-                                 style="font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;font-weight: bolder;font-size: 20px">
-                                 Sistem Informasi Manajemen Operasional
-                              </p>
-                           </div>
-                           <div class="item mt-5">
-                              <img src="{{asset('Logo_TML.png')}}" alt="logo">
-                           </div>
-
-                        </div>
-                     </div>
-                  </div>
+            <!-- Email Input -->
+            <div class="mb-3">
+               <label for="email" class="form-label">Alamat Email</label>
+               <div class="input-wrapper">
+                  <i class="bi bi-envelope input-icon"></i>
+                  <input type="email" name="email" id="email" class="form-control" placeholder="contoh@tatametal.com"
+                     value="{{ session('email') ?? old('email') }}" required autofocus autocomplete="email">
                </div>
             </div>
-         </div>
+
+            <!-- Password Input -->
+            <div class="mb-4">
+               <label for="password" class="form-label">Kata Sandi</label>
+               <div class="input-wrapper password-input-wrapper">
+                  <i class="bi bi-shield-lock input-icon"></i>
+                  <input type="password" name="password" id="password" class="form-control"
+                     placeholder="Masukkan kata sandi" required autocomplete="current-password">
+                  <button type="button" class="password-toggle-btn" id="togglePasswordBtn"
+                     aria-label="Tampilkan atau sembunyikan kata sandi" tabindex="-1">
+                     <i class="bi bi-eye" id="passwordIcon"></i>
+                  </button>
+               </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-submit w-100 d-flex align-items-center justify-content-center gap-2"
+               id="btnSubmit">
+               <span id="btnText">Masuk ke Sistem</span>
+               <i class="bi bi-arrow-right" id="btnIcon"></i>
+            </button>
+         </form>
       </div>
-   </section>
-   <!-- Optional JavaScript -->
-   <script src="{{asset('vendor')}}/js/jquery.min.js"></script>
-   <script src="{{asset('vendor')}}/js/popper.min.js"></script>
-   <script src="{{asset('vendor')}}/js/bootstrap.min.js"></script>
-   <script src="{{asset('vendor')}}/js/slick.min.js"></script>
+
+      <footer class="login-footer">
+         <div>&copy; {{ date('Y') }} <span>PT Tata Metal Lestari</span>.</div>
+         <div class="mt-1" style="font-size: 11px;">Sistem Informasi Manajemen Operasional.</div>
+      </footer>
+   </main>
+
+   <!-- Scripts -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+   <script>
+      // Toggle Password Visibility
+      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+      const passwordInput = document.getElementById('password');
+      const passwordIcon = document.getElementById('passwordIcon');
+
+      if (togglePasswordBtn && passwordInput && passwordIcon) {
+         togglePasswordBtn.addEventListener('click', function () {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            passwordIcon.classList.toggle('bi-eye', !isPassword);
+            passwordIcon.classList.toggle('bi-eye-slash', isPassword);
+         });
+      }
+
+      // Submit Button Loading Feedback
+      const loginForm = document.getElementById('loginForm');
+      const btnSubmit = document.getElementById('btnSubmit');
+      const btnText = document.getElementById('btnText');
+      const btnIcon = document.getElementById('btnIcon');
+
+      if (loginForm && btnSubmit) {
+         loginForm.addEventListener('submit', function () {
+            btnSubmit.disabled = true;
+            if (btnText) btnText.textContent = 'Memverifikasi...';
+            if (btnIcon) btnIcon.className = 'spinner-border spinner-border-sm text-light';
+         });
+      }
+   </script>
 </body>
 
 </html>

@@ -1,9 +1,15 @@
 <header class="app-header">
   <nav class="navbar navbar-expand-lg navbar-light">
-    <ul class="navbar-nav">
+    <ul class="navbar-nav align-items-center flex-row">
       <li class="nav-item d-block d-xl-none">
-        <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+        <a class="nav-link sidebartoggler nav-icon-hover p-2" id="headerCollapse" href="javascript:void(0)">
           <i class="ti ti-menu-2 fs-6" style="font-size: 24px;"></i>
+        </a>
+      </li>
+      <!-- Logo saat Mobile View -->
+      <li class="nav-item d-flex d-xl-none align-items-center ms-1">
+        <a href="{{ url('/welcome') }}" class="d-flex align-items-center text-decoration-none">
+          <img src="{{ asset('template_v2/bahan_logo_v2/logobg-ic.png') }}" style="height: 32px; width: auto;" alt="Logo" />
         </a>
       </li>
     </ul>

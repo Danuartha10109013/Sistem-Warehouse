@@ -6,7 +6,7 @@
 
 @section('content')
 
-<div class="container">
+<div class="container px-2 px-md-3">
 
     <!-- Page Title -->
     <div class="row mb-4">
@@ -43,7 +43,7 @@
 
 
     <!-- Card Form -->
-    <div class="card shadow-lg border-0 rounded-4 p-4">
+    <div class="card shadow-lg border-0 rounded-4 p-3 p-md-4">
         <form action="{{ route('pac.store') }}" method="POST">
             @csrf
 
@@ -74,14 +74,14 @@
                 <div class="col-md-4">
                     <label class="fw-bold mb-1">Attribute</label>
 
-                    <div class="input-group">
+                    <div class="d-flex gap-2">
                         <input type="text" id="attributeInput" name="attribute"
                             class="form-control rounded-pill px-3 py-2"
                             placeholder="Scan / Input Manual" required>
 
                         <!-- Ikon QR (button) -->
-                        <button type="button" class="btn btn-primary rounded-pill ms-2 px-3"
-                                onclick="openScanner()">
+                        <button type="button" class="btn btn-primary rounded-pill px-3 d-flex align-items-center justify-content-center"
+                                onclick="openScanner()" style="min-width: 46px; flex-shrink: 0;" title="Scan Barcode / QR">
                             <i class="fa fa-qrcode"></i>
                         </button>
                     </div>
@@ -118,8 +118,54 @@
                         return attrExists;
                     }
 
+                    let rekapTimer = null;
+
+                    function fetchRekapSo(attributeValue) {
+                        const val = (attributeValue || '').trim();
+                        const noSoInput = document.querySelector('input[name="no_so"]');
+                        const lainnyaTextarea = document.querySelector('textarea[name="lainnya"]');
+
+                        if (!val) {
+                            if (noSoInput) noSoInput.value = '';
+                            if (lainnyaTextarea) lainnyaTextarea.value = '';
+                            return;
+                        }
+
+                        fetch(`{{ route('pac.check_rekap_so') }}?attribute=${encodeURIComponent(val)}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data && data.found) {
+                                    if (noSoInput) noSoInput.value = data.no_so || '';
+                                    if (lainnyaTextarea) lainnyaTextarea.value = data.catatan || '';
+                                } else {
+                                    // Kosongkan kembali jika karakter dihapus atau tidak cocok
+                                    if (noSoInput) noSoInput.value = '';
+                                    if (lainnyaTextarea) lainnyaTextarea.value = '';
+                                }
+                            })
+                            .catch(err => console.error("Error fetching Rekap No SO:", err));
+                    }
+
+                    // Live AJAX saat mengetik / menghapus karakter secara responsif
+                    attrInput.addEventListener("input", () => {
+                        clearTimeout(rekapTimer);
+                        checkAttribute(attrInput.value);
+                        rekapTimer = setTimeout(() => {
+                            fetchRekapSo(attrInput.value);
+                        }, 200);
+                    });
+
                     attrInput.addEventListener("blur", () => {
                         checkAttribute(attrInput.value);
+                        fetchRekapSo(attrInput.value);
+                    });
+
+                    attrInput.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter") {
+                            clearTimeout(rekapTimer);
+                            checkAttribute(attrInput.value);
+                            fetchRekapSo(attrInput.value);
+                        }
                     });
 
                     const addForm = document.querySelector('form');
@@ -167,6 +213,8 @@
 
                                         // Langsung periksa duplikasi juga untuk hasil scan
                                         checkAttribute(val);
+                                        // Autofill No SO & Catatan dari Rekap No SO
+                                        fetchRekapSo(val);
 
                                         // Tutup scanner
                                         closeScanner();
@@ -507,10 +555,10 @@
             </div>
 
             <!-- Buttons -->
-            <div class="mt-4 d-flex justify-content-between">
-                <a href="{{ route('pac') }}" class="btn btn-light border rounded-pill px-4 py-2">Kembali</a>
+            <div class="mt-4 d-flex justify-content-between align-items-center gap-2">
+                <a href="{{ route('pac') }}" class="btn btn-light border rounded-pill px-3 px-sm-4 py-2">Kembali</a>
 
-                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 px-sm-5 py-2">
                     Simpan
                 </button>
             </div>
@@ -552,6 +600,27 @@
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-
+<style>
+    @media (max-width: 768px) {
+        .card {
+            border-radius: 16px !important;
+        }
+        .form-control, .form-select {
+            font-size: 15px !important;
+            padding-top: 0.55rem !important;
+            padding-bottom: 0.55rem !important;
+        }
+        label.fw-bold {
+            font-size: 13.5px !important;
+        }
+        #cameraPreview {
+            max-height: 240px;
+            object-fit: cover;
+        }
+        #customDropdown {
+            max-height: 260px !important;
+        }
+    }
+</style>
 
 @endsection

@@ -23,10 +23,10 @@ class MasterProductController extends Controller
                   ->orWhere('name', 'LIKE', "%{$search}%");
         }
 
-        $data = $query->paginate(10);
+        $data = $query->paginate(12)->withQueryString();
 
         if ($request->ajax()) {
-            return view('master_product.partials.table', compact('data'))->render();
+            return view('master_product.partials.content', compact('data'))->render();
         }
 
         return view('master_product.index', compact('data'));

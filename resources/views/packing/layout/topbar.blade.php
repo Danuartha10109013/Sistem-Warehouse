@@ -14,6 +14,9 @@
             </a>
             <a href="{{route('pac')}}" class="nav-item nav-link {{ request()->routeIs('pac') ? 'active' : '' }}">Packing</a>
             <a href="{{route('pac.add')}}" class="nav-item nav-link {{ request()->routeIs('pac.add') ? 'active' : '' }}">Tambah Data</a>
+            @if(Auth::check() && in_array(Auth::user()->role, [0, 5]))
+            <a href="{{route('pac.rekap_so')}}" class="nav-item nav-link {{ request()->routeIs('pac.rekap_so') ? 'active' : '' }}">Rekap No SO</a>
+            @endif
         </div>
         {{-- <a href="#" class="btn btn-light border border-primary rounded-pill text-primary py-2 px-4 me-4">Log In</a> --}}
     </div>

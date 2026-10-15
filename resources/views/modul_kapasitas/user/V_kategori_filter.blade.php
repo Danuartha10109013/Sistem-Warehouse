@@ -71,12 +71,12 @@
                                     {{ $filter->kategori }}
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <form action="{{ route('modul-kapasitas.filter-kategori.destroy', $filter->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus filter kategori ini?');">
+                                    <form id="delete-form-{{ $filter->id }}" action="{{ route('modul-kapasitas.filter-kategori.destroy', $filter->id) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="font-medium text-red-600 dark:text-red-500 hover:underline flex items-center justify-center gap-1 mx-auto">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-                                            Hapus
+                                        <button type="button" onclick="confirmDelete('{{ $filter->id }}', '{{ addslashes($filter->kategori) }}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg border border-red-200 hover:border-red-600 transition-all shadow-sm hover:shadow cursor-pointer" title="Hapus Filter">
+                                            <i class="ti ti-trash text-sm"></i>
+                                            <span>Hapus</span>
                                         </button>
                                     </form>
                                 </td>
@@ -97,4 +97,27 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function confirmDelete(id, kategori) {
+        if (typeof window.showCustomConfirm === 'function') {
+            window.showCustomConfirm({
+                iconClass: 'fas fa-trash-alt',
+                title: 'Hapus Filter Kategori?',
+                text: 'Kategori <b>"' + kategori + '"</b> akan dihapus dari daftar filter.',
+                confirmText: 'Ya, Hapus'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        } else {
+            if (confirm('Apakah Anda yakin ingin menghapus filter kategori "' + kategori + '"?')) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        }
+    }
+</script>
+@endpush
 @endsection

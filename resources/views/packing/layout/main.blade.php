@@ -28,6 +28,39 @@
         <!-- Template Stylesheet -->
         <link href="{{ asset('sac') }}/css/style.css" rel="stylesheet">
 
+        <style>
+            html, body {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+                width: 100% !important;
+            }
+            .header, .hero-header {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+            }
+            @media (max-width: 768px) {
+                .navbar {
+                    padding-left: 0.75rem !important;
+                    padding-right: 0.75rem !important;
+                }
+                .navbar-brand h1 {
+                    font-size: 1.15rem !important;
+                }
+                .navbar-brand img {
+                    max-height: 32px !important;
+                }
+                .hero-header {
+                    padding-left: 0.75rem !important;
+                    padding-right: 0.75rem !important;
+                    padding-top: 125px !important;
+                    padding-bottom: 30px !important;
+                }
+                .hero-header::before, .hero-header::after {
+                    display: none !important;
+                }
+            }
+        </style>
+
     </head>
 
     <body>
@@ -43,9 +76,9 @@
 
         <!-- Navbar & Hero Start -->
         <div class="container-fluid header position-relative overflow-hidden p-0">
-            @include('packing.layout.topbar');
+            @include('packing.layout.topbar')
             <!-- Hero Header Start -->
-            <div class="hero-header overflow-hidden px-5 " >
+            <div class="hero-header overflow-hidden px-2 px-sm-3 px-md-5" >
                 {{-- <div class="rotate-img">
                     <img src="img/sty-1.png" class="img-fluid w-100" alt="">
                     <div class="rotate-sty-2"></div>

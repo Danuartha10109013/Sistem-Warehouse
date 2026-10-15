@@ -1,51 +1,120 @@
-<header class="sticky top-0 z-[60] bg-white dark:bg-dark w-full">
-    <nav class="px-4 sm:px-30 py-4 rounded-none bg-transparent dark:bg-transparent w-full">
-        <div class="flex gap-3 items-center justify-between w-full">
-            <div class="flex gap-2 items-center">
-                <span data-drawer-target="sidebar" data-drawer-toggle="sidebar" aria-controls="sidebar" class="h-10 w-10 flex text-black dark:text-white text-opacity-65 xl:hidden hover:text-primary hover:bg-lightprimary rounded-full justify-center items-center cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
-                </span>
-                <div class="hidden md:flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm">
-                    <svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span id="headerDate">Memuat tanggal...</span>
-                </div>
-            </div>
+<header class="sticky top-0 z-[50] bg-white border-b border-slate-100 w-full" style="box-shadow: 0px 2px 10px rgba(0,0,0,0.04);">
+    <div class="px-4 sm:px-6 py-2.5 flex items-center justify-between w-full">
+        <!-- Kiri: Hamburger Toggle & Logo Mobile View -->
+        <div class="flex items-center gap-2">
+            <button type="button" data-drawer-target="sidebar" data-drawer-toggle="sidebar" aria-controls="sidebar" class="p-2 text-slate-600 hover:text-[#135b9f] hover:bg-slate-100 rounded-lg transition-colors xl:hidden flex items-center justify-center cursor-pointer" id="headerCollapse">
+                <i class="ti ti-menu-2" style="font-size: 24px;"></i>
+            </button>
+            
+            <!-- Logo saat Mobile View -->
+            <a href="{{ route('modul-kapasitas.dashboard') }}" class="flex xl:hidden items-center text-decoration-none ml-1">
+                <img src="{{ asset('template_v2/bahan_logo_v2/logobg-ic.png') }}" style="height: 32px; width: auto;" alt="Logo" />
+            </a>
+        </div>
 
-            <div class="flex gap-4 items-center">
-                <a href="{{ route('welcome') }}" class="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary transition-colors flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-lg shadow-sm hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                    <span class="hidden sm:inline">Menu Utama</span>
-                </a>
-                
-                <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 p-1.5 pr-4 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <div class="h-9 w-9 rounded-full flex justify-center items-center bg-primary text-white">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        <!-- Kanan: Menu Utama & User Profile Dropdown -->
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Tombol Menu Utama -->
+            <a href="{{ url('/welcome') }}" class="flex items-center gap-2 text-sm font-semibold transition-all" style="background-color: #f1f5f9; color: #475569; border-radius: 8px; padding: 6px 12px; border: 1px solid #e2e8f0;" onmouseover="this.style.backgroundColor='#e2e8f0'; this.style.color='#1e293b';" onmouseout="this.style.backgroundColor='#f1f5f9'; this.style.color='#475569';">
+                <i class="ti ti-home" style="font-size: 18px;"></i>
+                <span class="hidden md:inline">Menu Utama</span>
+            </a>
+
+            <!-- User Profile Dropdown Container -->
+            <div class="relative" id="userProfileDropdownContainer">
+                <button type="button" id="userProfileBtn" class="flex items-center gap-2 p-1 md:py-1 md:px-2 rounded-full hover:bg-slate-100 transition-colors cursor-pointer" aria-expanded="false">
+                    <!-- Info Nama & Role (Desktop) -->
+                    <div class="hidden md:flex flex-col items-end justify-center me-1 text-right">
+                        <span class="font-bold text-slate-800 leading-tight" style="font-size: 14px;">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</span>
+                        <span class="text-slate-500 font-medium mt-0.5 leading-none" style="font-size: 11px;">
+                            @if(Auth::check())
+                                @if(Auth::user()->role == 5 || Auth::user()->role == 0) Super Admin
+                                @elseif(Auth::user()->role == 1) Admin
+                                @else Pegawai @endif
+                            @else Guest @endif
+                        </span>
                     </div>
-                    <div class="flex flex-col hidden sm:flex">
-                        @if(Auth::check())
-                            <span class="text-sm font-bold text-gray-800 dark:text-white leading-none">{{ Auth::user()->name }}</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                {{ Auth::user()->role == '1' ? 'Admin' : (Auth::user()->role == '2' ? 'Pegawai' : (Auth::user()->role == '0' ? 'Super Admin' : 'User')) }}
-                            </span>
+
+                    <!-- Avatar -->
+                    @if(Auth::check() && Auth::user()->profile)
+                        <img src="{{ asset('storage/'.Auth::user()->profile) }}" alt="Profile" class="w-10 h-10 rounded-full object-cover shadow-sm" onerror="this.outerHTML='<span class=\'w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-base shadow-sm\' style=\'background: linear-gradient(135deg, #135b9f 0%, #0f4a85 100%);\'>{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>'">
+                    @else
+                        <span class="w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-base shadow-sm" style="background: linear-gradient(135deg, #135b9f 0%, #0f4a85 100%);">
+                            {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 1)) : 'G' }}
+                        </span>
+                    @endif
+
+                    <i class="ti ti-chevron-down text-slate-400 hidden md:block" style="font-size: 16px;"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div id="userProfileDropdownMenu" class="hidden absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl border border-slate-200 shadow-xl p-2 z-50 transition-all">
+                    <!-- Info User Card -->
+                    <div class="flex items-center p-3 mb-2 bg-slate-50 rounded-xl">
+                        @if(Auth::check() && Auth::user()->profile)
+                            <img src="{{ asset('storage/'.Auth::user()->profile) }}" alt="Profile" class="w-12 h-12 rounded-full object-cover shrink-0" onerror="this.outerHTML='<span class=\'w-12 h-12 rounded-full text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-sm\' style=\'background: linear-gradient(135deg, #135b9f 0%, #0f4a85 100%);\'>{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>'">
                         @else
-                            <span class="text-sm font-bold text-gray-800 dark:text-white leading-none">Guest</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">Not logged in</span>
+                            <span class="w-12 h-12 rounded-full text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-sm" style="background: linear-gradient(135deg, #135b9f 0%, #0f4a85 100%);">
+                                {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 1)) : 'G' }}
+                            </span>
                         @endif
+                        <div class="ml-3 overflow-hidden text-left">
+                            <h6 class="font-bold text-slate-800 text-sm truncate" title="{{ Auth::check() ? Auth::user()->name : 'Guest' }}">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</h6>
+                            <span class="text-xs text-slate-500 font-semibold block">
+                                @if(Auth::check())
+                                    @if(Auth::user()->role == 5 || Auth::user()->role == 0) Super Admin
+                                    @elseif(Auth::user()->role == 1) Admin
+                                    @else Pegawai @endif
+                                @else Guest @endif
+                            </span>
+                        </div>
                     </div>
+
+                    <!-- Link My Profile -->
+                    <a href="{{ Auth::check() ? url('/profile/' . Auth::user()->id) : '#' }}" class="flex items-center gap-2.5 py-2 px-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-[#135b9f] transition-all">
+                        <i class="ti ti-user-circle" style="font-size: 18px;"></i>
+                        <span>Detail Profile</span>
+                    </a>
+                    
+                    <hr class="my-1.5 border-slate-100">
+
+                    <!-- Link Logout -->
+                    <a href="{{ route('logout') }}" id="header-logout-btn" class="flex items-center gap-2.5 py-2 px-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-all">
+                        <i class="ti ti-logout" style="font-size: 18px;"></i>
+                        <span>Sign Out</span>
+                    </a>
                 </div>
             </div>
         </div>
-    </nav>
+    </div>
 </header>
 
 <script>
-    // Script untuk menampilkan tanggal hari ini secara otomatis
     document.addEventListener("DOMContentLoaded", function() {
-        const dateElement = document.getElementById('headerDate');
-        if (dateElement) {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const today = new Date();
-            dateElement.innerText = today.toLocaleDateString('id-ID', options);
+        const profileBtn = document.getElementById('userProfileBtn');
+        const profileMenu = document.getElementById('userProfileDropdownMenu');
+
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isHidden = profileMenu.classList.contains('hidden');
+                profileMenu.classList.toggle('hidden');
+                profileBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+                    profileMenu.classList.add('hidden');
+                    profileBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !profileMenu.classList.contains('hidden')) {
+                    profileMenu.classList.add('hidden');
+                    profileBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
         }
     });
 </script>

@@ -93,6 +93,19 @@ Route::prefix('Laporan-packing')->middleware(['Laporan-Packing'])->group(functio
     Route::put('/update/{id}',[PackingController::class,'update'])->name('pac.update');
     Route::get('/print/{id}',[PackingController::class,'print'])->name('pac.print');
     Route::get('/export',[PackingController::class,'export'])->name('pac.export');
+    Route::get('/check-rekap-so',[PackingController::class,'checkRekapSo'])->name('pac.check_rekap_so');
+
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/rekap-so',[PackingController::class,'rekapSo'])->name('pac.rekap_so');
+        Route::post('/rekap-so/store',[PackingController::class,'storeRekapSo'])->name('pac.rekap_so.store');
+        Route::delete('/rekap-so/clear-all',[PackingController::class,'clearRekapSo'])->name('pac.rekap_so.clear');
+        Route::post('/rekap-so/clear-all',[PackingController::class,'clearRekapSo']);
+        Route::get('/rekap-so/clear-all', function() {
+            return redirect()->route('pac.rekap_so');
+        });
+        Route::delete('/rekap-so/{id}',[PackingController::class,'destroyRekapSo'])->name('pac.rekap_so.destroy')->whereNumber('id');
+        Route::get('/rekap-so/template',[PackingController::class,'templateRekapSo'])->name('pac.rekap_so.template');
+    });
 });
 Route::prefix('openpacking')->group(function () {
     Route::get('/',[OpenPackingController::class,'index'])->name('opc');
@@ -145,6 +158,12 @@ Route::prefix('report-open-pack')->group(function () {
 Route::middleware([AutoLogout::class])->group(function () {
 
     Route::get('/welcome', [LoginController::class, 'welcome'])->name('welcome');
+
+    // Log Aktivitas Pengguna (Semua Role: Super Admin, Admin, Pegawai)
+    Route::prefix('activity-log')->name('activity-log.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('index');
+        Route::get('/{id}', [\App\Http\Controllers\ActivityLogController::class, 'show'])->name('show');
+    });
 
     Route::prefix('rekap-prd')->middleware(['Rekap-PRD'])->group(function () {
         Route::get('/', [RekapPrdController::class, 'index'])->name('rekap-prd.dashboard');
@@ -327,10 +346,10 @@ Route::middleware([AutoLogout::class])->group(function () {
             Route::delete('k-user/delete/{id}',[KUserController::class,'destroy'])->name('kelola-user.delete');
         });
 
-        // Log Aktivitas Pengguna (Superadmin Only)
+        // Log Aktivitas Pengguna (Alias Superadmin)
         Route::prefix('activity-log')->name('activity-log.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('index');
-            Route::get('/{id}', [\App\Http\Controllers\ActivityLogController::class, 'show'])->name('show');
+            Route::get('/', function () { return redirect()->route('activity-log.index'); })->name('index');
+            Route::get('/{id}', function ($id) { return redirect()->route('activity-log.show', $id); })->name('show');
         });
         Route::prefix('data-master')->group(function () {
             Route::get('/',[DataMasterController::class,'index'])->name('data-master');

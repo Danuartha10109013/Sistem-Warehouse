@@ -87,7 +87,7 @@
                     <tr>
                         <th scope="col" class="px-2 py-2 2xl:px-6 2xl:py-4 font-extrabold border-b border-blue-400 dark:border-blue-700 whitespace-nowrap sticky left-0 z-50 bg-primary dark:bg-blue-900 text-sm sticky-shadow">KATEGORI STOCK</th>
                         @for($d = 1; $d <= $daysInMonth; $d++)
-                            <th scope="col" class="px-1 py-2 2xl:px-3 2xl:py-4 text-center border-b border-r border-blue-400 dark:border-blue-700 min-w-[50px] last:border-r-0 bg-blue-600 dark:bg-blue-800 shadow-inner font-bold text-sm">{{ $d }}</th>
+                            <th scope="col" class="px-1 py-2 2xl:px-3 2xl:py-4 text-center border-b border-r border-blue-400/40 dark:border-blue-700 min-w-[50px] last:border-r-0 bg-primary dark:bg-blue-900 font-bold text-sm">{{ $d }}</th>
                         @endfor
                     </tr>
                 </thead>
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 2b. Function to handle deletion via dynamic form
     window.deleteSource = function(source, tanggal) {
-        if(confirm('Hapus semua data dari sumber ' + source + ' pada tanggal ' + tanggal + '?')) {
+        const doDelete = function() {
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = "{{ route('modul-kapasitas.input-harian.delete-source') }}";
@@ -291,6 +291,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
             document.body.appendChild(form);
             form.submit();
+        };
+
+        if (typeof window.showCustomConfirm === 'function') {
+            window.showCustomConfirm({
+                iconClass: 'fas fa-trash-alt',
+                title: 'Hapus Data Sumber?',
+                text: 'Hapus semua data dari sumber <b>"' + source + '"</b> pada tanggal <b>' + tanggal + '</b>?',
+                confirmText: 'Ya, Hapus'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    doDelete();
+                }
+            });
+        } else {
+            if (confirm('Hapus semua data dari sumber ' + source + ' pada tanggal ' + tanggal + '?')) {
+                doDelete();
+            }
         }
     };
 

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Pagination\Paginator;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
 
 public function boot(): void
 {
+    Paginator::useBootstrapFive();
     if ($this->app->runningInConsole()) {
         $this->app->booted(function () {
             $schedule = app(Schedule::class);

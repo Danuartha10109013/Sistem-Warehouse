@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Welcome || PT Tata Metal Lestari</title>
+    <link rel="shortcut icon" href="{{asset('Logo TML.png')}}" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #a8b2b5, #6ca885, #67a8ce);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: white;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Background STOP SUAP - Seperti cap air (watermark) di tengah bawah */
+        /* .stop-suap-background {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background-image: url('{{ asset("STOP SUAP.png") }}');
+         background-size: 15% auto;
+         transform: translate(40%, -17%) !important;
+         background-repeat: no-repeat;
+         background-position: center 60%;
+         background-attachment: fixed;
+         z-index: 1;
+         pointer-events: none;
+         opacity: 0.3;
+      } */
+
+        /* Wrapper untuk konten */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .judul {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 10;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .judul h1 {
+            font-size: 2.5rem;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .gambar {
+            text-align: center;
+            margin: 0 auto 30px auto;
+            position: relative;
+            z-index: 10;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .gambar img {
+            max-width: 150px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .menu-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .menu-item {
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        /* Efek shimmer/glow pada menu item */
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-item:hover::before {
+            left: 100%;
+        }
+
+        .menu-item i {
+            font-size: 50px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+                0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-item:hover i {
+            transform: scale(1.1);
+        }
+
+        .menu-title {
+            font-size: 18px;
+            font-weight: 500;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover .menu-title {
+            transform: translateY(-2px);
+        }
+
+        h1 {
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-style: italic;
+        }
+
+        /* Responsive untuk tablet */
+        @media (max-width: 768px) {
+            .stop-suap-background {
+                background-size: 30% auto;
+                background-position: center 65%;
+                opacity: 0.3;
+            }
+
+            .judul {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .judul h1 {
+                font-size: 1.8rem;
+            }
+
+            .gambar {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .menu-item {
+                width: 120px;
+                height: 120px;
+                border-radius: 15px;
+            }
+
+            .menu-item i {
+                font-size: 40px;
+            }
+
+            .menu-title {
+                font-size: 14px;
+            }
+        }
+
+        /* Responsive untuk mobile */
+        @media (max-width: 576px) {
+            .stop-suap-background {
+                background-size: 30% auto;
+                background-position: center 65%;
+                opacity: 0.3;
+            }
+
+            body {
+                padding: 15px;
+            }
+
+            .judul {
+                padding: 15px;
+                margin-bottom: 15px;
+                border-radius: 15px;
+            }
+
+            .judul h1 {
+                font-size: 1.5rem;
+            }
+
+            .gambar {
+                padding: 15px;
+                margin-bottom: 15px;
+                border-radius: 15px;
+            }
+
+            .gambar img {
+                max-width: 120px;
+            }
+
+            .menu-item {
+                width: 100px;
+                height: 100px;
+                border-radius: 15px;
+            }
+
+            .menu-item i {
+                font-size: 35px;
+            }
+
+            .menu-title {
+                font-size: 12px;
+            }
+
+            .menu-container {
+                gap: 15px;
+            }
+        }
+
+        /* Untuk layar sangat kecil (mobile portrait) */
+        @media (max-width: 480px) {
+            .stop-suap-background {
+                background-size: 30% auto;
+                background-position: center 60%;
+                opacity: 0.3;
+            }
+
+            .judul {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .judul h1 {
+                font-size: 1.2rem;
+            }
+
+            .gambar {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .menu-item {
+                width: 90px;
+                height: 90px;
+                border-radius: 12px;
+            }
+
+            .menu-item i {
+                font-size: 30px;
+            }
+
+            .menu-title {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background STOP SUAP -->
+    <!-- <div class="stop-suap-background" aria-label="Stop Suap - Hargai Petugas Kami"></div> -->
+
+    <div class="content-wrapper">
+        <div class="judul">
+            <h1 style="font-size: 2em;font-weight: bolder">Sistem Informasi Manajemen Operasional</h1>
+            <h1 style="font-size: 1em">PT. Tata Metal Lestari</h1>
+        </div>
+
+        <div class="gambar">
+            <img src="{{ asset('Logo TML.png') }}" alt="Logo PT Tata Metal Lestari">
+        </div>
+        @if(Auth::check())
+            @php
+                $rawAkses = json_decode(Auth::user()->type, true);
+                $akses = is_array($rawAkses) ? $rawAkses : (empty(Auth::user()->type) ? [] : [Auth::user()->type]);
+
+                // Daftar semua menu dan route-nya
+                $menuItems = [
+                    "SP" => ["title" => "Ship Mark", "icon" => "mdi-shipping-pallet", "route" => Auth::user()->role == 0 ? route('Ship-Mark.admin.dashboard') : route('Ship-Mark.pegawai.dashboard')],
+                    "MP" => ["title" => "Mapping", "icon" => "mdi-map-marker-path", "route" => Auth::user()->role == 0 ? route('Mapping.admin.shipment') : route('Mapping.pegawai.shipment')],
+                    "FC" => ["title" => "Form Check", "icon" => "mdi-checkbox-marked-outline", "route" => Auth::user()->role == 0 ? route('fomcheck') : route('fomcheck')],
+                    "OP" => ["title" => "Open Packing", "icon" => "mdi-package-variant-closed-check", "route" => Auth::user()->role == 0 ? route('Open-Packing.admin.dashboard') : route('Open-Packing.pegawai.dashboard')],
+                    "PL" => ["title" => "Packing List", "icon" => "mdi-format-list-checks", "route" => route('Packing-List.admin.dashboard')],
+                    "CK" => ["title" => "Checklist Kendaraan", "icon" => "mdi-car", "route" => Auth::user()->role == 0 ? route('Kendaraan.admin.dashboard') : route('Kendaraan.pegawai.dashboard')],
+                    "SL" => ["title" => "Scan Layout", "icon" => "mdi-qrcode", "route" => Auth::user()->role == 0 ? route('Scan-Layout.admin.dashboard') : route('Scan-Layout.pegawai.dashboard')],
+                    "CD" => ["title" => "Coil Damage", "icon" => "mdi-package-variant-closed-remove", "route" => Auth::user()->role == 0 ? route('Coil-Damage.admin.dashboard') : route('Coil-Damage.pegawai.dashboard')],
+                    "SO" => ["title" => "Stock Opname", "icon" => "mdi-package-variant-closed-check", "route" => Auth::user()->role == 0 ? route('so.utama') : route('so.utama')],
+                    // "L8"  => ["title" => "Packing L08", "icon" => "mdi-numeric-8-box-multiple", "route" => Auth::user()->role == 0 ? route('L-08.admin.dashboard') : route('L-08.pegawai.dashboard')],
+                    // "PC"  => ["title" => "Form Packing", "icon" => "mdi-numeric-8-box-multiple", "route" => Auth::user()->role == 0 ? route('L-08.admin.dashboard') : route('L-08.pegawai.dashboard')],
+                ];
+             @endphp
+
+            <div class="menu-container">
+                @foreach ($menuItems as $key => $item)
+                    @if (in_array('all', $akses) || in_array($key, $akses) || ($key == 'admin' && Auth::user()->role == 0))
+                        <a href="{{ $item['route'] }}" class="menu-item">
+                            <div>
+                                <i class="mdi {{ $item['icon'] }}"></i>
+                                <div class="menu-title">{{ $item['title'] }}</div>
+                            </div>
+                        </a>
+                    @endif
+                @endforeach
+
+                {{-- Tambahan menu SIK dkk --}}
+                @if (in_array('all', $akses) || in_array('SIK', $akses))
+                    <a href="{{ route('sik') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-email"></i>
+                            <div class="menu-title">Surat Izin Keluar</div>
+                        </div>
+                    </a>
+                @endif
+                @if (in_array('all', $akses) || in_array('LP', $akses))
+                    <a href="{{ route('pac') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-note"></i>
+                            <div class="menu-title">Laporan Packing</div>
+                        </div>
+                    </a>
+                @endif
+                @if (in_array('all', $akses) || in_array('ID', $akses))
+                    <a href="{{ route('idod') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-image-filter-tilt-shift"></i>
+                            <div class="menu-title">Laporan ID OD</div>
+                        </div>
+                    </a>
+                @endif
+                @if (in_array('all', $akses) || in_array('SW', $akses))
+                    <a href="{{ route('sidewall') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-chart-donut"></i>
+                            <div class="menu-title">Laporan Sidewall</div>
+                        </div>
+                    </a>
+                @endif
+                @if (in_array('all', $akses) || in_array('OP', $akses))
+                    <a href="{{ route('report-open-pack') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-note"></i>
+                            <div class="menu-title">Report Open Pack</div>
+                        </div>
+                    </a>
+                @endif
+
+                @if (in_array('all', $akses) || in_array('LR', $akses))
+                    <a href="{{ route('laporanrepacking') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-recycle"></i>
+                            <div class="menu-title">Laporan Repacking</div>
+                        </div>
+                    </a>
+                @endif
+
+                @if (in_array('all', $akses) || in_array('MK', $akses))
+                    <a href="{{ route('modul-kapasitas.dashboard') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-chart-bar"></i>
+                            <div class="menu-title">Modul Kapasitas</div>
+                        </div>
+                    </a>
+                @endif
+
+                @if (in_array('all', $akses) || in_array('RP', $akses))
+                    <a href="{{ route('rekap-prd.dashboard') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-file-chart"></i>
+                            <div class="menu-title">Rekap Hasil PRD & Pengeluaran</div>
+                        </div>
+                    </a>
+                @endif
+
+                @if (in_array('all', $akses) || in_array('VT', $akses))
+                    <a href="{{ route('verifikasi-timbangan.index') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-scale-balance"></i>
+                            <div class="menu-title">Verifikasi Timbangan</div>
+                        </div>
+                    </a>
+                @endif
+
+                @if (in_array('all', $akses) || in_array('SKE', $akses))
+                    <a href="{{ route('scan-koil-eup.index') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-barcode-scan"></i>
+                            <div class="menu-title">Scan Koil EUP</div>
+                        </div>
+                    </a>
+                @endif
+
+                @if (in_array('all', $akses) || in_array('MPR', $akses))
+                    <a href="{{ route('master-product.index') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-cube-outline"></i>
+                            <div class="menu-title">Master Product</div>
+                        </div>
+                    </a>
+                @endif
+
+                @if (in_array('all', $akses) || in_array('ST', $akses))
+                    <a href="{{ route('stock') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-database-settings"></i>
+                            <div class="menu-title">Update Stock</div>
+                        </div>
+                    </a>
+                @endif
+                {{-- Menu khusus Superadmin --}}
+                @if (Auth::user()->role == 5)
+                    <a href="{{ route('superadmin.Administrator.kelola-user') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-account"></i>
+                            <div class="menu-title">Kelola Pegawai</div>
+                        </div>
+                    </a>
+                    <a href="{{ route('superadmin.data-master') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-database-settings"></i>
+                            <div class="menu-title">Data Master</div>
+                        </div>
+                    </a>
+                @endif
+
+                {{-- Log Aktivitas untuk Admin dan Pegawai (Super Admin akses via menu Kelola Pegawai) --}}
+                @if (Auth::user()->role != 5)
+                    <a href="{{ route('activity-log.index') }}" class="menu-item">
+                        <div>
+                            <i class="mdi mdi-history"></i>
+                            <div class="menu-title">Log Aktivitas</div>
+                        </div>
+                    </a>
+                @endif
+
+                {{-- Logout --}}
+                <a href="{{ route('logout') }}" class="menu-item" id="logout-btn">
+                    <div>
+                        <i class="mdi mdi-logout"></i>
+                        <div class="menu-title">Sign Out</div>
+                    </div>
+                </a>
+            </div>
+
+            {{-- SweetAlert logout confirmation --}}
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                document.getElementById('logout-btn').addEventListener('click', function (e) {
+                    e.preventDefault(); // Stop the default link action
+                    const logoutUrl = this.href;
+
+                    Swal.fire({
+                        html: `
+                          <div style="margin-bottom: 24px; margin-top: 10px; text-align: center;">
+                              <div style="width: 80px; height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: #fef2f2; border-radius: 50%;">
+                                  <i class="mdi mdi-logout" style="font-size: 40px; color: #b91c1c;"></i>
+                              </div>
+                          </div>
+                          <h2 style="font-weight: 800; color: #1e293b; font-size: 22px; margin-bottom: 12px; font-family: 'Inter', sans-serif; letter-spacing: -0.5px; text-align: center;">Konfirmasi Keluar</h2>
+                          <p style="color: #64748b; font-size: 15px; margin-bottom: 0; line-height: 1.6; font-family: 'Inter', sans-serif; text-align: center;">
+                              Apakah Anda yakin ingin keluar dari sistem?
+                          </p>
+                      `,
+                        showCloseButton: true,
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Keluar',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true,
+                        width: '380px', // Ini yang bikin bentuknya kotak, tidak lebar ke pinggir
+                        customClass: {
+                            confirmButton: 'btn px-4 ms-2 text-white',
+                            cancelButton: 'btn px-4 me-2 border text-dark',
+                            popup: 'rounded-4 shadow-lg border-0'
+                        },
+                        buttonsStyling: false,
+                        didOpen: () => {
+                            // Tambah inline style untuk tombol seperti showCustomConfirm
+                            const confirmBtn = Swal.getConfirmButton();
+                            const cancelBtn = Swal.getCancelButton();
+                            confirmBtn.style.backgroundColor = '#b91c1c';
+                            confirmBtn.style.borderRadius = '8px';
+                            cancelBtn.style.backgroundColor = '#ffffff';
+                            cancelBtn.style.borderRadius = '8px';
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = logoutUrl;
+                        }
+                    });
+                });
+            </script>
+
+        @else
+            <script>window.location = "{{ route('login') }}";</script>
+        @endif
+
+    </div> <!-- End content-wrapper -->
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

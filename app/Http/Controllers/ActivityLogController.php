@@ -5,15 +5,29 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ActivityLogController extends Controller
 {
     public function index(Request $request)
     {
+        $currentUser = Auth::user();
+        $isSuperAdmin = ($currentUser && $currentUser->role == 5);
+
         $query = ActivityLog::with('user')->latest();
 
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+        if ($isSuperAdmin) {
+            if ($request->filled('user_id')) {
+                $query->where('user_id', $request->user_id);
+            }
+            $users = User::select('id', 'name', 'username')->get();
+            $actions = ActivityLog::select('action')->distinct()->pluck('action');
+            $modules = ActivityLog::select('module')->whereNotNull('module')->distinct()->pluck('module');
+        } else {
+            $query->where('user_id', $currentUser->id);
+            $users = collect();
+            $actions = ActivityLog::where('user_id', $currentUser->id)->select('action')->distinct()->pluck('action');
+            $modules = ActivityLog::where('user_id', $currentUser->id)->whereNotNull('module')->select('module')->distinct()->pluck('module');
         }
 
         if ($request->filled('action')) {
@@ -33,17 +47,23 @@ class ActivityLogController extends Controller
             });
         }
 
-        $logs = $query->paginate(25)->withQueryString();
-        $users = User::select('id', 'name', 'username')->get();
-        $actions = ActivityLog::select('action')->distinct()->pluck('action');
-        $modules = ActivityLog::select('module')->whereNotNull('module')->distinct()->pluck('module');
+        $logs = $query->paginate(15)->withQueryString();
 
-        return view('activity_log.index', compact('logs', 'users', 'actions', 'modules'));
+        if ($request->ajax()) {
+            return view('activity_log.partials.table', compact('logs', 'isSuperAdmin'))->render();
+        }
+
+        return view('activity_log.index', compact('logs', 'users', 'actions', 'modules', 'isSuperAdmin'));
     }
 
     public function show($id)
     {
         $log = ActivityLog::with('user')->findOrFail($id);
+
+        if (Auth::user()->role != 5 && $log->user_id != Auth::id()) {
+            abort(403, 'Akses tidak diizinkan');
+        }
+
         return response()->json($log);
     }
 }

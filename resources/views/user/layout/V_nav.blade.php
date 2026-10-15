@@ -26,7 +26,7 @@
           </a>
         </li>
         <li class="sidebar-item">
-          <a class="sidebar-link {{ request()->routeIs('superadmin.activity-log*') ? 'active' : '' }}" href="{{ route('superadmin.activity-log.index') }}" aria-expanded="false">
+          <a class="sidebar-link {{ request()->routeIs('*activity-log*') ? 'active' : '' }}" href="{{ route('activity-log.index') }}" aria-expanded="false">
             <span>
               <i class="fas fa-history" style="font-size: 1.1rem;"></i>
             </span>

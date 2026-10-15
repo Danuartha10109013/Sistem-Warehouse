@@ -12,8 +12,22 @@
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
    <style>
+      /* Subtle enterprise top accent bar */
+      .top-accent-bar {
+         position: fixed;
+         top: 0;
+         left: 0;
+         right: 0;
+         height: 3px;
+         background: linear-gradient(90deg, #135b9f 0%, #4a9e91 50%, #67a8ce 100%);
+         z-index: 100;
+      }
+
       body {
-         background: linear-gradient(135deg, #a8b2b5, #6ca885, #67a8ce);
+         background: 
+            radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.22) 0%, transparent 60%),
+            linear-gradient(135deg, #9bb2bf 0%, #689a9e 48%, #4a7d9b 100%);
+         background-attachment: fixed;
          display: flex;
          flex-direction: column;
          justify-content: center;
@@ -23,6 +37,7 @@
          color: white;
          position: relative;
          padding: 20px;
+         -webkit-font-smoothing: antialiased;
       }
 
       /* Background STOP SUAP - Seperti cap air (watermark) di tengah bawah */
@@ -315,6 +330,7 @@
 </head>
 
 <body>
+   <div class="top-accent-bar"></div>
    <!-- Background STOP SUAP -->
    <!-- <div class="stop-suap-background" aria-label="Stop Suap - Hargai Petugas Kami"></div> -->
 
@@ -478,7 +494,11 @@
                      <div class="menu-title">Data Master</div>
                   </div>
                </a>
-               <a href="{{ route('superadmin.activity-log.index') }}" class="menu-item">
+            @endif
+
+            {{-- Log Aktivitas untuk Admin dan Pegawai (Super Admin akses via menu Kelola Pegawai) --}}
+            @if (Auth::user()->role != 5)
+               <a href="{{ route('activity-log.index') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-history"></i>
                      <div class="menu-title">Log Aktivitas</div>

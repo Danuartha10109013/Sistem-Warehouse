@@ -39,6 +39,39 @@
     @media (max-width: 768px) {
         .table-clean thead th, .table-clean tbody td { padding: 12px 8px; font-size: 13px; }
     }
+
+    /* Product Card Styling (Shopee / E-Commerce Style) */
+    .product-card {
+        border-radius: 12px;
+        border-color: #e2e8f0 !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        background-color: #ffffff;
+    }
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
+        border-color: #cbd5e1 !important;
+    }
+    .product-img-wrap {
+        aspect-ratio: 1 / 1;
+        width: 100%;
+        background-color: #f8fafc;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #f1f5f9;
+        cursor: pointer;
+    }
+    .product-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.35s ease;
+    }
+    .product-card:hover .product-card-img {
+        transform: scale(1.06);
+    }
 </style>
 
 <div class="container-fluid p-0">
@@ -82,26 +115,13 @@
             </div>
         </div>
         
-        <div class="card-body p-0 position-relative">
-            <div id="loadingOverlay" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:10; align-items:center; justify-content:center;">
+        <div class="card-body p-3 p-md-4 position-relative" style="min-height: 450px;">
+            <div id="loadingOverlay" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:10; align-items:center; justify-content:center; backdrop-filter: blur(2px);">
                 <div class="spinner-border text-dark" role="status"><span class="visually-hidden">Loading...</span></div>
             </div>
             
-            <div class="table-responsive" style="min-height: 400px; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-                <table class="table table-clean w-100 mb-0">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width: 60px;">NO</th>
-                            <th style="width: 200px;">SEARCH KEY (SKU)</th>
-                            <th>NAMA PRODUK</th>
-                            <th style="width: 100px;">FOTO</th>
-                            <th class="text-center" style="width: 120px;">AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        @include('master_product.partials.table')
-                    </tbody>
-                </table>
+            <div id="productContentContainer">
+                @include('master_product.partials.content')
             </div>
         </div>
     </div>
@@ -146,20 +166,69 @@
     </div>
 </div>
 
-<!-- Modal View Photo (Shopee Style) -->
-<div class="modal fade" id="modalViewPhoto" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-transparent border-0">
-            <div class="photo-viewer-card position-relative">
-                <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="top: 16px; right: 16px; z-index: 10; background-color: rgba(255,255,255,0.9); padding: 10px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></button>
-                
-                <img id="viewPhotoImg" src="" alt="Product Photo" class="photo-viewer-img">
-                
-                <div class="photo-viewer-details">
-                    <div class="d-flex align-items-start justify-content-between gap-3">
-                        <div>
-                            <div class="photo-viewer-sku mb-2" id="viewPhotoSku">SKU-12345</div>
-                            <h4 class="photo-viewer-title" id="viewPhotoTitle">Nama Produk</h4>
+<!-- Modal Detail Produk (E-Commerce / Shopee Style) -->
+<div class="modal fade" id="modalDetailProduk" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header border-bottom py-3 px-4 bg-light">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary px-2 py-1 rounded-pill" style="font-size: 11px;">Katalog Produk</span>
+                    <h6 class="modal-title fw-bold text-dark mb-0">Detail Produk</h6>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-4 align-items-center">
+                    {{-- Sisi Kiri: Foto Produk --}}
+                    <div class="col-md-5 text-center">
+                        <div class="detail-photo-frame position-relative rounded-3 border p-2" style="background-color: #f8fafc; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <img id="detailProductImg" src="" alt="Foto Produk" class="img-fluid rounded" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                            <div id="detailNoPhotoPlaceholder" class="text-muted p-4 d-none">
+                                <i class="fas fa-image fa-3x mb-2 text-secondary opacity-50"></i>
+                                <div class="fw-semibold">Belum Ada Foto Produk</div>
+                                <small class="text-muted">Klik tombol di bawah untuk upload foto</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mt-3 w-100" id="detailBtnUploadFoto">
+                            <i class="fas fa-camera me-1"></i> Upload / Ganti Foto
+                        </button>
+                    </div>
+
+                    {{-- Sisi Kanan: Detail Informasi --}}
+                    <div class="col-md-7">
+                        <div class="mb-3">
+                            <span class="text-uppercase text-muted fw-bold" style="font-size: 11px; letter-spacing: 0.8px;">Search Key (SKU)</span>
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <span class="badge bg-dark px-3 py-2 fs-6 font-monospace" id="detailProductSku" style="letter-spacing: 0.5px;">-</span>
+                                <button type="button" class="btn btn-sm btn-light border py-1 px-2" id="detailBtnCopySku" title="Salin SKU">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="text-uppercase text-muted fw-bold" style="font-size: 11px; letter-spacing: 0.8px;">Nama Produk</span>
+                            <h4 class="fw-bold text-dark mt-1" id="detailProductName" style="line-height: 1.35;">-</h4>
+                        </div>
+
+                        <div class="mb-4 p-3 rounded-3" style="background-color: #f1f5f9; font-size: 13px;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Status Foto:</span>
+                                <span id="detailProductStatusFoto" class="fw-semibold">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Terdaftar Sejak:</span>
+                                <span id="detailProductCreatedAt" class="fw-semibold text-dark">-</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary flex-grow-1" id="detailBtnEdit" style="background-color: #135b9f;">
+                                <i class="fas fa-edit me-1"></i> Edit Data
+                            </button>
+                            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">
+                                Tutup
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -309,7 +378,6 @@
     let scanMode = 'add'; // 'add' atau 'search'
 
     // --- AJAX Pagination & Search ---
-    const tableBody = document.getElementById('tableBody');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const searchInput = document.getElementById('searchInput');
 
@@ -322,13 +390,13 @@
         })
         .then(res => res.text())
         .then(html => {
-            tableBody.innerHTML = html;
+            const container = document.getElementById('productContentContainer');
+            if (container) {
+                container.innerHTML = html;
+            }
             loadingOverlay.style.display = 'none';
             bindPaginationLinks();
-            
-            // Tampilkan baris pagination yang disembunyikan
-            const pagRow = document.querySelector('.pagination-row');
-            if (pagRow) pagRow.style.display = 'table-row';
+            applyActiveViewMode();
         })
         .catch(err => {
             loadingOverlay.style.display = 'none';
@@ -337,7 +405,7 @@
     }
 
     function bindPaginationLinks() {
-        document.querySelectorAll('.pagination-wrapper a.page-link').forEach(link => {
+        document.querySelectorAll('#productContentContainer .pagination-wrapper a.page-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 fetchTableData(this.href);
@@ -357,23 +425,135 @@
 
     // Inisialisasi awal pagination links (jika tidak via AJAX)
     bindPaginationLinks();
-    const initPag = document.querySelector('.pagination-row');
-    if(initPag) initPag.style.display = 'table-row';
 
-    // --- Tombol Edit & View Foto ---
+    // --- View Mode Switcher (Katalog Grid vs Table) ---
+    function applyActiveViewMode() {
+        const mode = localStorage.getItem('mp_view_mode') || 'grid';
+        const gridView = document.getElementById('catalogGridView');
+        const tableView = document.getElementById('catalogTableView');
+        const btnGrid = document.getElementById('btnViewGrid');
+        const btnTable = document.getElementById('btnViewTable');
+
+        if (!gridView || !tableView) return;
+
+        if (mode === 'table') {
+            gridView.classList.add('d-none');
+            tableView.classList.remove('d-none');
+            if (btnGrid) {
+                btnGrid.classList.remove('active', 'btn-dark', 'text-white');
+                btnGrid.classList.add('btn-light', 'text-secondary');
+            }
+            if (btnTable) {
+                btnTable.classList.add('active', 'btn-dark', 'text-white');
+                btnTable.classList.remove('btn-light', 'text-secondary');
+            }
+        } else {
+            tableView.classList.add('d-none');
+            gridView.classList.remove('d-none');
+            if (btnGrid) {
+                btnGrid.classList.add('active', 'btn-dark', 'text-white');
+                btnGrid.classList.remove('btn-light', 'text-secondary');
+            }
+            if (btnTable) {
+                btnTable.classList.remove('active', 'btn-dark', 'text-white');
+                btnTable.classList.add('btn-light', 'text-secondary');
+            }
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        const btnGrid = e.target.closest('#btnViewGrid');
+        if (btnGrid) {
+            localStorage.setItem('mp_view_mode', 'grid');
+            applyActiveViewMode();
+            return;
+        }
+        const btnTable = e.target.closest('#btnViewTable');
+        if (btnTable) {
+            localStorage.setItem('mp_view_mode', 'table');
+            applyActiveViewMode();
+            return;
+        }
+    });
+
+    applyActiveViewMode();
+
+    // --- Detail Modal Logic (Shopee Style) ---
+    let currentDetailProductId = null;
+    let currentDetailProductSku = '';
+    let currentDetailProductName = '';
+
+    window.viewProductDetail = function(id, search_key, name, fotoUrl, createdAt) {
+        currentDetailProductId = id;
+        currentDetailProductSku = search_key;
+        currentDetailProductName = name;
+
+        document.getElementById('detailProductSku').innerText = search_key;
+        document.getElementById('detailProductName').innerText = name;
+        document.getElementById('detailProductCreatedAt').innerText = createdAt || '-';
+
+        const imgEl = document.getElementById('detailProductImg');
+        const noPhotoEl = document.getElementById('detailNoPhotoPlaceholder');
+        const statusEl = document.getElementById('detailProductStatusFoto');
+
+        if (fotoUrl && fotoUrl.trim() !== '') {
+            imgEl.src = fotoUrl;
+            imgEl.classList.remove('d-none');
+            noPhotoEl.classList.add('d-none');
+            statusEl.innerHTML = '<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fas fa-check-circle me-1"></i> Foto Tersedia</span>';
+        } else {
+            imgEl.src = '';
+            imgEl.classList.add('d-none');
+            noPhotoEl.classList.remove('d-none');
+            statusEl.innerHTML = '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"><i class="fas fa-times-circle me-1"></i> Belum Ada Foto</span>';
+        }
+
+        new bootstrap.Modal(document.getElementById('modalDetailProduk')).show();
+    };
+
+    // Tombol Edit dari dalam Detail Modal
+    if (document.getElementById('detailBtnEdit')) {
+        document.getElementById('detailBtnEdit').addEventListener('click', function() {
+            bootstrap.Modal.getInstance(document.getElementById('modalDetailProduk')).hide();
+            editProduct(currentDetailProductId, currentDetailProductSku, currentDetailProductName);
+        });
+    }
+
+    // Tombol Upload Foto dari dalam Detail Modal
+    if (document.getElementById('detailBtnUploadFoto')) {
+        document.getElementById('detailBtnUploadFoto').addEventListener('click', function() {
+            bootstrap.Modal.getInstance(document.getElementById('modalDetailProduk')).hide();
+            document.getElementById('fotoProductId').value = currentDetailProductId;
+            document.getElementById('fotoProductName').innerText = currentDetailProductName + ' (' + currentDetailProductSku + ')';
+            document.getElementById('fotoPreviewContainer').style.display = 'none';
+            document.getElementById('fotoInput').value = '';
+            new bootstrap.Modal(document.getElementById('modalUploadFoto')).show();
+        });
+    }
+
+    // Tombol Copy SKU
+    if (document.getElementById('detailBtnCopySku')) {
+        document.getElementById('detailBtnCopySku').addEventListener('click', function() {
+            navigator.clipboard.writeText(currentDetailProductSku).then(() => {
+                const icon = this.querySelector('i');
+                icon.className = 'fas fa-check text-success';
+                setTimeout(() => { icon.className = 'fas fa-copy'; }, 1500);
+            });
+        });
+    }
+
+    // Backward-compatibility jika viewPhoto masih dipanggil
+    window.viewPhoto = function(url, title, sku) {
+        window.viewProductDetail(null, sku, title, url, '-');
+    };
+
+    // --- Tombol Edit ---
     window.editProduct = function(id, search_key, name) {
         document.getElementById('edit_search_key').value = search_key;
         document.getElementById('edit_name').value = name;
         document.getElementById('formEdit').action = `/master-product/update/${id}`;
         new bootstrap.Modal(document.getElementById('modalEdit')).show();
-    }
-
-    window.viewPhoto = function(url, title, sku) {
-        document.getElementById('viewPhotoImg').src = url;
-        document.getElementById('viewPhotoTitle').innerText = title;
-        document.getElementById('viewPhotoSku').innerText = sku;
-        new bootstrap.Modal(document.getElementById('modalViewPhoto')).show();
-    }
+    };
 
     // --- Kamera / Scanner ---
     function showErrorPopup(titleText, messageText) {
@@ -688,8 +868,8 @@
         });
     });
 
-    // Delegated event listener untuk delete karena tabel diload via AJAX
-    document.getElementById('tableBody').addEventListener('submit', function(e) {
+    // Delegated event listener untuk delete karena data diload via AJAX
+    document.addEventListener('submit', function(e) {
         if (e.target && e.target.classList.contains('delete-form')) {
             e.preventDefault();
             const form = e.target;

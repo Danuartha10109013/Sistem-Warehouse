@@ -1,19 +1,25 @@
 <header class="app-header">
   <nav class="navbar navbar-expand-lg navbar-light">
-    <ul class="navbar-nav">
+    <ul class="navbar-nav align-items-center flex-row">
       <li class="nav-item d-block d-xl-none">
-        <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+        <a class="nav-link sidebartoggler nav-icon-hover p-2" id="headerCollapse" href="javascript:void(0)">
           <i class="ti ti-menu-2 fs-6" style="font-size: 24px;"></i>
+        </a>
+      </li>
+      <!-- Logo saat Mobile View -->
+      <li class="nav-item d-flex d-xl-none align-items-center ms-1">
+        <a href="{{ route('rekap-prd.dashboard') }}" class="d-flex align-items-center text-decoration-none">
+          <img src="{{ asset('template_v2/bahan_logo_v2/logobg-ic.png') }}" style="height: 32px; width: auto;" alt="Logo" />
         </a>
       </li>
     </ul>
     <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
       <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
         <!-- Tombol Menu Utama -->
-        <li class="nav-item d-none d-md-block me-3">
-            <a href="{{ url('/welcome') }}" class="btn btn-sm d-flex align-items-center gap-2" style="background-color: #f1f5f9; color: #475569; border-radius: 8px; font-weight: 600; padding: 8px 16px; border: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#e2e8f0'; this.style.color='#1e293b';" onmouseout="this.style.backgroundColor='#f1f5f9'; this.style.color='#475569';">
+        <li class="nav-item me-2 me-md-3">
+            <a href="{{ url('/welcome') }}" class="btn btn-sm d-flex align-items-center gap-2" style="background-color: #f1f5f9; color: #475569; border-radius: 8px; font-weight: 600; padding: 6px 12px; border: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#e2e8f0'; this.style.color='#1e293b';" onmouseout="this.style.backgroundColor='#f1f5f9'; this.style.color='#475569';">
                 <i class="ti ti-home fs-5"></i>
-                Menu Utama
+                <span class="d-none d-md-inline">Menu Utama</span>
             </a>
         </li>
         <li class="nav-item dropdown">
