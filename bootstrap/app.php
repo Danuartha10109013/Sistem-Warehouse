@@ -22,6 +22,7 @@ use App\Http\Middleware\CheckTypeMPR;
 use App\Http\Middleware\CheckTypeST;
 use App\Http\Middleware\CheckTypeMK;
 use App\Http\Middleware\CheckTypeVT;
+use App\Http\Middleware\CheckTypePL2;
 use App\Http\Middleware\PegawaiMiddleware;
 use App\Http\Middleware\RunScheduler;
 use App\Http\Middleware\ScanLayout;
@@ -33,6 +34,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -219,6 +221,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Verifikasi Timbangan
         $middleware->appendToGroup('Verifikasi-Timbangan', [CheckTypeVT::class]);
+        $middleware->appendToGroup('admin', [AdminMiddleware::class]);
+        $middleware->appendToGroup('pegawai', [PegawaiMiddleware::class]);
+
+        // Packing List 2.0
+        $middleware->appendToGroup('Packing-List-2', [CheckTypePL2::class]);
         $middleware->appendToGroup('admin', [AdminMiddleware::class]);
         $middleware->appendToGroup('pegawai', [PegawaiMiddleware::class]);
 

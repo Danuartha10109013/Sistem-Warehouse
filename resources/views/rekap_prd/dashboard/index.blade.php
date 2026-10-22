@@ -48,6 +48,14 @@
             color: #135b9f;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+        /* Fix for calendar icon in WebKit browsers */
+        input[type="month"]::-webkit-calendar-picker-indicator {
+            width: 16px !important;
+            height: 16px !important;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+        }
     </style>
 
     <!-- Summary Cards -->
@@ -107,36 +115,56 @@
         </div>
     </div>
 
+    @php
+        $bulanNama = [
+            '01' => 'JANUARI', '02' => 'FEBRUARI', '03' => 'MARET', '04' => 'APRIL',
+            '05' => 'MEI', '06' => 'JUNI', '07' => 'JULI', '08' => 'AGUSTUS',
+            '09' => 'SEPTEMBER', '10' => 'OKTOBER', '11' => 'NOVEMBER', '12' => 'DESEMBER'
+        ];
+        $mPart = substr($filter_month ?? date('Y-m'), 5, 2);
+        $yPart = substr($filter_month ?? date('Y-m'), 0, 4);
+        $chartTitle = ($filter == 'harian') 
+            ? "POSISI STOCK WH TML CIK - " . ($bulanNama[$mPart] ?? '') . " " . $yPart
+            : "POSISI STOCK WH TML CIK - " . $year;
+    @endphp
+
     <!-- Chart Keseluruhan -->
     <div class="card shadow-sm border-0" style="border-radius: 16px;">
         <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
                 <h5 class="fw-bold mb-0" style="color: #1e293b;">Grafik Keseluruhan</h5>
                 
-                <form action="{{ route('rekap-prd.dashboard') }}" method="GET" class="m-0">
+                <form id="filterForm" action="{{ route('rekap-prd.dashboard') }}" method="GET" class="d-flex align-items-center m-0 gap-2 flex-wrap">
                     <div class="segmented-control">
                         <button type="submit" name="filter" value="harian" class="segmented-btn {{ $filter == 'harian' ? 'active' : '' }}">Harian</button>
                         <button type="submit" name="filter" value="bulanan" class="segmented-btn {{ $filter == 'bulanan' ? 'active' : '' }}">Bulanan</button>
                         <button type="submit" name="filter" value="tahunan" class="segmented-btn {{ $filter == 'tahunan' ? 'active' : '' }}">Tahunan</button>
                     </div>
+
+                    @if($filter == 'harian')
+                        <div class="d-flex align-items-center gap-1 ms-sm-2">
+                            <span class="text-muted fw-semibold" style="font-size: 13px;">Bulan:</span>
+                            <input type="month" name="filter_month" value="{{ $filter_month }}" onchange="submitFilterHarian()" class="form-control form-control-sm" style="border-radius: 8px; width: auto; font-size: 13px;" title="Pilih Bulan">
+                        </div>
+                    @endif
                 </form>
             </div>
             
             <div class="row">
                 <div class="col-12 mb-4">
-                    <h6 class="text-center fw-bold">POSISI STOCK WH TML CIK - 2026</h6>
+                    <h6 class="text-center fw-bold">{{ $chartTitle }}</h6>
                     <div style="height: 400px; width: 100%; position: relative;">
                         @if($data->count() > 0)
                             <canvas id="overallChart"></canvas>
                         @else
                             <div class="h-100 w-100 d-flex align-items-center justify-content-center text-muted">
-                                Belum ada data untuk ditampilkan.
+                                Belum ada data untuk ditampilkan pada periode ini.
                             </div>
                         @endif
                     </div>
                 </div>
                 <div class="col-12">
-                    <h6 class="text-center fw-bold mt-4">POSISI STOCK WH TML CIK - 2026</h6>
+                    <h6 class="text-center fw-bold mt-4">{{ $chartTitle }}</h6>
                     <div style="height: 400px; width: 100%; position: relative;">
                         @if($data->count() > 0)
                             <canvas id="overallChart2"></canvas>
@@ -150,6 +178,20 @@
 @endsection
 
 @push('scripts')
+<script>
+function submitFilterHarian() {
+    const form = document.getElementById('filterForm');
+    let hidden = form.querySelector('input[name="filter"]');
+    if (!hidden) {
+        hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'filter';
+        form.appendChild(hidden);
+    }
+    hidden.value = 'harian';
+    form.submit();
+}
+</script>
 @if($data->count() > 0)
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -161,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if(filter === 'harian') {
         // Exclude initial stock
         chartData = chartData.filter(item => item.tanggal !== '2026-08-31');
-        chartData.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal)).slice(-30); // 30 hari terakhir
+        chartData.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
     } else {
         chartData.sort((a, b) => {
             if(a.periode > b.periode) return 1;

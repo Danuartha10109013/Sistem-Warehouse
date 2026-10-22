@@ -42,6 +42,7 @@ use App\Http\Controllers\IdOdController;
 use App\Http\Controllers\SidewallController;
 use App\Http\Controllers\RekapPrdController;
 use App\Http\Controllers\MasterProductController;
+use App\Http\Controllers\PackingList2Controller;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -172,6 +173,18 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::post('/store', [RekapPrdController::class, 'store'])->name('rekap-prd.store');
         Route::post('/export', [RekapPrdController::class, 'exportExcel'])->name('rekap-prd.export');
         Route::delete('/{id}', [RekapPrdController::class, 'destroy'])->name('rekap-prd.destroy');
+    });
+
+    // ============================
+    // MODUL: PACKING LIST 2.0
+    // ============================
+    Route::prefix('packing-list-2')->middleware(['Packing-List-2'])->group(function () {
+        Route::get('/', [PackingList2Controller::class, 'index'])->name('packing-list-2.dashboard');
+        Route::get('/tempel', [PackingList2Controller::class, 'paste'])->name('packing-list-2.paste');
+        Route::post('/parse-preview', [PackingList2Controller::class, 'parsePreview'])->name('packing-list-2.parse-preview');
+        Route::post('/store', [PackingList2Controller::class, 'store'])->name('packing-list-2.store');
+        Route::get('/batch/{id}', [PackingList2Controller::class, 'detail'])->name('packing-list-2.detail');
+        Route::delete('/batch/{id}', [PackingList2Controller::class, 'destroyBatch'])->name('packing-list-2.batch.destroy');
     });
 
     Route::prefix('master-product')->middleware(['Master-Product'])->group(function () {

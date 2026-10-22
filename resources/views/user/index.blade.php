@@ -260,6 +260,10 @@
                                                                                 <input class="form-check-input shadow-sm edit-type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="VT" {{ in_array('VT', json_decode($d->type, true) ?? []) ? 'checked' : '' }}>
                                                                                 <label class="form-check-label">Verifikasi Timbangan</label>
                                                                             </div>
+                                                                            <div class="form-check mb-2">
+                                                                                <input class="form-check-input shadow-sm edit-type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="PL2" {{ in_array('PL2', json_decode($d->type, true) ?? []) ? 'checked' : '' }}>
+                                                                                <label class="form-check-label">Packing List 2.0</label>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -439,6 +443,10 @@
                                             <div class="form-check mb-2">
                                                 <input class="form-check-input shadow-sm type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="VT" id="typeVT">
                                                 <label class="form-check-label" for="typeVT">Verifikasi Timbangan</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input shadow-sm type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="PL2" id="typePL2">
+                                                <label class="form-check-label" for="typePL2">Packing List 2.0</label>
                                             </div>
                                         </div>
                                     </div>

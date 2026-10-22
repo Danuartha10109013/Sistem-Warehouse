@@ -480,6 +480,15 @@
                   </div>
                </a>
             @endif
+
+            @if (in_array('all', $akses) || in_array('PL2', $akses) || Auth::user()->role == 0)
+               <a href="{{ route('packing-list-2.dashboard') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-format-list-checks"></i>
+                     <div class="menu-title">Packing List 2.0</div>
+                  </div>
+               </a>
+            @endif
             {{-- Menu khusus Superadmin --}}
             @if (Auth::user()->role == 5)
                <a href="{{ route('superadmin.Administrator.kelola-user') }}" class="menu-item">

@@ -11,6 +11,11 @@ class RekapPrdController extends Controller
         // [TAG: FILTER AWAL] Mengambil filter dari URL, secara default menampilkan grafik 'harian'
         $filter = $request->query('filter', 'harian'); 
         
+        $latest = \App\Models\RekapPrd::orderBy('tanggal', 'desc')->first();
+        $defaultMonth = $latest ? date('Y-m', strtotime($latest->tanggal)) : date('Y-m');
+        $filter_month = $request->query('filter_month', $defaultMonth);
+        $filter_year = $request->query('filter_year', date('Y'));
+        
         if ($filter == 'bulanan') {
             // [TAG: QUERY BULANAN] Mengelompokkan semua data menjadi per Bulan
             $data = \App\Models\RekapPrd::selectRaw('
@@ -25,8 +30,8 @@ class RekapPrdController extends Controller
             ->get();
 
             foreach ($data as $item) {
-                $latest = \App\Models\RekapPrd::whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$item->periode])->orderBy('tanggal', 'desc')->first();
-                $item->sisa_stock = $latest ? $latest->sisa_stock : 0;
+                $latestItem = \App\Models\RekapPrd::whereRaw('DATE_FORMAT(tanggal, "%Y-%m") = ?', [$item->periode])->orderBy('tanggal', 'desc')->first();
+                $item->sisa_stock = $latestItem ? $latestItem->sisa_stock : 0;
             }
         } elseif ($filter == 'tahunan') {
             // [TAG: QUERY TAHUNAN] Mengelompokkan semua data ke total Per Tahun
@@ -42,18 +47,22 @@ class RekapPrdController extends Controller
             ->get();
 
             foreach ($data as $item) {
-                $latest = \App\Models\RekapPrd::whereYear('tanggal', $item->periode)->orderBy('tanggal', 'desc')->first();
-                $item->sisa_stock = $latest ? $latest->sisa_stock : 0;
+                $latestItem = \App\Models\RekapPrd::whereYear('tanggal', $item->periode)->orderBy('tanggal', 'desc')->first();
+                $item->sisa_stock = $latestItem ? $latestItem->sisa_stock : 0;
             }
         } else {
-            // [TAG: QUERY HARIAN] Mengambil semua data secara harian
-            $data = \App\Models\RekapPrd::orderBy('tanggal', 'desc')->get();
+            // [TAG: QUERY HARIAN] Mengambil data harian per bulan yang dipilih
+            $year = substr($filter_month, 0, 4);
+            $month = substr($filter_month, 5, 2);
+            $data = \App\Models\RekapPrd::whereYear('tanggal', $year)
+                                        ->whereMonth('tanggal', $month)
+                                        ->orderBy('tanggal', 'asc')
+                                        ->get();
         }
 
-        $latest = \App\Models\RekapPrd::orderBy('tanggal', 'desc')->first();
-        $year = date('Y');
+        $year = substr($filter_month, 0, 4);
 
-        return view('rekap_prd.dashboard.index', compact('data', 'latest', 'year', 'filter'));
+        return view('rekap_prd.dashboard.index', compact('data', 'latest', 'year', 'filter', 'filter_month', 'filter_year'));
     }
 
     public function input(Request $request)
