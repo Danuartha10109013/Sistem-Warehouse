@@ -81,7 +81,15 @@ class AuthController extends Controller
         }
 
         // Buat Sanctum token untuk sesi mobile
-        $token = $user->createToken('flutter-mobile-app')->plainTextToken;
+        try {
+            $token = $user->createToken('flutter-mobile-app')->plainTextToken;
+        } catch (\Throwable $e) {
+            \Log::error('Sanctum Token Creation Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat token login. Pastikan migrasi tabel personal_access_tokens sudah dijalankan di database server: ' . $e->getMessage(),
+            ], 500);
+        }
 
         // Label role yang ramah pembaca
         $roleLabel = match ((int) $user->role) {

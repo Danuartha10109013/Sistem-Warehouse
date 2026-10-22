@@ -52,6 +52,10 @@ Route::get('/scheduler-run', function () {
     Artisan::call('schedule:run');
     return 'Scheduler executed at ' . now();
 });
+Route::get('/migrate-run', function () {
+    Artisan::call('migrate', ['--force' => true]);
+    return '<pre>' . Artisan::output() . '</pre>';
+});
 Route::get('/country-data/{negara}', function ($negara) {
     $negara = strtolower($negara);
     $count = 0;
