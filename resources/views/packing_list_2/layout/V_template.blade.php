@@ -402,7 +402,7 @@
 
           // Custom global search for DataTables
           $('.custom-dt-search').on('keyup', function() {
-              if ($('#dataTable').length > 0) {
+              if ($('#dataTable').length > 0 && $.fn.DataTable.isDataTable('#dataTable')) {
                   $('#dataTable').DataTable().search(this.value).draw();
               }
           });
@@ -414,7 +414,7 @@
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
   <script>
       $(document).ready(function() {
-          if ($('#dataTable').length > 0) {
+          if ($('#dataTable').length > 0 && $('#dataTable tbody tr td[colspan]').length === 0) {
               $('#dataTable').DataTable({
                   "pageLength": 10,
                   "dom": "<'table-responsive'tr><'row dt-footer-row'<'col-sm-12 col-md-5 d-flex align-items-center'i><'col-sm-12 col-md-7'p>>",

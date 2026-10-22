@@ -112,7 +112,7 @@
             </div>
 
             <div class="table-responsive">
-                <table id="dataTable" class="table table-hover align-middle mb-0" style="width: 100%;">
+                <table @if(count($batches) > 0) id="dataTable" @endif class="table table-hover align-middle mb-0" style="width: 100%;">
                     <thead style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
                         <tr>
                             <th class="py-3 px-3 text-secondary text-uppercase fw-bold" style="font-size: 12px; width: 60px;">No</th>
