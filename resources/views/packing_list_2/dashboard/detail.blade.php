@@ -2,14 +2,79 @@
 
 @section('title', 'Detail Batch ' . $batch->kode_batch . ' - Packing List 2.0')
 
+@push('css')
+<style>
+    .btn-export-excel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #107c41 !important;
+        color: #ffffff !important;
+        border: 1px solid #0e6c38 !important;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 7px 16px;
+        box-shadow: 0 1px 2px rgba(16, 124, 65, 0.2);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none;
+    }
+    .btn-export-excel:hover {
+        background-color: #0b5e31 !important;
+        border-color: #084926 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(16, 124, 65, 0.28);
+        transform: translateY(-1px);
+    }
+    .btn-export-excel:active {
+        background-color: #084926 !important;
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(16, 124, 65, 0.2);
+    }
+    .btn-export-excel-table {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background-color: #ffffff;
+        color: #1e293b !important;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        font-weight: 600;
+        font-size: 12.5px;
+        padding: 6px 14px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none;
+    }
+    .btn-export-excel-table i {
+        color: #107c41;
+        font-size: 16px;
+    }
+    .btn-export-excel-table:hover {
+        background-color: #f0fdf4;
+        border-color: #86efac;
+        color: #166534 !important;
+        box-shadow: 0 3px 6px rgba(16, 124, 65, 0.12);
+        transform: translateY(-1px);
+    }
+    .btn-export-excel-table:active {
+        background-color: #dcfce7;
+        transform: translateY(0);
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="container-fluid p-0">
     <!-- Header Page Info -->
     <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px; background: linear-gradient(to right, #ffffff, #f8f9fa);">
         <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div>
-                <div class="d-flex align-items-center gap-2 mb-1">
+                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
                     <h4 class="fw-bolder mb-0" style="color: #1e293b; letter-spacing: -0.5px;">Detail Batch: {{ $batch->kode_batch }}</h4>
+                    @if ($batch->no_rit)
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" style="font-size: 12px; border-radius: 6px;"><i class="ti ti-truck-delivery me-1"></i>Rit {{ $batch->no_rit }}</span>
+                    @endif
                     @if ($summary['menunggu'] > 0 && $summary['tervalidasi'] == 0)
                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1" style="font-size: 12px; border-radius: 6px;">Semua Menunggu Validasi</span>
                     @elseif ($summary['menunggu'] == 0 && $summary['total'] > 0)
@@ -23,6 +88,10 @@
                 </div>
             </div>
             <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('packing-list-2.batch.export-excel', array_merge(['id' => $batch->id], request()->only(['search', 'status']))) }}" class="btn-export-excel">
+                    <i class="ti ti-file-spreadsheet fs-5"></i>
+                    <span>Export Excel</span>
+                </a>
                 <a href="{{ route('packing-list-2.dashboard') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2" style="border-radius: 8px; font-weight: 600; font-size: 13px;">
                     <i class="ti ti-arrow-left fs-5"></i>
                     <span>Kembali</span>
@@ -152,9 +221,15 @@
     <!-- Items Table Card -->
     <div class="card border-0 shadow-sm" style="border-radius: 16px;">
         <div class="card-body p-4">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h5 class="fw-bold mb-0 text-dark">Daftar Item Koil di Batch Ini</h5>
-                <span class="text-muted" style="font-size: 13px;">Menampilkan {{ count($items) }} dari {{ $summary['total'] }} item</span>
+            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="fw-bold mb-0 text-dark">Daftar Item Koil di Batch Ini</h5>
+                    <span class="text-muted" style="font-size: 13px;">(Menampilkan {{ count($items) }} dari {{ $summary['total'] }} item)</span>
+                </div>
+                <a href="{{ route('packing-list-2.batch.export-excel', array_merge(['id' => $batch->id], request()->only(['search', 'status']))) }}" class="btn-export-excel-table">
+                    <i class="ti ti-file-spreadsheet"></i>
+                    <span>Export ke Excel</span>
+                </a>
             </div>
 
             <div class="table-responsive">

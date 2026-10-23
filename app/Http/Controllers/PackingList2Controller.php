@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PackingList2BatchExport;
+use App\Exports\PackingList2LaporanHarianExport;
 use App\Models\PackingList2Batch;
 use App\Models\PackingList2Item;
 use App\Services\PackingList2Parser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PackingList2Controller extends Controller
 {
@@ -63,7 +66,11 @@ class PackingList2Controller extends Controller
             $query->having('count_menunggu', '=', 0);
         }
 
-        $batches = $query->orderBy('created_at', 'desc')->get();
+        $batches = $query->orderByRaw('DATE(created_at) DESC')
+            ->orderByRaw('CASE WHEN no_rit IS NULL THEN 1 ELSE 0 END ASC')
+            ->orderByRaw('CAST(no_rit AS UNSIGNED) ASC')
+            ->orderBy('kode_batch', 'asc')
+            ->get();
 
         return view('packing_list_2.dashboard.index', compact(
             'totalBatch',
@@ -211,45 +218,108 @@ class PackingList2Controller extends Controller
             ], 422);
         }
 
-        // [TAG: TRANSAKSI DATABASE] Simpan 1 batch dan seluruh item secara atomik
+        // [TAG: PENGELOMPOKAN RIT] Kelompokkan baris berdasarkan nomor rit dari kolom keterangan
+        $groupedByRit = [];
+        foreach ($validatedRows as $row) {
+            $rit = $this->parser->extractRitNumber($row['keterangan'] ?? null);
+            $key = $rit !== null ? "RIT_{$rit}" : 'TANPA_RIT';
+            if (!isset($groupedByRit[$key])) {
+                $groupedByRit[$key] = [
+                    'rit'   => $rit,
+                    'items' => [],
+                ];
+            }
+            $groupedByRit[$key]['items'][] = $row;
+        }
+
+        // [TAG: TRANSAKSI DATABASE] Simpan batch per rit secara atomik
         DB::beginTransaction();
         try {
-            // Generate kode batch unik
-            $prefix = 'BATCH-' . date('Ymd');
-            $latestBatch = PackingList2Batch::where('kode_batch', 'like', "{$prefix}-%")->latest('id')->first();
-            $nextSeq = 1;
-            if ($latestBatch) {
-                $parts = explode('-', $latestBatch->kode_batch);
-                $lastNum = (int) end($parts);
-                $nextSeq = $lastNum + 1;
+            $dateStr = date('Ymd');
+            $createdBatches = [];
+
+            foreach ($groupedByRit as $group) {
+                $rit = $group['rit'];
+                $items = $group['items'];
+                $countItems = count($items);
+
+                // Buat kode batch berbasis tanggal dan rit
+                if ($rit !== null) {
+                    $padRit = str_pad($rit, 2, '0', STR_PAD_LEFT);
+                    $baseCode = "BATCH-{$dateStr}-RIT{$padRit}";
+                    $kodeBatch = $baseCode;
+
+                    // Jika di hari yang sama sudah ada batch rit ini, tambah suffix angka
+                    $counter = 2;
+                    while (PackingList2Batch::where('kode_batch', $kodeBatch)->exists()) {
+                        $kodeBatch = "{$baseCode}-{$counter}";
+                        $counter++;
+                    }
+                    $catatanBatch = $catatan ? "{$catatan} (Rit {$rit})" : "Rit {$rit}";
+                } else {
+                    $prefix = "BATCH-{$dateStr}";
+                    $latestBatch = PackingList2Batch::where('kode_batch', 'like', "{$prefix}-%")->latest('id')->first();
+                    $nextSeq = 1;
+                    if ($latestBatch) {
+                        $parts = explode('-', $latestBatch->kode_batch);
+                        $lastNum = (int) end($parts);
+                        $nextSeq = $lastNum + 1;
+                    }
+                    $kodeBatch = sprintf('%s-%04d', $prefix, $nextSeq);
+                    $catatanBatch = $catatan;
+                }
+
+                $batch = PackingList2Batch::create([
+                    'kode_batch' => $kodeBatch,
+                    'no_rit'     => $rit,
+                    'user_id'    => Auth::id(),
+                    'total_item' => $countItems,
+                    'catatan'    => $catatanBatch,
+                ]);
+
+                // Assign batch_id ke setiap baris dalam grup ini
+                foreach ($items as &$item) {
+                    $item['batch_id'] = $batch->id;
+                }
+                unset($item);
+
+                // Bulk insert item
+                PackingList2Item::insert($items);
+
+                $createdBatches[] = [
+                    'id'         => $batch->id,
+                    'kode_batch' => $kodeBatch,
+                    'no_rit'     => $rit,
+                    'total_item' => $countItems,
+                ];
             }
-            $kodeBatch = sprintf('%s-%04d', $prefix, $nextSeq);
-
-            $batch = PackingList2Batch::create([
-                'kode_batch' => $kodeBatch,
-                'user_id'    => Auth::id(),
-                'total_item' => count($validatedRows),
-                'catatan'    => $catatan,
-            ]);
-
-            // Assign batch_id ke setiap baris
-            foreach ($validatedRows as &$item) {
-                $item['batch_id'] = $batch->id;
-            }
-            unset($item);
-
-            // Bulk insert item
-            PackingList2Item::insert($validatedRows);
 
             DB::commit();
 
-            return response()->json([
-                'success'    => true,
-                'message'    => "Berhasil menyimpan batch {$kodeBatch} dengan " . count($validatedRows) . " item.",
-                'batch_id'   => $batch->id,
-                'kode_batch' => $kodeBatch,
-                'redirect'   => route('packing-list-2.detail', $batch->id),
-            ]);
+            $batchCount = count($createdBatches);
+            if ($batchCount === 1) {
+                $first = $createdBatches[0];
+                $ritText = $first['no_rit'] ? " (Rit {$first['no_rit']})" : "";
+                return response()->json([
+                    'success'     => true,
+                    'batch_count' => 1,
+                    'message'     => "Berhasil menyimpan batch {$first['kode_batch']}{$ritText} dengan {$first['total_item']} item.",
+                    'batch_id'    => $first['id'],
+                    'kode_batch'  => $first['kode_batch'],
+                    'redirect'    => route('packing-list-2.detail', $first['id']),
+                ]);
+            } else {
+                $names = implode(', ', array_map(function ($b) {
+                    return $b['kode_batch'] . ($b['no_rit'] ? " (Rit {$b['no_rit']})" : "");
+                }, $createdBatches));
+                return response()->json([
+                    'success'     => true,
+                    'batch_count' => $batchCount,
+                    'message'     => "Berhasil menyimpan {$batchCount} batch terpisah: {$names}.",
+                    'batches'     => $createdBatches,
+                    'redirect'    => route('packing-list-2.dashboard'),
+                ]);
+            }
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json([
@@ -325,5 +395,119 @@ class PackingList2Controller extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal menghapus batch: ' . $e->getMessage());
         }
+    }
+
+    // [TAG: EXPORT EXCEL BATCH] Download seluruh item koil batch ke file Excel
+    public function exportExcel($id, Request $request)
+    {
+        $batch = PackingList2Batch::with(['user'])->findOrFail($id);
+
+        $query = PackingList2Item::with(['validator'])->where('batch_id', $batch->id);
+
+        // Filter status jika ada
+        if ($request->filled('status')) {
+            $st = $request->status;
+            if ($st === 'VALID' || $st === 'TERVALIDASI') {
+                $query->whereIn('status', ['VALID', 'TERVALIDASI']);
+            } else {
+                $query->where('status', $st);
+            }
+        }
+
+        // Pencarian NO COIL atau KODE
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('no_coil', 'like', "%{$search}%")
+                  ->orWhere('kode', 'like', "%{$search}%")
+                  ->orWhere('nama_produk', 'like', "%{$search}%");
+            });
+        }
+
+        $items = $query->orderBy('id', 'asc')->get();
+
+        $safeCode = preg_replace('/[^A-Za-z0-9_-]/', '_', $batch->kode_batch);
+        $fileName = 'Daftar_Item_Koil_' . $safeCode . '_' . date('Ymd_His') . '.xlsx';
+
+        return Excel::download(new PackingList2BatchExport($batch, $items), $fileName);
+    }
+
+    // [TAG: LAPORAN HARIAN BATCH] Halaman laporan dan riwayat batch per hari
+    public function laporanHarian(Request $request)
+    {
+        $tanggal = $request->input('tanggal', date('Y-m-d'));
+
+        // Query batch pada tanggal yang dipilih
+        $batches = PackingList2Batch::with(['user', 'items.validator'])
+            ->whereDate('created_at', $tanggal)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        // Hitung statistik hari ini
+        $totalBatch = $batches->count();
+        $totalItems = 0;
+        $totalValid = 0;
+        $totalPending = 0;
+        $totalSelisih = 0;
+
+        foreach ($batches as $b) {
+            $totalItems += $b->items->count();
+            $totalValid += $b->items->whereIn('status', ['VALID', 'TERVALIDASI'])->count();
+            $totalPending += $b->items->where('status', 'MENUNGGU_VALIDASI')->count();
+            $totalSelisih += $b->items->where('status', 'TIDAK_VALID')->count();
+        }
+
+        $summary = [
+            'total_batch' => $totalBatch,
+            'total_items' => $totalItems,
+            'valid'       => $totalValid,
+            'menunggu'    => $totalPending,
+            'tidak_valid' => $totalSelisih,
+        ];
+
+        // Daftar tanggal terbaru yang memiliki batch untuk tombol cepat
+        $availableDates = PackingList2Batch::selectRaw('DATE(created_at) as tgl, COUNT(*) as jml_batch')
+            ->groupBy('tgl')
+            ->orderBy('tgl', 'desc')
+            ->limit(7)
+            ->get();
+
+        return view('packing_list_2.laporan.index', compact('batches', 'tanggal', 'summary', 'availableDates'));
+    }
+
+    // [TAG: EXPORT EXCEL LAPORAN HARIAN] Download seluruh batch dan koil tanggal terpilih
+    public function exportLaporanHarian(Request $request)
+    {
+        $tanggal = $request->input('tanggal', date('Y-m-d'));
+
+        $batches = PackingList2Batch::with(['user', 'items.validator'])
+            ->whereDate('created_at', $tanggal)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $totalItems = 0;
+        $totalValid = 0;
+        $totalPending = 0;
+        $totalSelisih = 0;
+
+        foreach ($batches as $b) {
+            $totalItems += $b->items->count();
+            $totalValid += $b->items->whereIn('status', ['VALID', 'TERVALIDASI'])->count();
+            $totalPending += $b->items->where('status', 'MENUNGGU_VALIDASI')->count();
+            $totalSelisih += $b->items->where('status', 'TIDAK_VALID')->count();
+        }
+
+        $summary = [
+            'total_batch' => $batches->count(),
+            'total_items' => $totalItems,
+            'valid'       => $totalValid,
+            'menunggu'    => $totalPending,
+            'tidak_valid' => $totalSelisih,
+        ];
+
+        $dateStr = str_replace('-', '', $tanggal);
+        $fileName = 'Laporan_Batch_Harian_' . $dateStr . '_' . date('His') . '.xlsx';
+
+        return Excel::download(new PackingList2LaporanHarianExport($tanggal, $batches, $summary), $fileName);
     }
 }

@@ -86,6 +86,42 @@
         border-bottom: 2px solid #135b9f;
         background-color: transparent;
     }
+
+    /* Scan Option Cards & Pulse Animation */
+    .scan-option-card {
+        border: 1.5px solid #cbd5e1;
+        border-radius: 12px;
+        background: #ffffff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .scan-option-card:hover {
+        border-color: #135b9f !important;
+        background-color: #f8fafc !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(19, 91, 159, 0.08);
+    }
+    @keyframes blinkLaser {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.25; }
+    }
+    .blink-laser {
+        animation: blinkLaser 1.2s infinite;
+    }
+    @keyframes pulseRing {
+        0% { transform: scale(0.9); opacity: 0.8; }
+        100% { transform: scale(1.4); opacity: 0; }
+    }
+    .pulse-ring-laser {
+        position: absolute;
+        top: -6px;
+        left: -6px;
+        right: -6px;
+        bottom: -6px;
+        border: 2px solid #ef4444;
+        border-radius: 50%;
+        animation: pulseRing 1.5s infinite;
+    }
 </style>
 
 <style>
@@ -357,6 +393,97 @@
     </div>
 </div>
 
+<!-- Modal Pilihan Metode Scan: Kamera vs Zebra Infrared -->
+<div class="modal fade" id="modalPilihMetodeScan" tabindex="-1" aria-hidden="true" style="text-align: left; z-index: 1065;">
+    <div class="modal-dialog modal-dialog-centered modal-sm" style="max-width: 440px;">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.18);">
+            <div class="modal-header border-bottom-0 pb-1 pt-4 px-4">
+                <div>
+                    <h6 class="modal-title fw-bold text-dark mb-0" style="font-size: 16px;">Pilih Metode Scan Barcode</h6>
+                    <small class="text-muted" style="font-size: 12px;">Pilih metode pembacaan barcode untuk form</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-4 py-3">
+                <!-- Input Sink Tersembunyi untuk Menangkap Keystroke Zebra Saat Modal Terbuka -->
+                <input type="text" id="zebra-hidden-scanner-sink" style="position: absolute; opacity: 0; pointer-events: none; left: -9999px; width: 1px; height: 1px;" autocomplete="off">
+
+                <!-- Pilihan Target Field: No Coil EUP vs Berat -->
+                <div class="mb-3 p-2 bg-light rounded-3 d-flex align-items-center justify-content-between border">
+                    <span class="text-secondary fw-bold" style="font-size: 12px;"><i class="fas fa-crosshairs me-1 text-primary"></i> Target Input:</span>
+                    <div class="btn-group btn-group-sm" role="group" id="btn-group-target-scan">
+                        <button type="button" class="btn btn-primary btn-target-select active" data-target="no_coil_eup" id="btn-target-coil" style="font-size: 11.5px; font-weight: 600; padding: 4px 10px;">
+                            <i class="fas fa-barcode me-1"></i> No Coil
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-target-select" data-target="berat" id="btn-target-berat" style="font-size: 11.5px; font-weight: 600; padding: 4px 10px;">
+                            <i class="fas fa-weight me-1"></i> Berat
+                        </button>
+                    </div>
+                </div>
+
+                <!-- State 1: Pilihan Metode -->
+                <div id="scan-method-selection">
+                    <div class="d-flex flex-column gap-3">
+                        <!-- Opsi 1: Zebra TC22R Infrared / Pelatuk -->
+                        <div class="scan-option-card p-3" id="opt-scan-zebra" role="button">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="d-flex align-items-center justify-content-center rounded-3 text-danger flex-shrink-0" style="width: 48px; height: 48px; background-color: #fef2f2;">
+                                    <i class="fas fa-barcode fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 14px;">Scanner Fisik Zebra TC22</h6>
+                                        <span class="badge bg-danger text-white" style="font-size: 10px; border-radius: 4px;">Hardware</span>
+                                    </div>
+                                    <p class="text-muted mb-0" style="font-size: 12px; line-height: 1.4;">
+                                        Tarik <strong>pelatuk fisik (BUTTON_L1)</strong> sekarang. Data hasil scan akan langsung masuk otomatis ke target input yang dipilih di atas.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opsi 2: Kamera Perangkat -->
+                        <div class="scan-option-card p-3" id="opt-scan-camera" role="button">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="d-flex align-items-center justify-content-center rounded-3 text-primary flex-shrink-0" style="width: 48px; height: 48px; background-color: #eff6ff;">
+                                    <i class="fas fa-camera fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 14px;">Kamera Layar</h6>
+                                        <span class="badge bg-primary text-white" style="font-size: 10px; border-radius: 4px;">Webcam</span>
+                                    </div>
+                                    <p class="text-muted mb-0" style="font-size: 12px; line-height: 1.4;">
+                                        Buka kamera internal perangkat untuk membaca barcode/QR melalui tangkapan video.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- State 2: Menunggu Tembakan Zebra -->
+                <div id="scan-zebra-waiting" style="display: none;" class="text-center py-3">
+                    <div class="mb-3 position-relative d-inline-block">
+                        <div class="pulse-ring-laser"></div>
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-danger text-white mx-auto shadow" style="width: 68px; height: 68px;">
+                            <i class="fas fa-barcode fs-2"></i>
+                        </div>
+                    </div>
+                    <h6 class="fw-bold text-dark mb-1">Siap Scan Sinar Zebra</h6>
+                    <p class="text-muted mb-3" style="font-size: 12.5px;">Arahkan moncong Zebra dan <strong>tekan pelatuk fisik</strong> sekarang...</p>
+                    <div class="p-2 rounded bg-light border text-danger font-monospace mb-3" style="font-size: 12px;">
+                        <i class="fas fa-circle text-danger me-1 blink-laser"></i> Menunggu tembakan sinar laser Zebra...
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-cancel-zebra" style="border-radius: 6px;">
+                        Kembali ke Pilihan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Kelola Layout -->
 <div class="modal fade" id="modalKelolaLayout" tabindex="-1" aria-hidden="true" style="text-align: left;">
     <div class="modal-dialog modal-dialog-centered">
@@ -521,64 +648,344 @@
             });
         }
 
-        // Generic QR Code Scanner Logic
-        function initScanner(btnId, readerId, inputId) {
-            const btnScan = document.getElementById(btnId);
-            const qrReader = document.getElementById(readerId);
-            const inputField = document.getElementById(inputId);
-            let html5QrCode = null;
-
-            if (btnScan) {
-                btnScan.addEventListener('click', function() {
-                    if (qrReader.style.display === 'block') {
-                        if (html5QrCode) {
-                            html5QrCode.stop().then(() => {
-                                qrReader.style.display = 'none';
-                                btnScan.innerHTML = '<i class="fas fa-qrcode"></i>';
-                            }).catch(err => console.error(err));
-                        }
-                        return;
-                    }
-
-                    qrReader.style.display = 'block';
-                    btnScan.innerHTML = '<i class="fas fa-times text-danger"></i>'; 
-                    
-                    if (!html5QrCode) {
-                        html5QrCode = new Html5Qrcode(readerId);
-                    }
-                    
-                    html5QrCode.start(
-                        { facingMode: "environment" },
-                        { fps: 10, qrbox: { width: 250, height: 250 } },
-                        (decodedText, decodedResult) => {
-                            if (inputId === 'berat') {
-                                // Ekstrak hanya angka untuk berat
-                                const num = decodedText.replace(/[^0-9.]/g, '');
-                                inputField.value = num;
-                            } else {
-                                inputField.value = decodedText;
-                            }
-                            
-                            html5QrCode.stop().then(() => {
-                                qrReader.style.display = 'none';
-                                btnScan.innerHTML = '<i class="fas fa-qrcode"></i>';
-                            });
-                        },
-                        (errorMessage) => {}
-                    ).catch((err) => {
-                        console.error("Error starting camera", err);
-                        showErrorPopup('Akses Kamera Gagal', 'Browser tidak memiliki izin atau tidak ada kamera yang terdeteksi.');
-                        qrReader.style.display = 'none';
-                        btnScan.innerHTML = '<i class="fas fa-qrcode"></i>';
-                    });
-                });
+        // Sound Beep Generator via Web Audio API
+        function playZebraBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1400, audioCtx.currentTime); // 1400 Hz beep
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.12);
+            } catch (e) {
+                // Ignore audio context error if browser blocks autoplay
             }
-            
-            return html5QrCode;
         }
 
-        const scannerCoil = initScanner('btn-scan', 'qr-reader', 'no_coil_eup');
-        const scannerBerat = initScanner('btn-scan-berat', 'qr-reader-berat', 'berat');
+        // Variabel Controller Scanner
+        let activeTargetField = 'no_coil_eup'; // 'no_coil_eup' atau 'berat'
+        let html5QrCodeCoil = null;
+        let html5QrCodeBerat = null;
+        const modalPilihMetodeEl = document.getElementById('modalPilihMetodeScan');
+        const bsModalPilihMetode = modalPilihMetodeEl ? new bootstrap.Modal(modalPilihMetodeEl) : null;
+        const bsModalTambah = modalTambah ? new bootstrap.Modal(modalTambah) : null;
+
+        const scanMethodSelection = document.getElementById('scan-method-selection');
+        const scanZebraWaiting = document.getElementById('scan-zebra-waiting');
+        const optScanZebra = document.getElementById('opt-scan-zebra');
+        const optScanCamera = document.getElementById('opt-scan-camera');
+        const btnCancelZebra = document.getElementById('btn-cancel-zebra');
+
+        // Buka Modal Pilihan Metode Scan & Set Target Field
+        function openScanMethodModal(targetField) {
+            setScanTargetField(targetField);
+            if (scanMethodSelection) scanMethodSelection.style.display = 'block';
+            if (scanZebraWaiting) scanZebraWaiting.style.display = 'none';
+            if (bsModalPilihMetode) bsModalPilihMetode.show();
+        }
+
+        // Fungsi Switch Target Input (No Coil EUP vs Berat)
+        function setScanTargetField(field) {
+            activeTargetField = field;
+            const btnCoil = document.getElementById('btn-target-coil');
+            const btnBerat = document.getElementById('btn-target-berat');
+            if (btnCoil && btnBerat) {
+                if (field === 'berat') {
+                    btnBerat.className = 'btn btn-primary btn-target-select active';
+                    btnCoil.className = 'btn btn-outline-primary btn-target-select';
+                } else {
+                    btnCoil.className = 'btn btn-primary btn-target-select active';
+                    btnBerat.className = 'btn btn-outline-primary btn-target-select';
+                }
+            }
+            // Arahkan fokus ke sink penangkap scan
+            const sink = document.getElementById('zebra-hidden-scanner-sink');
+            if (sink) {
+                sink.value = '';
+                sink.focus();
+            }
+        }
+
+        // Listener Tombol Pilihan Target di Modal
+        document.querySelectorAll('.btn-target-select').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const target = this.getAttribute('data-target');
+                setScanTargetField(target);
+            });
+        });
+
+        // Saat modal metode scan terbuka, auto-fokus ke sink agar tembakan Zebra langsung tertangkap
+        if (modalPilihMetodeEl) {
+            modalPilihMetodeEl.addEventListener('shown.bs.modal', function () {
+                const sink = document.getElementById('zebra-hidden-scanner-sink');
+                if (sink) {
+                    sink.value = '';
+                    sink.focus();
+                }
+            });
+        }
+
+        // Listener Input Sink Penangkap Barcode Zebra di Modal
+        const zebraSink = document.getElementById('zebra-hidden-scanner-sink');
+        if (zebraSink) {
+            zebraSink.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const val = this.value.trim();
+                    this.value = '';
+                    if (val.length >= 2) {
+                        applyZebraScannedBarcode(val);
+                    }
+                }
+            });
+            zebraSink.addEventListener('input', function() {
+                const val = this.value;
+                if (val.includes('\n') || val.includes('\r')) {
+                    const clean = val.replace(/[\r\n]/g, '').trim();
+                    this.value = '';
+                    if (clean.length >= 2) {
+                        applyZebraScannedBarcode(clean);
+                    }
+                }
+            });
+        }
+
+        // Handler Klik Tombol QR di Input Form
+        const btnScanCoil = document.getElementById('btn-scan');
+        const qrReaderCoil = document.getElementById('qr-reader');
+        if (btnScanCoil) {
+            btnScanCoil.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (qrReaderCoil && qrReaderCoil.style.display === 'block') {
+                    stopCameraScanner('no_coil_eup');
+                    return;
+                }
+                openScanMethodModal('no_coil_eup');
+            });
+        }
+
+        const btnScanBerat = document.getElementById('btn-scan-berat');
+        const qrReaderBerat = document.getElementById('qr-reader-berat');
+        if (btnScanBerat) {
+            btnScanBerat.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (qrReaderBerat && qrReaderBerat.style.display === 'block') {
+                    stopCameraScanner('berat');
+                    return;
+                }
+                openScanMethodModal('berat');
+            });
+        }
+
+        // Opsi 1: Pengguna Memilih Scanner Fisik Zebra
+        if (optScanZebra) {
+            optScanZebra.addEventListener('click', function() {
+                if (bsModalPilihMetode) bsModalPilihMetode.hide();
+
+                setTimeout(() => {
+                    const targetInput = document.getElementById(activeTargetField);
+                    if (targetInput) {
+                        targetInput.focus();
+                        targetInput.select();
+                    }
+                }, 300);
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: 'info',
+                    title: 'Target: ' + (activeTargetField === 'berat' ? 'Berat Koil' : 'No Coil EUP'),
+                    text: 'Tarik pelatuk fisik (BUTTON_L1) di genggaman Zebra.',
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true
+                });
+            });
+        }
+
+        // Opsi 2: Pengguna Memilih Kamera
+        if (optScanCamera) {
+            optScanCamera.addEventListener('click', function() {
+                if (bsModalPilihMetode) bsModalPilihMetode.hide();
+                startCameraScanner(activeTargetField);
+            });
+        }
+
+        // Jalankan Kamera WebRTC
+        function startCameraScanner(targetField) {
+            const readerId = targetField === 'berat' ? 'qr-reader-berat' : 'qr-reader';
+            const btnId = targetField === 'berat' ? 'btn-scan-berat' : 'btn-scan';
+            const qrReader = document.getElementById(readerId);
+            const btnScan = document.getElementById(btnId);
+            const inputField = document.getElementById(targetField);
+
+            if (!qrReader || !btnScan || !inputField) return;
+
+            qrReader.style.display = 'block';
+            btnScan.innerHTML = '<i class="fas fa-times text-danger"></i>';
+
+            let qrInstance = targetField === 'berat' ? html5QrCodeBerat : html5QrCodeCoil;
+            if (!qrInstance) {
+                qrInstance = new Html5Qrcode(readerId);
+                if (targetField === 'berat') html5QrCodeBerat = qrInstance;
+                else html5QrCodeCoil = qrInstance;
+            }
+
+            qrInstance.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    playZebraBeep();
+                    if (targetField === 'berat') {
+                        const num = decodedText.replace(/[^0-9.]/g, '');
+                        inputField.value = num;
+                    } else {
+                        inputField.value = decodedText;
+                    }
+                    stopCameraScanner(targetField);
+                    highlightInputField(inputField);
+                },
+                (errorMessage) => {}
+            ).catch((err) => {
+                console.error("Error starting camera", err);
+                showErrorPopup('Akses Kamera Gagal', 'Browser tidak memiliki izin atau tidak ada kamera yang terdeteksi.');
+                stopCameraScanner(targetField);
+            });
+        }
+
+        // Hentikan Kamera
+        function stopCameraScanner(targetField) {
+            const readerId = targetField === 'berat' ? 'qr-reader-berat' : 'qr-reader';
+            const btnId = targetField === 'berat' ? 'btn-scan-berat' : 'btn-scan';
+            const qrReader = document.getElementById(readerId);
+            const btnScan = document.getElementById(btnId);
+            const qrInstance = targetField === 'berat' ? html5QrCodeBerat : html5QrCodeCoil;
+
+            if (qrReader) qrReader.style.display = 'none';
+            if (btnScan) btnScan.innerHTML = '<i class="fas fa-qrcode"></i>';
+
+            if (qrInstance) {
+                qrInstance.stop().then(() => {}).catch(err => console.error(err));
+            }
+        }
+
+        // Efek Highlight Hijau Sukses pada Input
+        function highlightInputField(el) {
+            if (!el) return;
+            el.style.transition = 'all 0.3s ease';
+            el.style.backgroundColor = '#dcfce7';
+            el.style.borderColor = '#16a34a';
+            setTimeout(() => {
+                el.style.backgroundColor = '';
+                el.style.borderColor = '#cbd5e1';
+            }, 900);
+        }
+
+        // Injeksi Hasil Scan Hardware Zebra ke Form
+        function applyZebraScannedBarcode(barcodeText) {
+            playZebraBeep();
+
+            // Jika modal pilihan metode sedang terbuka, tutup otomatis
+            if (modalPilihMetodeEl && modalPilihMetodeEl.classList.contains('show')) {
+                if (bsModalPilihMetode) bsModalPilihMetode.hide();
+            }
+
+            // Matikan kamera jika sebelumnya menyala
+            stopCameraScanner('no_coil_eup');
+            stopCameraScanner('berat');
+
+            // Jika modalTambah belum terbuka, buka secara otomatis
+            if (modalTambah && !modalTambah.classList.contains('show')) {
+                if (bsModalTambah) bsModalTambah.show();
+                activeTargetField = 'no_coil_eup';
+            }
+
+            // Cek elemen aktif atau input target
+            const activeEl = document.activeElement;
+            let targetEl = null;
+
+            if (activeTargetField === 'berat') {
+                targetEl = document.getElementById('berat');
+            } else if (activeEl && activeEl.id === 'berat') {
+                targetEl = activeEl;
+            } else {
+                targetEl = document.getElementById('no_coil_eup');
+            }
+
+            if (targetEl) {
+                if (targetEl.id === 'berat') {
+                    const cleanNum = barcodeText.replace(/[^0-9.]/g, '');
+                    targetEl.value = cleanNum;
+                } else {
+                    targetEl.value = barcodeText;
+                    // Auto-fokus ke pilihan layout/palet berikutnya
+                    const nextSelect = modalTambah ? modalTambah.querySelector('select[name="palet_id"]') : null;
+                    if (nextSelect) nextSelect.focus();
+                }
+
+                highlightInputField(targetEl);
+
+                // Toast notifikasi sukses scan Zebra
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Scan Zebra Berhasil!',
+                    text: barcodeText,
+                    showConfirmButton: false,
+                    timer: 1800,
+                    timerProgressBar: true
+                });
+            }
+        }
+
+        // [DETEKSI SCANNER HARDWARE ZEBRA]: Listener Keystroke Berkecepatan Tinggi
+        let zebraCharBuffer = [];
+        let lastCharTimestamp = 0;
+        const ZEBRA_BURST_MAX_MS = 100; // Toleransi intercharacter delay Zebra
+
+        window.addEventListener('keydown', function (e) {
+            const currentTime = Date.now();
+            const elapsed = currentTime - lastCharTimestamp;
+            lastCharTimestamp = currentTime;
+
+            // Jika tombol Enter diterima
+            if (e.key === 'Enter') {
+                if (zebraCharBuffer.length >= 3) {
+                    const finalBarcode = zebraCharBuffer.join('').trim();
+                    zebraCharBuffer = [];
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyZebraScannedBarcode(finalBarcode);
+                    return;
+                } else if (e.target && (e.target.id === 'no_coil_eup' || e.target.id === 'berat') && e.target.value.trim().length >= 3) {
+                    // Kasus DataWedge mengetik langsung ke field yang sedang aktif
+                    const typedBarcode = e.target.value.trim();
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyZebraScannedBarcode(typedBarcode);
+                    return;
+                }
+                zebraCharBuffer = [];
+                return;
+            }
+
+            // Jika jeda antar karakter melebihi batas burst, reset buffer
+            if (elapsed > ZEBRA_BURST_MAX_MS) {
+                zebraCharBuffer = [];
+            }
+
+            // Tampung karakter teks
+            if (e.key && e.key.length === 1) {
+                zebraCharBuffer.push(e.key);
+            }
+        }, true); // useCapture = true agar menangkap sebelum submit form default
         
         // AJAX Kelola Layout
         const formLayout = document.getElementById('form-layout');

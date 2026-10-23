@@ -74,6 +74,7 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
                 </div>
 
                 <div id="validationBanner" class="alert py-2 px-3 mb-0" style="border-radius: 8px; font-size: 13.5px;"></div>
+                <div id="ritGroupsContainer" class="d-flex flex-wrap align-items-center gap-2 mt-3 pt-2 border-top" style="display: none;"></div>
             </div>
         </div>
 
@@ -275,6 +276,36 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
         document.getElementById('sumValid').innerText = validCount;
         document.getElementById('sumInvalid').innerText = invalidCount;
 
+        // Hitung pengelompokan nomor Rit dari keterangan
+        const ritGroups = {};
+        currentRows.forEach(r => {
+            const ket = (r.keterangan || '').trim();
+            let rit = null;
+            if (/^\d+$/.test(ket)) {
+                rit = parseInt(ket, 10);
+            } else {
+                const m = ket.match(/rit\s*[-#:]?\s*(\d+)/i) || ket.match(/\b(\d+)\b/) || ket.match(/(\d+)/);
+                if (m) rit = parseInt(m[1], 10);
+            }
+            const key = rit !== null ? `Rit ${rit}` : 'Tanpa Rit';
+            ritGroups[key] = (ritGroups[key] || 0) + 1;
+        });
+
+        const ritContainer = document.getElementById('ritGroupsContainer');
+        const ritKeys = Object.keys(ritGroups);
+        if (currentRows.length > 0 && ritKeys.length > 0) {
+            ritContainer.style.setProperty('display', 'flex', 'important');
+            let ritHtml = '<div class="d-flex align-items-center gap-2 flex-wrap w-100"><span class="text-muted fw-semibold" style="font-size: 12px;"><i class="ti ti-truck-delivery me-1 text-primary"></i>Pengelompokan Batch (' + ritKeys.length + ' Rit):</span>';
+            ritKeys.forEach(k => {
+                ritHtml += `<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" style="font-size: 12px;"><strong>${k}</strong>: ${ritGroups[k]} Koil</span>`;
+            });
+            ritHtml += '</div>';
+            ritContainer.innerHTML = ritHtml;
+        } else {
+            ritContainer.style.setProperty('display', 'none', 'important');
+            ritContainer.innerHTML = '';
+        }
+
         const banner = document.getElementById('validationBanner');
         const saveBtn = document.getElementById('btnSaveBatch');
 
@@ -292,7 +323,8 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
             banner.className = 'alert alert-success py-2 px-3 mb-0';
             banner.innerHTML = `<i class="ti ti-circle-check me-1"></i> Semua <strong>${validCount}</strong> baris valid dan siap disimpan ke sistem.`;
             saveBtn.disabled = false;
-            saveBtn.innerHTML = `<i class="ti ti-device-floppy fs-5"></i><span>Simpan Batch (${validCount} Item)</span>`;
+            const batchLabel = ritKeys.length > 1 ? `Simpan ${ritKeys.length} Batch (${validCount} Item)` : `Simpan Batch (${validCount} Item)`;
+            saveBtn.innerHTML = `<i class="ti ti-device-floppy fs-5"></i><span>${batchLabel}</span>`;
         }
     }
 
@@ -403,9 +435,37 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
 
         const catatan = document.getElementById('catatanBatch').value.trim();
 
+        // Hitung pengelompokan nomor Rit untuk konfirmasi
+        const ritGroups = {};
+        currentRows.forEach(r => {
+            const ket = (r.keterangan || '').trim();
+            let rit = null;
+            if (/^\d+$/.test(ket)) {
+                rit = parseInt(ket, 10);
+            } else {
+                const m = ket.match(/rit\s*[-#:]?\s*(\d+)/i) || ket.match(/\b(\d+)\b/) || ket.match(/(\d+)/);
+                if (m) rit = parseInt(m[1], 10);
+            }
+            const key = rit !== null ? `Rit ${rit}` : 'Tanpa Rit';
+            ritGroups[key] = (ritGroups[key] || 0) + 1;
+        });
+        const ritKeys = Object.keys(ritGroups);
+
+        let swalTitle = 'Simpan Batch?';
+        let swalHtml = '';
+        if (ritKeys.length > 1) {
+            swalTitle = `Simpan ${ritKeys.length} Batch Terpisah?`;
+            swalHtml = `Sistem akan otomatis memisahkan ${currentRows.length} item menjadi <strong>${ritKeys.length} batch</strong> berdasarkan nomor Rit:<br><div class="mt-2 text-start p-2 bg-light rounded" style="font-size: 13px;">${ritKeys.map(k => `&bull; <strong>${k}</strong>: ${ritGroups[k]} item koil`).join('<br>')}</div>`;
+        } else if (ritKeys.length === 1 && ritKeys[0] !== 'Tanpa Rit') {
+            swalTitle = `Simpan Batch ${ritKeys[0]}?`;
+            swalHtml = `Akan menyimpan 1 batch (${ritKeys[0]}) dengan ${currentRows.length} item koil baru berstatus MENUNGGU_VALIDASI.`;
+        } else {
+            swalHtml = `Akan menyimpan 1 batch dengan ${currentRows.length} item koil baru berstatus MENUNGGU_VALIDASI.`;
+        }
+
         Swal.fire({
-            title: 'Simpan Batch?',
-            text: `Akan menyimpan 1 batch dengan ${currentRows.length} item koil baru berstatus MENUNGGU_VALIDASI.`,
+            title: swalTitle,
+            html: swalHtml,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Ya, Simpan',
@@ -459,11 +519,12 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        const confirmBtnText = (data.batch_count && data.batch_count > 1) ? 'Lihat Daftar Batch' : 'Lihat Detail Batch';
                         Swal.fire({
                             icon: 'success',
                             title: 'Batch Berhasil Disimpan!',
                             text: data.message,
-                            confirmButtonText: 'Lihat Detail Batch',
+                            confirmButtonText: confirmBtnText,
                             customClass: { confirmButton: 'btn btn-primary px-4' }
                         }).then(() => {
                             window.location.href = data.redirect || "{{ route('packing-list-2.dashboard') }}";

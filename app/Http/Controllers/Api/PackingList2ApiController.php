@@ -75,7 +75,11 @@ class PackingList2ApiController extends Controller
             $query->having('count_menunggu', '>', 0);
         }
 
-        $batches = $query->orderBy('created_at', 'desc')->get()->map(function ($b) {
+        $batches = $query->orderByRaw('DATE(created_at) DESC')
+            ->orderByRaw('CASE WHEN no_rit IS NULL THEN 1 ELSE 0 END ASC')
+            ->orderByRaw('CAST(no_rit AS UNSIGNED) ASC')
+            ->orderBy('kode_batch', 'asc')
+            ->get()->map(function ($b) {
             $total = (int) ($b->total_items ?: $b->total_item);
             $valid = (int) $b->count_tervalidasi;
             $tidakValid = (int) $b->count_tidak_valid;
@@ -85,6 +89,7 @@ class PackingList2ApiController extends Controller
                 'id'                 => $b->id,
                 'batch_number'       => $b->kode_batch,
                 'kode_batch'         => $b->kode_batch,
+                'no_rit'             => $b->no_rit,
                 'total_rows'         => $total,
                 'total_items'        => $total,
                 'validated_count'    => $valid,

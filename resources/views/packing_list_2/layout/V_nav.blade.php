@@ -33,6 +33,14 @@
             <span class="hide-menu">Tempel Data Excel</span>
           </a>
         </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link {{ request()->routeIs('packing-list-2.laporan*') ? 'active' : '' }}" href="{{ route('packing-list-2.laporan') }}" aria-expanded="false">
+            <span>
+              <i class="fas fa-history" style="font-size: 1.1rem;"></i>
+            </span>
+            <span class="hide-menu">Riwayat & Laporan</span>
+          </a>
+        </li>
       </ul>
     </nav>
   </div>

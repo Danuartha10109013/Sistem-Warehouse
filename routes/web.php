@@ -188,7 +188,10 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::post('/parse-preview', [PackingList2Controller::class, 'parsePreview'])->name('packing-list-2.parse-preview');
         Route::post('/store', [PackingList2Controller::class, 'store'])->name('packing-list-2.store');
         Route::get('/batch/{id}', [PackingList2Controller::class, 'detail'])->name('packing-list-2.detail');
+        Route::get('/batch/{id}/export-excel', [PackingList2Controller::class, 'exportExcel'])->name('packing-list-2.batch.export-excel');
         Route::delete('/batch/{id}', [PackingList2Controller::class, 'destroyBatch'])->name('packing-list-2.batch.destroy');
+        Route::get('/laporan', [PackingList2Controller::class, 'laporanHarian'])->name('packing-list-2.laporan');
+        Route::get('/laporan/export-excel', [PackingList2Controller::class, 'exportLaporanHarian'])->name('packing-list-2.laporan.export');
     });
 
     Route::prefix('master-product')->middleware(['Master-Product'])->group(function () {

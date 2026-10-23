@@ -137,9 +137,14 @@
                             <tr>
                                 <td class="px-3 text-muted fw-semibold">{{ $index + 1 }}</td>
                                 <td class="px-3">
-                                    <a href="{{ route('packing-list-2.detail', $b->id) }}" class="fw-bold text-primary text-decoration-none">
-                                        {{ $b->kode_batch }}
-                                    </a>
+                                    <div class="d-flex align-items-center gap-1 flex-wrap">
+                                        <a href="{{ route('packing-list-2.detail', $b->id) }}" class="fw-bold text-primary text-decoration-none">
+                                            {{ $b->kode_batch }}
+                                        </a>
+                                        @if($b->no_rit)
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0" style="font-size: 11px; border-radius: 4px;">Rit {{ $b->no_rit }}</span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-3 text-muted" style="font-size: 13px;">
                                     {{ $b->created_at ? $b->created_at->format('d M Y, H:i') : '-' }}

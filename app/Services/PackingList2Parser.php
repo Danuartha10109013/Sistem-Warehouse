@@ -162,6 +162,8 @@ class PackingList2Parser
                 $invalidCount++;
             }
 
+            $ritNumber = $this->extractRitNumber($keterangan);
+
             $processedRows[] = [
                 'row_number'        => $rowNum,
                 'kode'              => $kode,
@@ -194,9 +196,17 @@ class PackingList2Parser
                 'loc'               => $tujuan,
                 'keterangan'        => $keterangan,
                 'ket'               => $keterangan,
+                'rit_number'        => $ritNumber,
                 'is_valid'          => $isValid,
                 'errors'            => $errors,
             ];
+        }
+
+        // Hitung pengelompokan rit
+        $ritGroups = [];
+        foreach ($processedRows as $r) {
+            $key = $r['rit_number'] !== null ? 'Rit ' . $r['rit_number'] : 'Tanpa Rit';
+            $ritGroups[$key] = ($ritGroups[$key] ?? 0) + 1;
         }
 
         return [
@@ -205,7 +215,40 @@ class PackingList2Parser
             'valid_rows'   => $validCount,
             'invalid_rows' => $invalidCount,
             'all_valid'    => count($processedRows) > 0 && $invalidCount === 0,
+            'rit_groups'   => $ritGroups,
         ];
+    }
+
+    /**
+     * Ekstrak nomor rit dari kolom keterangan (contoh: "8", "RIT 8", "T 8").
+     */
+    public function extractRitNumber(?string $keterangan): ?string
+    {
+        if ($keterangan === null) {
+            return null;
+        }
+        $keterangan = trim($keterangan);
+        if ($keterangan === '') {
+            return null;
+        }
+
+        if (preg_match('/^\d+$/', $keterangan)) {
+            return (string) ((int) $keterangan);
+        }
+
+        if (preg_match('/rit\s*[-#:]?\s*(\d+)/i', $keterangan, $matches)) {
+            return (string) ((int) $matches[1]);
+        }
+
+        if (preg_match('/\b(\d+)\b/', $keterangan, $matches)) {
+            return (string) ((int) $matches[1]);
+        }
+
+        if (preg_match('/(\d+)/', $keterangan, $matches)) {
+            return (string) ((int) $matches[1]);
+        }
+
+        return null;
     }
 
     /**
