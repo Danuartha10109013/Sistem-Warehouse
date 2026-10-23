@@ -321,7 +321,7 @@
                 <h6 class="modal-title fw-bold" style="color: #1e293b; font-size: 16px;">Input Data Scan Koil EUP</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('scan-koil-eup.store') }}" method="POST">
+            <form id="form-scan-koil" action="{{ route('scan-koil-eup.store') }}" method="POST">
                 @csrf
                 <div class="modal-body px-4 py-3">
                     <div class="row">
@@ -386,7 +386,7 @@
                 </div>
                 <div class="modal-footer border-top-0 px-4 pb-4 pt-1">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="font-size: 13.5px; font-weight: 600; border-radius: 6px; padding: 8px 16px;">Batal</button>
-                    <button type="submit" class="btn btn-primary" style="background-color: #135b9f; border-color: #135b9f; font-size: 13.5px; font-weight: 600; border-radius: 6px; padding: 8px 20px;">Simpan</button>
+                    <button type="submit" id="btn-submit-scan" class="btn btn-primary" style="background-color: #135b9f; border-color: #135b9f; font-size: 13.5px; font-weight: 600; border-radius: 6px; padding: 8px 20px;">Simpan</button>
                 </div>
             </form>
         </div>
@@ -620,18 +620,73 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         
-        // Auto-focus input form
+        // Proteksi Form Submit Ganda (Anti Double-Submit)
+        const formTambahScan = document.getElementById('form-scan-koil');
+        const btnSubmitScan = document.getElementById('btn-submit-scan');
+        let isSubmittingScan = false;
+
+        if (formTambahScan) {
+            formTambahScan.addEventListener('submit', function (e) {
+                if (isSubmittingScan) {
+                    e.preventDefault();
+                    return false;
+                }
+                isSubmittingScan = true;
+                if (btnSubmitScan) {
+                    btnSubmitScan.disabled = true;
+                    btnSubmitScan.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...';
+                }
+            });
+
+            // Cegah tombol Enter otomatis men-submit form sebelum user siap
+            const noCoilInput = document.getElementById('no_coil_eup');
+            const beratInput = document.getElementById('berat');
+
+            if (noCoilInput) {
+                noCoilInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (beratInput && !beratInput.value) {
+                            beratInput.focus();
+                        }
+                    }
+                });
+            }
+            if (beratInput) {
+                beratInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (btnSubmitScan) {
+                            btnSubmitScan.focus();
+                        }
+                    }
+                });
+            }
+        }
+
+        // Auto-focus input form & reset submit state
         const modalTambah = document.getElementById('modalTambah');
         if (modalTambah) {
             modalTambah.addEventListener('shown.bs.modal', function () {
+                isSubmittingScan = false;
+                if (btnSubmitScan) {
+                    btnSubmitScan.disabled = false;
+                    btnSubmitScan.innerHTML = 'Simpan';
+                }
                 const inputCoil = modalTambah.querySelector('input[name="no_coil_eup"]');
                 if (inputCoil) {
                     inputCoil.focus();
                 }
             });
             
-            // Matikan kamera jika modal ditutup
+            // Matikan kamera dan reset state jika modal ditutup
             modalTambah.addEventListener('hidden.bs.modal', function () {
+                isSubmittingScan = false;
+                if (btnSubmitScan) {
+                    btnSubmitScan.disabled = false;
+                    btnSubmitScan.innerHTML = 'Simpan';
+                }
+
                 // Untuk Coil EUP
                 const qrReader = document.getElementById('qr-reader');
                 const btnScan = document.getElementById('btn-scan');
@@ -924,9 +979,14 @@
                     targetEl.value = cleanNum;
                 } else {
                     targetEl.value = barcodeText;
-                    // Auto-fokus ke pilihan layout/palet berikutnya
-                    const nextSelect = modalTambah ? modalTambah.querySelector('select[name="palet_id"]') : null;
-                    if (nextSelect) nextSelect.focus();
+                    // Auto-fokus ke berat jika berat masih kosong
+                    const beratInput = document.getElementById('berat');
+                    if (beratInput && !beratInput.value) {
+                        beratInput.focus();
+                    } else {
+                        const nextSelect = modalTambah ? modalTambah.querySelector('select[name="palet_id"]') : null;
+                        if (nextSelect) nextSelect.focus();
+                    }
                 }
 
                 highlightInputField(targetEl);

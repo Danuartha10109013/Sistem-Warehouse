@@ -39,8 +39,17 @@ class ScanKoilEupController extends Controller
             'berat' => 'required|numeric',
         ]);
 
+        // Mencegah duplikasi data akibat double-click / submit beruntun (dalam 10 detik terakhir)
+        $isDuplicate = ScanKoilEup::where('no_coil_eup', trim($request->no_coil_eup))
+            ->where('created_at', '>=', now()->subSeconds(10))
+            ->exists();
+
+        if ($isDuplicate) {
+            return redirect()->back()->with('warning', 'Data koil ini baru saja tersimpan (mencegah duplikasi double click).');
+        }
+
         ScanKoilEup::create([
-            'no_coil_eup' => $request->no_coil_eup,
+            'no_coil_eup' => trim($request->no_coil_eup),
             'palet_id' => $request->palet_id ?: null,
             'layout_id' => $request->layout_id,
             'berat' => $request->berat,
