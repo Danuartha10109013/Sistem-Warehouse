@@ -1,0 +1,297 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Exports\VerifikasiStikerHasilScanExport;
+use App\Imports\VerifikasiStikerImport;
+use App\Models\VerifikasiStiker;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+
+class VerifikasiStikerController extends Controller
+{
+    // [TAG: HALAMAN UTAMA] Dashboard Verifikasi Stiker dengan Filter Tanggal Input
+    public function index(Request $request)
+    {
+        $availableDates = VerifikasiStiker::select('tanggal_input')
+            ->whereNotNull('tanggal_input')
+            ->distinct()
+            ->orderBy('tanggal_input', 'desc')
+            ->pluck('tanggal_input');
+
+        $selectedDate = $request->get('tanggal_input', $availableDates->first() ? $availableDates->first()->format('Y-m-d') : now()->toDateString());
+
+        $query = VerifikasiStiker::query();
+        if ($selectedDate !== 'all') {
+            $query->whereDate('tanggal_input', $selectedDate);
+        }
+
+        $totalData = (clone $query)->count();
+        $totalSesuai = (clone $query)->where('status_verifikasi', 'sesuai')->count();
+        $totalBelum = (clone $query)->where('status_verifikasi', 'belum')->count();
+        $totalTidakSesuai = (clone $query)->where('status_verifikasi', 'tidak_sesuai')->count();
+
+        $recentVerifikasi = (clone $query)->whereNotNull('verified_at')
+            ->orderBy('verified_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return view('verifikasi_stiker.dashboard.index', compact(
+            'availableDates',
+            'selectedDate',
+            'totalData',
+            'totalSesuai',
+            'totalBelum',
+            'totalTidakSesuai',
+            'recentVerifikasi'
+        ));
+    }
+
+    // [TAG: HALAMAN SCAN] Form Scan & 3 Ceklis Verifikasi
+    public function scan(Request $request)
+    {
+        $availableDates = VerifikasiStiker::select('tanggal_input')
+            ->whereNotNull('tanggal_input')
+            ->distinct()
+            ->orderBy('tanggal_input', 'desc')
+            ->pluck('tanggal_input');
+
+        $selectedDate = $request->get('tanggal_input', $availableDates->first() ? $availableDates->first()->format('Y-m-d') : now()->toDateString());
+
+        $verifiedQuery = VerifikasiStiker::whereIn('status_verifikasi', ['sesuai', 'tidak_sesuai'])
+            ->orderBy('verified_at', 'desc')
+            ->orderBy('updated_at', 'desc');
+
+        if ($selectedDate !== 'all') {
+            $verifiedQuery->whereDate('tanggal_input', $selectedDate);
+        }
+
+        $riwayatVerifikasi = $verifiedQuery->get();
+
+        return view('verifikasi_stiker.scan.index', compact('availableDates', 'selectedDate', 'riwayatVerifikasi'));
+    }
+
+    // [TAG: AJAX CHECK ATTRIBUTE] Pencarian data berdasarkan Attribute & Tanggal Input
+    public function checkAttribute(Request $request)
+    {
+        $request->validate([
+            'attribute'     => 'required|string',
+            'tanggal_input' => 'nullable|string',
+        ]);
+
+        $search = trim($request->attribute);
+        $tglInput = $request->tanggal_input;
+
+        $query = VerifikasiStiker::where('attribute', $search);
+
+        if ($tglInput && $tglInput !== 'all') {
+            $query->whereDate('tanggal_input', $tglInput);
+        }
+
+        // Cari record yang belum diverifikasi terlebih dahulu
+        $item = (clone $query)
+            ->orderByRaw("CASE WHEN status_verifikasi = 'belum' THEN 0 ELSE 1 END")
+            ->orderBy('id', 'desc')
+            ->first();
+
+        // Jika tidak ketemu di tanggal terpilih tapi ada di tanggal lain, beri info
+        if (!$item && $tglInput && $tglInput !== 'all') {
+            $existOtherDate = VerifikasiStiker::where('attribute', $search)->first();
+            if ($existOtherDate) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Attribute "' . $search . '" ditemukan pada input tanggal ' . $existOtherDate->tanggal_input->format('d/m/Y') . ', bukan pada tanggal yang dipilih.',
+                ], 404);
+            }
+        }
+
+        if (!$item) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attribute "' . $search . '" tidak ditemukan dalam data master.',
+            ], 404);
+        }
+
+        $remainingCount = (clone $query)
+            ->where('status_verifikasi', 'belum')
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id'                => $item->id,
+                'tanggal_input'     => $item->tanggal_input ? $item->tanggal_input->format('d-m-Y') : null,
+                'attribute'         => $item->attribute,
+                'produk'            => $item->produk,
+                'supplier_lot_no'   => $item->supplier_lot_no,
+                'tgl_dn'            => $item->tgl_dn,
+                'berat'             => number_format($item->berat, 2, '.', ','),
+                'berat_raw'         => $item->berat,
+                'status_verifikasi' => $item->status_verifikasi,
+                'check_produk'      => (bool) $item->check_produk,
+                'check_lot_no'      => (bool) $item->check_lot_no,
+                'check_berat'       => (bool) $item->check_berat,
+                'verified_at'       => $item->verified_at ? $item->verified_at->format('d-m-Y H:i:s') : null,
+                'verified_by'       => $item->verified_by,
+                'remaining_belum'   => $remainingCount,
+            ],
+        ]);
+    }
+
+    // [TAG: SIMPAN VERIFIKASI] Verifikasi dengan 3 Checklist (Produk, Lot No, Berat)
+    public function verify(Request $request)
+    {
+        $request->validate([
+            'id'           => 'required|exists:verifikasi_stikers,id',
+            'check_produk' => 'required|boolean',
+            'check_lot_no' => 'required|boolean',
+            'check_berat'  => 'required|boolean',
+            'catatan'      => 'nullable|string',
+        ]);
+
+        $item = VerifikasiStiker::findOrFail($request->id);
+
+        $checkProduk = filter_var($request->check_produk, FILTER_VALIDATE_BOOLEAN);
+        $checkLotNo  = filter_var($request->check_lot_no, FILTER_VALIDATE_BOOLEAN);
+        $checkBerat  = filter_var($request->check_berat, FILTER_VALIDATE_BOOLEAN);
+
+        $item->check_produk = $checkProduk;
+        $item->check_lot_no = $checkLotNo;
+        $item->check_berat  = $checkBerat;
+
+        // Ketiganya wajib dicentang agar status menjadi "sesuai"
+        if ($checkProduk && $checkLotNo && $checkBerat) {
+            $item->status_verifikasi = 'sesuai';
+        } else {
+            $item->status_verifikasi = 'tidak_sesuai';
+        }
+
+        $item->verified_at = now();
+        $item->verified_by = Auth::check() ? Auth::user()->name : 'Operator';
+        $item->catatan = $request->catatan;
+        $item->save();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'status'  => $item->status_verifikasi,
+                'message' => $item->status_verifikasi === 'sesuai' 
+                    ? 'Semua 3 atribut stiker valid (Sesuai OK)!' 
+                    : 'Verifikasi disimpan sebagai TIDAK SESUAI (atribut belum lengkap).',
+                'data'    => $item,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Status verifikasi berhasil disimpan!');
+    }
+
+    // [TAG: HALAMAN DATA] Daftar data tabel dan filter per tanggal input
+    public function data(Request $request)
+    {
+        $availableDates = VerifikasiStiker::select('tanggal_input')
+            ->whereNotNull('tanggal_input')
+            ->distinct()
+            ->orderBy('tanggal_input', 'desc')
+            ->pluck('tanggal_input');
+
+        $query = VerifikasiStiker::query();
+
+        if ($request->filled('tanggal_input') && $request->tanggal_input !== 'all') {
+            $query->whereDate('tanggal_input', $request->tanggal_input);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status_verifikasi', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('attribute', 'like', "%{$s}%")
+                  ->orWhere('produk', 'like', "%{$s}%")
+                  ->orWhere('supplier_lot_no', 'like', "%{$s}%");
+            });
+        }
+
+        $data = $query->orderBy('id', 'desc')->paginate(15)->withQueryString();
+
+        return view('verifikasi_stiker.data.index', compact('data', 'availableDates'));
+    }
+
+    // [TAG: IMPORT EXCEL] Proses import file Excel dengan Tanggal Input Admin
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file_excel'    => 'required|mimes:xlsx,xls,csv|max:10240',
+            'tanggal_input' => 'nullable|date',
+        ]);
+
+        try {
+            $tglInput = $request->tanggal_input ?: now()->toDateString();
+            $import = new VerifikasiStikerImport($tglInput);
+            Excel::import($import, $request->file('file_excel'));
+
+            $msg = "Berhasil mengimport {$import->importedCount} data bahan baku berawalan CR_ untuk tanggal {$tglInput}!";
+            $details = [];
+            if ($import->skippedNonCrCount > 0) {
+                $details[] = "{$import->skippedNonCrCount} data dilewati karena tidak berawalan 'CR_'";
+            }
+            if ($import->skippedDuplicateCount > 0) {
+                $details[] = "{$import->skippedDuplicateCount} data dilewati karena kode atribut CR_ sudah terdaftar sebelumnya";
+            }
+            if (!empty($details)) {
+                $msg .= " (" . implode(', ', $details) . ").";
+            }
+
+            return redirect()->route('verifikasi-stiker.data', ['tanggal_input' => $tglInput])
+                ->with('success', $msg);
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal mengimport Excel: ' . $e->getMessage());
+        }
+    }
+
+    // [TAG: EXPORT EXCEL] Export hasil verifikasi stiker per hari
+    public function exportExcel(Request $request)
+    {
+        $tgl = $request->get('tanggal_input', now()->toDateString());
+        $query = VerifikasiStiker::whereIn('status_verifikasi', ['sesuai', 'tidak_sesuai'])
+            ->orderBy('verified_at', 'desc')
+            ->orderBy('updated_at', 'desc');
+
+        if ($tgl && $tgl !== 'all') {
+            $query->whereDate('tanggal_input', $tgl);
+            $filename = 'Hasil_Verifikasi_Stiker_' . $tgl . '.xlsx';
+            $titleDate = \Carbon\Carbon::parse($tgl)->format('d/m/Y');
+        } else {
+            $filename = 'Hasil_Verifikasi_Stiker_Semua_Tanggal.xlsx';
+            $titleDate = 'Semua Tanggal';
+        }
+
+        $items = $query->get();
+        $summary = [
+            'total'        => $items->count(),
+            'sesuai'       => $items->where('status_verifikasi', 'sesuai')->count(),
+            'tidak_sesuai' => $items->where('status_verifikasi', 'tidak_sesuai')->count(),
+        ];
+
+        return Excel::download(new VerifikasiStikerHasilScanExport($titleDate, $items, $summary), $filename);
+    }
+
+    // [TAG: HAPUS DATA] Hapus satu item
+    public function destroy($id)
+    {
+        $item = VerifikasiStiker::findOrFail($id);
+        $item->delete();
+
+        return redirect()->back()->with('success', 'Data berhasil dihapus!');
+    }
+
+    // [TAG: RESET SEMUA] Reset seluruh data verifikasi stiker
+    public function truncate()
+    {
+        VerifikasiStiker::truncate();
+        return redirect()->back()->with('success', 'Seluruh data berhasil di-reset!');
+    }
+}

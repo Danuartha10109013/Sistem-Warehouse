@@ -96,33 +96,66 @@
     <!-- Main Table Card: Daftar Batch -->
     <div class="card border-0 shadow-sm" style="border-radius: 16px;">
         <div class="card-body p-4">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                 <div>
                     <h5 class="fw-bold mb-1" style="color: #1e293b;">Daftar Batch Hasil Tempel</h5>
                     <p class="text-muted mb-0" style="font-size: 13px;">Riwayat batch koil yang diinput dari Excel.</p>
                 </div>
+            </div>
+
+            <!-- Toolbar Filter Tujuan / LOC & Rit -->
+            <form action="{{ route('packing-list-2.dashboard') }}" method="GET" class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 p-3 bg-light rounded-3 border">
+                <input type="hidden" name="tab" value="{{ $tab }}">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="fw-bold text-dark me-1" style="font-size: 13px;"><i class="ti ti-filter me-1 text-primary"></i>Filter:</span>
+                    
+                    <!-- Filter Tujuan / LOC -->
+                    <select name="tujuan" class="form-select form-select-sm" style="width: 155px; font-size: 13px; border-radius: 6px;" onchange="this.form.submit()">
+                        <option value="">-- Semua LOC --</option>
+                        @foreach($availableTujuan as $tj)
+                            <option value="{{ $tj }}" {{ (isset($selectedTujuan) && $selectedTujuan === $tj) ? 'selected' : '' }}>{{ $tj }}</option>
+                        @endforeach
+                    </select>
+
+                    <!-- Filter Rit -->
+                    <select name="rit" class="form-select form-select-sm" style="width: 140px; font-size: 13px; border-radius: 6px;" onchange="this.form.submit()">
+                        <option value="">-- Semua Rit --</option>
+                        @foreach($availableRits as $r)
+                            <option value="{{ $r }}" {{ (isset($selectedRit) && (string)$selectedRit === (string)$r) ? 'selected' : '' }}>Rit {{ $r }}</option>
+                        @endforeach
+                    </select>
+
+                    @if(request()->hasAny(['tujuan', 'rit']))
+                        <a href="{{ route('packing-list-2.dashboard', ['tab' => $tab]) }}" class="btn btn-sm btn-outline-secondary" style="border-radius: 6px; font-size: 12px;" title="Reset Filter">
+                            <i class="ti ti-rotate me-1"></i>Reset
+                        </a>
+                    @endif
+                </div>
+
                 <div class="d-flex align-items-center gap-2">
                     <div class="input-group" style="width: 250px;">
                         <span class="input-group-text bg-white border-end-0" style="border-color: #e2e8f0;">
                             <i class="ti ti-search text-muted"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0 custom-dt-search" placeholder="Cari batch..." style="border-color: #e2e8f0; font-size: 14px;">
+                        <input type="text" class="form-control border-start-0 custom-dt-search" placeholder="Cari batch..." style="border-color: #e2e8f0; font-size: 13.5px;">
                     </div>
                 </div>
-            </div>
+            </form>
 
             <div class="table-responsive">
                 <table @if(count($batches) > 0) id="dataTable" @endif class="table table-hover align-middle mb-0" style="width: 100%;">
                     <thead style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
                         <tr>
-                            <th class="py-3 px-3 text-secondary text-uppercase fw-bold" style="font-size: 12px; width: 60px;">No</th>
+                            <th class="py-3 px-3 text-secondary text-uppercase fw-bold" style="font-size: 12px; width: 50px;">No</th>
                             <th class="py-3 px-3 text-secondary text-uppercase fw-bold" style="font-size: 12px;">Kode Batch</th>
+                            <th class="py-3 px-3 text-secondary text-uppercase fw-bold text-center" style="font-size: 12px; width: 90px;">LOC</th>
+                            <th class="py-3 px-3 text-secondary text-uppercase fw-bold text-center" style="font-size: 12px; width: 80px;">Rit</th>
                             <th class="py-3 px-3 text-secondary text-uppercase fw-bold" style="font-size: 12px;">Tanggal Input</th>
                             <th class="py-3 px-3 text-secondary text-uppercase fw-bold" style="font-size: 12px;">Dibuat Oleh</th>
                             <th class="py-3 px-3 text-secondary text-uppercase fw-bold text-center" style="font-size: 12px;">Total Item</th>
                             <th class="py-3 px-3 text-secondary text-uppercase fw-bold" style="font-size: 12px;">Ringkasan Status</th>
                             <th class="py-3 px-3 text-secondary text-uppercase fw-bold" style="font-size: 12px;">Catatan</th>
-                            <th class="py-3 px-3 text-secondary text-uppercase fw-bold text-center" style="font-size: 12px; width: 130px;">Aksi</th>
+                            <th class="py-3 px-3 text-secondary text-uppercase fw-bold text-center" style="font-size: 12px; width: 110px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,14 +170,23 @@
                             <tr>
                                 <td class="px-3 text-muted fw-semibold">{{ $index + 1 }}</td>
                                 <td class="px-3">
-                                    <div class="d-flex align-items-center gap-1 flex-wrap">
-                                        <a href="{{ route('packing-list-2.detail', $b->id) }}" class="fw-bold text-primary text-decoration-none">
-                                            {{ $b->kode_batch }}
-                                        </a>
-                                        @if($b->no_rit)
-                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0" style="font-size: 11px; border-radius: 4px;">Rit {{ $b->no_rit }}</span>
-                                        @endif
-                                    </div>
+                                    <a href="{{ route('packing-list-2.detail', $b->id) }}" class="fw-bold text-primary text-decoration-none">
+                                        {{ $b->kode_batch }}
+                                    </a>
+                                </td>
+                                <td class="px-3 text-center">
+                                    @if($b->tujuan)
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 fw-bold" style="font-size: 11.5px; border-radius: 6px;">{{ $b->tujuan }}</span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 text-center">
+                                    @if($b->no_rit)
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-bold" style="font-size: 11.5px; border-radius: 6px;">Rit {{ $b->no_rit }}</span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
                                 </td>
                                 <td class="px-3 text-muted" style="font-size: 13px;">
                                     {{ $b->created_at ? $b->created_at->format('d M Y, H:i') : '-' }}

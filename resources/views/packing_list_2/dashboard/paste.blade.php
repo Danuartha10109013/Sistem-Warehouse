@@ -287,7 +287,9 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
                 const m = ket.match(/rit\s*[-#:]?\s*(\d+)/i) || ket.match(/\b(\d+)\b/) || ket.match(/(\d+)/);
                 if (m) rit = parseInt(m[1], 10);
             }
-            const key = rit !== null ? `Rit ${rit}` : 'Tanpa Rit';
+            const ritPart = rit !== null ? `Rit ${rit}` : 'Tanpa Rit';
+            const loc = (r.tujuan || r.loc || '').trim().toUpperCase() || 'Tanpa LOC';
+            const key = `${ritPart} - ${loc}`;
             ritGroups[key] = (ritGroups[key] || 0) + 1;
         });
 
@@ -295,7 +297,7 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
         const ritKeys = Object.keys(ritGroups);
         if (currentRows.length > 0 && ritKeys.length > 0) {
             ritContainer.style.setProperty('display', 'flex', 'important');
-            let ritHtml = '<div class="d-flex align-items-center gap-2 flex-wrap w-100"><span class="text-muted fw-semibold" style="font-size: 12px;"><i class="ti ti-truck-delivery me-1 text-primary"></i>Pengelompokan Batch (' + ritKeys.length + ' Rit):</span>';
+            let ritHtml = '<div class="d-flex align-items-center gap-2 flex-wrap w-100"><span class="text-muted fw-semibold" style="font-size: 12px;"><i class="ti ti-truck-delivery me-1 text-primary"></i>Pengelompokan Batch (' + ritKeys.length + ' Batch - Rit & Tujuan):</span>';
             ritKeys.forEach(k => {
                 ritHtml += `<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" style="font-size: 12px;"><strong>${k}</strong>: ${ritGroups[k]} Koil</span>`;
             });

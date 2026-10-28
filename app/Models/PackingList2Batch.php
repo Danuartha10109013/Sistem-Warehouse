@@ -14,6 +14,7 @@ class PackingList2Batch extends Model
     protected $fillable = [
         'kode_batch',
         'no_rit',
+        'tujuan',
         'user_id',
         'total_item',
         'catatan',

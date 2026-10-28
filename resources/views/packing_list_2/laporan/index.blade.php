@@ -98,7 +98,7 @@
 
                 <!-- Export Button -->
                 <div class="d-flex align-items-center gap-2">
-                    <a href="{{ route('packing-list-2.laporan.export', ['tanggal' => $tanggal]) }}" class="btn-export-excel">
+                    <a href="{{ route('packing-list-2.laporan.export', array_merge(['tanggal' => $tanggal], request()->only(['tujuan', 'rit']))) }}" class="btn-export-excel">
                         <i class="ti ti-file-spreadsheet fs-5"></i>
                         <span>Download Excel Laporan ({{ \Carbon\Carbon::parse($tanggal)->format('d/m/Y') }})</span>
                     </a>
@@ -113,13 +113,30 @@
                     <label for="tanggalInput" class="fw-bold text-dark mb-0 me-1" style="font-size: 13px;">
                         <i class="ti ti-calendar me-1 text-primary"></i>Pilih Tanggal:
                     </label>
-                    <input type="date" id="tanggalInput" name="tanggal" value="{{ $tanggal }}" class="form-control" style="width: 170px; font-size: 13px; border-color: #cbd5e1; border-radius: 8px;">
+                    <input type="date" id="tanggalInput" name="tanggal" value="{{ $tanggal }}" class="form-control" style="width: 155px; font-size: 13px; border-color: #cbd5e1; border-radius: 8px;">
+
+                    <!-- Filter Tujuan / LOC -->
+                    <select name="tujuan" class="form-select" style="width: 140px; font-size: 13px; border-color: #cbd5e1; border-radius: 8px;">
+                        <option value="">-- Semua LOC --</option>
+                        @foreach($availableTujuan as $tj)
+                            <option value="{{ $tj }}" {{ (isset($selectedTujuan) && $selectedTujuan === $tj) ? 'selected' : '' }}>{{ $tj }}</option>
+                        @endforeach
+                    </select>
+
+                    <!-- Filter Rit -->
+                    <select name="rit" class="form-select" style="width: 130px; font-size: 13px; border-color: #cbd5e1; border-radius: 8px;">
+                        <option value="">-- Semua Rit --</option>
+                        @foreach($availableRits as $r)
+                            <option value="{{ $r }}" {{ (isset($selectedRit) && (string)$selectedRit === (string)$r) ? 'selected' : '' }}>Rit {{ $r }}</option>
+                        @endforeach
+                    </select>
+
                     <button type="submit" class="btn btn-primary" style="font-weight: 600; font-size: 13px; border-radius: 8px; padding: 7px 15px;">
                         <i class="ti ti-search me-1"></i>Tampilkan
                     </button>
-                    @if ($tanggal !== date('Y-m-d'))
+                    @if ($tanggal !== date('Y-m-d') || request()->hasAny(['tujuan', 'rit']))
                         <a href="{{ route('packing-list-2.laporan', ['tanggal' => date('Y-m-d')]) }}" class="btn btn-outline-secondary" style="font-size: 13px; border-radius: 8px; padding: 7px 14px;">
-                            Hari Ini
+                            Reset
                         </a>
                     @endif
                 </form>
@@ -150,7 +167,7 @@
                     <span class="text-muted" style="font-size: 13px;">Menampilkan {{ $batches->count() }} batch yang dibuat pada tanggal ini</span>
                 </div>
                 <div>
-                    <a href="{{ route('packing-list-2.laporan.export', ['tanggal' => $tanggal]) }}" class="btn-export-excel-table">
+                    <a href="{{ route('packing-list-2.laporan.export', array_merge(['tanggal' => $tanggal], request()->only(['tujuan', 'rit']))) }}" class="btn-export-excel-table">
                         <i class="ti ti-file-spreadsheet"></i>
                         <span>Download Excel Hari Ini</span>
                     </a>
@@ -163,6 +180,7 @@
                         <tr>
                             <th class="text-center" style="width: 45px;">No</th>
                             <th>Kode Batch</th>
+                            <th class="text-center">LOC</th>
                             <th class="text-center">Rit</th>
                             <th>Jam Input</th>
                             <th>Dibuat Oleh</th>
@@ -187,6 +205,13 @@
                                     <a href="{{ route('packing-list-2.detail', $b->id) }}" class="fw-bold text-decoration-none text-primary">
                                         {{ $b->kode_batch }}
                                     </a>
+                                </td>
+                                <td class="text-center">
+                                    @if ($b->tujuan)
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 fw-bold" style="font-size: 11px;">{{ $b->tujuan }}</span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     @if ($b->no_rit)

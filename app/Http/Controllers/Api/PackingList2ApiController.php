@@ -70,6 +70,16 @@ class PackingList2ApiController extends Controller
             $query->where('kode_batch', 'like', "%{$s}%");
         }
 
+        // Filter: Tujuan / LOC
+        if ($request->filled('tujuan')) {
+            $query->where('tujuan', $request->tujuan);
+        }
+
+        // Filter: Rit
+        if ($request->filled('rit')) {
+            $query->where('no_rit', $request->rit);
+        }
+
         // Filter: hanya batch yang belum selesai jika requested
         if ($request->boolean('only_pending', false)) {
             $query->having('count_menunggu', '>', 0);
@@ -78,6 +88,7 @@ class PackingList2ApiController extends Controller
         $batches = $query->orderByRaw('DATE(created_at) DESC')
             ->orderByRaw('CASE WHEN no_rit IS NULL THEN 1 ELSE 0 END ASC')
             ->orderByRaw('CAST(no_rit AS UNSIGNED) ASC')
+            ->orderBy('tujuan', 'asc')
             ->orderBy('kode_batch', 'asc')
             ->get()->map(function ($b) {
             $total = (int) ($b->total_items ?: $b->total_item);
@@ -90,6 +101,8 @@ class PackingList2ApiController extends Controller
                 'batch_number'       => $b->kode_batch,
                 'kode_batch'         => $b->kode_batch,
                 'no_rit'             => $b->no_rit,
+                'tujuan'             => $b->tujuan,
+                'loc'                => $b->tujuan,
                 'total_rows'         => $total,
                 'total_items'        => $total,
                 'validated_count'    => $valid,
@@ -149,6 +162,11 @@ class PackingList2ApiController extends Controller
                   ->orWhere('kode', 'like', "%{$s}%")
                   ->orWhere('nama_produk', 'like', "%{$s}%");
             });
+        }
+
+        // Filter Tujuan / LOC
+        if ($request->filled('tujuan')) {
+            $query->where('tujuan', $request->tujuan);
         }
 
         $items = $query->orderBy('id', 'asc')->get()->map(function ($it) {

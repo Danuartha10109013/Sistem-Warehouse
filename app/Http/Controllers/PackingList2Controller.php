@@ -66,11 +66,34 @@ class PackingList2Controller extends Controller
             $query->having('count_menunggu', '=', 0);
         }
 
+        // [TAG: FILTER TUJUAN & RIT] Filter berdasarkan tujuan/loc dan rit
+        $selectedTujuan = $request->query('tujuan');
+        $selectedRit = $request->query('rit');
+
+        if ($request->filled('tujuan')) {
+            $query->where('tujuan', $selectedTujuan);
+        }
+        if ($request->filled('rit')) {
+            $query->where('no_rit', $selectedRit);
+        }
+
         $batches = $query->orderByRaw('DATE(created_at) DESC')
             ->orderByRaw('CASE WHEN no_rit IS NULL THEN 1 ELSE 0 END ASC')
             ->orderByRaw('CAST(no_rit AS UNSIGNED) ASC')
+            ->orderBy('tujuan', 'asc')
             ->orderBy('kode_batch', 'asc')
             ->get();
+
+        // Opsi Tujuan & Rit untuk dropdown filter
+        $standardTujuan = ['CBT', 'SDG', 'L01', 'L10'];
+        $dbTujuan = PackingList2Batch::whereNotNull('tujuan')->distinct()->pluck('tujuan')->toArray();
+        $availableTujuan = array_values(array_unique(array_merge($standardTujuan, $dbTujuan)));
+
+        $availableRits = PackingList2Batch::whereNotNull('no_rit')
+            ->distinct()
+            ->orderByRaw('CAST(no_rit AS UNSIGNED) ASC')
+            ->pluck('no_rit')
+            ->toArray();
 
         return view('packing_list_2.dashboard.index', compact(
             'totalBatch',
@@ -80,7 +103,11 @@ class PackingList2Controller extends Controller
             'batches',
             'tab',
             'countActive',
-            'countCompleted'
+            'countCompleted',
+            'availableTujuan',
+            'availableRits',
+            'selectedTujuan',
+            'selectedRit'
         ));
     }
 
@@ -218,60 +245,77 @@ class PackingList2Controller extends Controller
             ], 422);
         }
 
-        // [TAG: PENGELOMPOKAN RIT] Kelompokkan baris berdasarkan nomor rit dari kolom keterangan
-        $groupedByRit = [];
+        // [TAG: PENGELOMPOKAN RIT & TUJUAN] Kelompokkan baris berdasarkan nomor rit dan tujuan (LOC)
+        $groupedBatches = [];
         foreach ($validatedRows as $row) {
             $rit = $this->parser->extractRitNumber($row['keterangan'] ?? null);
-            $key = $rit !== null ? "RIT_{$rit}" : 'TANPA_RIT';
-            if (!isset($groupedByRit[$key])) {
-                $groupedByRit[$key] = [
-                    'rit'   => $rit,
-                    'items' => [],
+            $tujuan = !empty($row['tujuan']) ? strtoupper(trim($row['tujuan'])) : null;
+
+            $ritKey = $rit !== null ? "RIT_{$rit}" : 'TANPA_RIT';
+            $tujuanKey = $tujuan !== null ? "LOC_{$tujuan}" : 'TANPA_LOC';
+            $groupKey = "{$ritKey}_{$tujuanKey}";
+
+            if (!isset($groupedBatches[$groupKey])) {
+                $groupedBatches[$groupKey] = [
+                    'rit'    => $rit,
+                    'tujuan' => $tujuan,
+                    'items'  => [],
                 ];
             }
-            $groupedByRit[$key]['items'][] = $row;
+            $groupedBatches[$groupKey]['items'][] = $row;
         }
 
-        // [TAG: TRANSAKSI DATABASE] Simpan batch per rit secara atomik
+        // [TAG: TRANSAKSI DATABASE] Simpan batch per kombinasi rit & tujuan secara atomik
         DB::beginTransaction();
         try {
             $dateStr = date('Ymd');
             $createdBatches = [];
 
-            foreach ($groupedByRit as $group) {
+            foreach ($groupedBatches as $group) {
                 $rit = $group['rit'];
+                $tujuan = $group['tujuan'];
                 $items = $group['items'];
                 $countItems = count($items);
 
-                // Buat kode batch berbasis tanggal dan rit
+                // Buat kode batch berbasis tanggal, rit, dan tujuan
+                $parts = ["BATCH", $dateStr];
                 if ($rit !== null) {
                     $padRit = str_pad($rit, 2, '0', STR_PAD_LEFT);
-                    $baseCode = "BATCH-{$dateStr}-RIT{$padRit}";
-                    $kodeBatch = $baseCode;
-
-                    // Jika di hari yang sama sudah ada batch rit ini, tambah suffix angka
-                    $counter = 2;
-                    while (PackingList2Batch::where('kode_batch', $kodeBatch)->exists()) {
-                        $kodeBatch = "{$baseCode}-{$counter}";
-                        $counter++;
-                    }
-                    $catatanBatch = $catatan ? "{$catatan} (Rit {$rit})" : "Rit {$rit}";
-                } else {
-                    $prefix = "BATCH-{$dateStr}";
-                    $latestBatch = PackingList2Batch::where('kode_batch', 'like', "{$prefix}-%")->latest('id')->first();
-                    $nextSeq = 1;
-                    if ($latestBatch) {
-                        $parts = explode('-', $latestBatch->kode_batch);
-                        $lastNum = (int) end($parts);
-                        $nextSeq = $lastNum + 1;
-                    }
-                    $kodeBatch = sprintf('%s-%04d', $prefix, $nextSeq);
-                    $catatanBatch = $catatan;
+                    $parts[] = "RIT{$padRit}";
                 }
+                if ($tujuan !== null) {
+                    $cleanTujuan = preg_replace('/[^A-Z0-9]/', '', $tujuan);
+                    if (!empty($cleanTujuan)) {
+                        $parts[] = $cleanTujuan;
+                    }
+                }
+                if ($rit === null && $tujuan === null) {
+                    $parts[] = "GENERAL";
+                }
+
+                $baseCode = implode('-', $parts);
+                $kodeBatch = $baseCode;
+
+                // Jika di hari yang sama sudah ada batch kode ini, tambah suffix angka counter
+                $counter = 2;
+                while (PackingList2Batch::where('kode_batch', $kodeBatch)->exists()) {
+                    $kodeBatch = "{$baseCode}-{$counter}";
+                    $counter++;
+                }
+
+                $labelGrup = [];
+                if ($rit !== null) $labelGrup[] = "Rit {$rit}";
+                if ($tujuan !== null) $labelGrup[] = "Loc: {$tujuan}";
+                $labelGrupStr = implode(', ', $labelGrup);
+
+                $catatanBatch = $catatan 
+                    ? ($labelGrupStr ? "{$catatan} ({$labelGrupStr})" : $catatan)
+                    : ($labelGrupStr ?: '-');
 
                 $batch = PackingList2Batch::create([
                     'kode_batch' => $kodeBatch,
                     'no_rit'     => $rit,
+                    'tujuan'     => $tujuan,
                     'user_id'    => Auth::id(),
                     'total_item' => $countItems,
                     'catatan'    => $catatanBatch,
@@ -290,6 +334,7 @@ class PackingList2Controller extends Controller
                     'id'         => $batch->id,
                     'kode_batch' => $kodeBatch,
                     'no_rit'     => $rit,
+                    'tujuan'     => $tujuan,
                     'total_item' => $countItems,
                 ];
             }
@@ -300,17 +345,20 @@ class PackingList2Controller extends Controller
             if ($batchCount === 1) {
                 $first = $createdBatches[0];
                 $ritText = $first['no_rit'] ? " (Rit {$first['no_rit']})" : "";
+                $locText = $first['tujuan'] ? " [{$first['tujuan']}]" : "";
                 return response()->json([
                     'success'     => true,
                     'batch_count' => 1,
-                    'message'     => "Berhasil menyimpan batch {$first['kode_batch']}{$ritText} dengan {$first['total_item']} item.",
+                    'message'     => "Berhasil menyimpan batch {$first['kode_batch']}{$ritText}{$locText} dengan {$first['total_item']} item.",
                     'batch_id'    => $first['id'],
                     'kode_batch'  => $first['kode_batch'],
                     'redirect'    => route('packing-list-2.detail', $first['id']),
                 ]);
             } else {
                 $names = implode(', ', array_map(function ($b) {
-                    return $b['kode_batch'] . ($b['no_rit'] ? " (Rit {$b['no_rit']})" : "");
+                    $ritText = $b['no_rit'] ? " (Rit {$b['no_rit']})" : "";
+                    $locText = $b['tujuan'] ? " [{$b['tujuan']}]" : "";
+                    return $b['kode_batch'] . $ritText . $locText;
                 }, $createdBatches));
                 return response()->json([
                     'success'     => true,
@@ -346,6 +394,11 @@ class PackingList2Controller extends Controller
             }
         }
 
+        // [TAG: FILTER TUJUAN] Filter tujuan (LOC)
+        if ($request->filled('tujuan')) {
+            $query->where('tujuan', $request->tujuan);
+        }
+
         // Pencarian NO COIL atau KODE
         if ($request->filled('search')) {
             $search = $request->search;
@@ -367,7 +420,12 @@ class PackingList2Controller extends Controller
             'tervalidasi' => $batch->items()->where('status', '!=', 'MENUNGGU_VALIDASI')->count(),
         ];
 
-        return view('packing_list_2.dashboard.detail', compact('batch', 'items', 'summary'));
+        // Opsi tujuan untuk filter di detail
+        $standardTujuan = ['CBT', 'SDG', 'L01', 'L10'];
+        $itemTujuan = PackingList2Item::where('batch_id', $batch->id)->whereNotNull('tujuan')->distinct()->pluck('tujuan')->toArray();
+        $availableTujuan = array_values(array_unique(array_merge($standardTujuan, $itemTujuan)));
+
+        return view('packing_list_2.dashboard.detail', compact('batch', 'items', 'summary', 'availableTujuan'));
     }
 
     // [TAG: HAPUS BATCH] Hapus batch beserta seluruh data koil di dalamnya
@@ -414,6 +472,11 @@ class PackingList2Controller extends Controller
             }
         }
 
+        // Filter tujuan jika ada
+        if ($request->filled('tujuan')) {
+            $query->where('tujuan', $request->tujuan);
+        }
+
         // Pencarian NO COIL atau KODE
         if ($request->filled('search')) {
             $search = $request->search;
@@ -436,12 +499,21 @@ class PackingList2Controller extends Controller
     public function laporanHarian(Request $request)
     {
         $tanggal = $request->input('tanggal', date('Y-m-d'));
+        $selectedTujuan = $request->input('tujuan');
+        $selectedRit = $request->input('rit');
 
         // Query batch pada tanggal yang dipilih
-        $batches = PackingList2Batch::with(['user', 'items.validator'])
-            ->whereDate('created_at', $tanggal)
-            ->orderBy('id', 'asc')
-            ->get();
+        $query = PackingList2Batch::with(['user', 'items.validator'])
+            ->whereDate('created_at', $tanggal);
+
+        if ($request->filled('tujuan')) {
+            $query->where('tujuan', $selectedTujuan);
+        }
+        if ($request->filled('rit')) {
+            $query->where('no_rit', $selectedRit);
+        }
+
+        $batches = $query->orderBy('id', 'asc')->get();
 
         // Hitung statistik hari ini
         $totalBatch = $batches->count();
@@ -472,18 +544,47 @@ class PackingList2Controller extends Controller
             ->limit(7)
             ->get();
 
-        return view('packing_list_2.laporan.index', compact('batches', 'tanggal', 'summary', 'availableDates'));
+        // Opsi tujuan & rit untuk filter laporan
+        $standardTujuan = ['CBT', 'SDG', 'L01', 'L10'];
+        $dbTujuan = PackingList2Batch::whereNotNull('tujuan')->distinct()->pluck('tujuan')->toArray();
+        $availableTujuan = array_values(array_unique(array_merge($standardTujuan, $dbTujuan)));
+
+        $availableRits = PackingList2Batch::whereNotNull('no_rit')
+            ->distinct()
+            ->orderByRaw('CAST(no_rit AS UNSIGNED) ASC')
+            ->pluck('no_rit')
+            ->toArray();
+
+        return view('packing_list_2.laporan.index', compact(
+            'batches', 
+            'tanggal', 
+            'summary', 
+            'availableDates',
+            'availableTujuan',
+            'availableRits',
+            'selectedTujuan',
+            'selectedRit'
+        ));
     }
 
     // [TAG: EXPORT EXCEL LAPORAN HARIAN] Download seluruh batch dan koil tanggal terpilih
     public function exportLaporanHarian(Request $request)
     {
         $tanggal = $request->input('tanggal', date('Y-m-d'));
+        $selectedTujuan = $request->input('tujuan');
+        $selectedRit = $request->input('rit');
 
-        $batches = PackingList2Batch::with(['user', 'items.validator'])
-            ->whereDate('created_at', $tanggal)
-            ->orderBy('id', 'asc')
-            ->get();
+        $query = PackingList2Batch::with(['user', 'items.validator'])
+            ->whereDate('created_at', $tanggal);
+
+        if ($request->filled('tujuan')) {
+            $query->where('tujuan', $selectedTujuan);
+        }
+        if ($request->filled('rit')) {
+            $query->where('no_rit', $selectedRit);
+        }
+
+        $batches = $query->orderBy('id', 'asc')->get();
 
         $totalItems = 0;
         $totalValid = 0;

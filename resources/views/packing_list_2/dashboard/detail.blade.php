@@ -72,6 +72,9 @@
             <div>
                 <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
                     <h4 class="fw-bolder mb-0" style="color: #1e293b; letter-spacing: -0.5px;">Detail Batch: {{ $batch->kode_batch }}</h4>
+                    @if ($batch->tujuan)
+                        <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1" style="font-size: 12px; border-radius: 6px;"><i class="ti ti-map-pin me-1"></i>LOC: {{ $batch->tujuan }}</span>
+                    @endif
                     @if ($batch->no_rit)
                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" style="font-size: 12px; border-radius: 6px;"><i class="ti ti-truck-delivery me-1"></i>Rit {{ $batch->no_rit }}</span>
                     @endif
@@ -88,7 +91,7 @@
                 </div>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <a href="{{ route('packing-list-2.batch.export-excel', array_merge(['id' => $batch->id], request()->only(['search', 'status']))) }}" class="btn-export-excel">
+                <a href="{{ route('packing-list-2.batch.export-excel', array_merge(['id' => $batch->id], request()->only(['search', 'status', 'tujuan']))) }}" class="btn-export-excel">
                     <i class="ti ti-file-spreadsheet fs-5"></i>
                     <span>Export Excel</span>
                 </a>
@@ -184,7 +187,7 @@
         <div class="card-body p-4">
             <form action="{{ route('packing-list-2.detail', $batch->id) }}" method="GET" class="row g-3 align-items-center">
                 <!-- Search Input -->
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0" style="border-color: #cbd5e1;">
                             <i class="ti ti-search text-muted"></i>
@@ -194,7 +197,7 @@
                 </div>
 
                 <!-- Status Filter -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <select name="status" class="form-select" style="border-color: #cbd5e1; font-size: 13.5px;">
                         <option value="">-- Semua Status --</option>
                         <option value="MENUNGGU_VALIDASI" {{ request('status') === 'MENUNGGU_VALIDASI' ? 'selected' : '' }}>Menunggu Pemeriksaan</option>
@@ -203,12 +206,22 @@
                     </select>
                 </div>
 
+                <!-- LOC / Tujuan Filter -->
+                <div class="col-md-3">
+                    <select name="tujuan" class="form-select" style="border-color: #cbd5e1; font-size: 13.5px;">
+                        <option value="">-- Semua LOC / Tujuan --</option>
+                        @foreach($availableTujuan as $tj)
+                            <option value="{{ $tj }}" {{ request('tujuan') === $tj ? 'selected' : '' }}>{{ $tj }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Actions -->
-                <div class="col-md-3 d-flex gap-2">
+                <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary px-3 w-100" style="border-radius: 8px; font-weight: 600;">
                         <i class="ti ti-filter me-1"></i> Filter
                     </button>
-                    @if (request()->hasAny(['search', 'status']))
+                    @if (request()->hasAny(['search', 'status', 'tujuan']))
                         <a href="{{ route('packing-list-2.detail', $batch->id) }}" class="btn btn-outline-secondary px-3" style="border-radius: 8px;" title="Reset Filter">
                             <i class="ti ti-rotate"></i>
                         </a>
@@ -226,7 +239,7 @@
                     <h5 class="fw-bold mb-0 text-dark">Daftar Item Koil di Batch Ini</h5>
                     <span class="text-muted" style="font-size: 13px;">(Menampilkan {{ count($items) }} dari {{ $summary['total'] }} item)</span>
                 </div>
-                <a href="{{ route('packing-list-2.batch.export-excel', array_merge(['id' => $batch->id], request()->only(['search', 'status']))) }}" class="btn-export-excel-table">
+                <a href="{{ route('packing-list-2.batch.export-excel', array_merge(['id' => $batch->id], request()->only(['search', 'status', 'tujuan']))) }}" class="btn-export-excel-table">
                     <i class="ti ti-file-spreadsheet"></i>
                     <span>Export ke Excel</span>
                 </a>

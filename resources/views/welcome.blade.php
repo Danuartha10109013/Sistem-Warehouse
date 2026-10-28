@@ -489,6 +489,15 @@
                   </div>
                </a>
             @endif
+
+            @if (in_array('all', $akses) || in_array('VS', $akses) || Auth::user()->role == 0)
+               <a href="{{ route('verifikasi-stiker.dashboard') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-label-check-outline"></i>
+                     <div class="menu-title">Verifikasi Stiker</div>
+                  </div>
+               </a>
+            @endif
             {{-- Menu khusus Superadmin --}}
             @if (Auth::user()->role == 5)
                <a href="{{ route('superadmin.Administrator.kelola-user') }}" class="menu-item">

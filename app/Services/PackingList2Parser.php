@@ -202,11 +202,13 @@ class PackingList2Parser
             ];
         }
 
-        // Hitung pengelompokan rit
-        $ritGroups = [];
+        // Hitung pengelompokan batch berdasarkan kombinasi Rit dan Tujuan (LOC)
+        $batchGroups = [];
         foreach ($processedRows as $r) {
-            $key = $r['rit_number'] !== null ? 'Rit ' . $r['rit_number'] : 'Tanpa Rit';
-            $ritGroups[$key] = ($ritGroups[$key] ?? 0) + 1;
+            $ritStr = $r['rit_number'] !== null ? 'Rit ' . $r['rit_number'] : 'Tanpa Rit';
+            $tujuanStr = !empty($r['tujuan']) ? strtoupper(trim($r['tujuan'])) : 'TANPA LOC';
+            $key = $ritStr . ' - ' . $tujuanStr;
+            $batchGroups[$key] = ($batchGroups[$key] ?? 0) + 1;
         }
 
         return [
@@ -215,7 +217,8 @@ class PackingList2Parser
             'valid_rows'   => $validCount,
             'invalid_rows' => $invalidCount,
             'all_valid'    => count($processedRows) > 0 && $invalidCount === 0,
-            'rit_groups'   => $ritGroups,
+            'rit_groups'   => $batchGroups,
+            'batch_groups' => $batchGroups,
         ];
     }
 

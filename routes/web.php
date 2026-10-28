@@ -43,6 +43,7 @@ use App\Http\Controllers\SidewallController;
 use App\Http\Controllers\RekapPrdController;
 use App\Http\Controllers\MasterProductController;
 use App\Http\Controllers\PackingList2Controller;
+use App\Http\Controllers\VerifikasiStikerController;
 use App\Http\Middleware\AutoLogout;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -177,6 +178,21 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::post('/store', [RekapPrdController::class, 'store'])->name('rekap-prd.store');
         Route::post('/export', [RekapPrdController::class, 'exportExcel'])->name('rekap-prd.export');
         Route::delete('/{id}', [RekapPrdController::class, 'destroy'])->name('rekap-prd.destroy');
+    });
+
+    // ============================
+    // MODUL: VERIFIKASI STIKER
+    // ============================
+    Route::prefix('verifikasi-stiker')->middleware('auth')->group(function () {
+        Route::get('/',                 [VerifikasiStikerController::class, 'index'])->name('verifikasi-stiker.dashboard');
+        Route::get('/scan',             [VerifikasiStikerController::class, 'scan'])->name('verifikasi-stiker.scan');
+        Route::post('/check-attribute', [VerifikasiStikerController::class, 'checkAttribute'])->name('verifikasi-stiker.check-attribute');
+        Route::post('/verify',          [VerifikasiStikerController::class, 'verify'])->name('verifikasi-stiker.verify');
+        Route::get('/data',             [VerifikasiStikerController::class, 'data'])->name('verifikasi-stiker.data');
+        Route::post('/import',          [VerifikasiStikerController::class, 'import'])->name('verifikasi-stiker.import');
+        Route::post('/truncate',        [VerifikasiStikerController::class, 'truncate'])->name('verifikasi-stiker.truncate');
+        Route::get('/export-excel',     [VerifikasiStikerController::class, 'exportExcel'])->name('verifikasi-stiker.export-excel');
+        Route::delete('/{id}',          [VerifikasiStikerController::class, 'destroy'])->name('verifikasi-stiker.destroy');
     });
 
     // ============================
