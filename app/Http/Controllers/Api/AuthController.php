@@ -123,13 +123,14 @@ class AuthController extends Controller
             'message' => 'Login berhasil.',
             'token'   => $token,
             'user'    => [
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'username'   => $user->username,
-                'email'      => $user->email,
-                'role'       => (int) $user->role,
-                'role_label' => $roleLabel,
-                'division'   => $user->division,
+                'id'          => $user->id,
+                'name'        => $user->name,
+                'username'    => $user->username,
+                'email'       => $user->email,
+                'role'        => (int) $user->role,
+                'role_label'  => $roleLabel,
+                'division'    => $user->division,
+                'permissions' => $userPermissions,
             ],
             'active_modules' => $activeModules,
         ]);
@@ -166,15 +167,106 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'user'    => [
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'username'   => $user->username,
-                'email'      => $user->email,
-                'role'       => (int) $user->role,
-                'role_label' => $roleLabel,
-                'division'   => $user->division,
+                'id'          => $user->id,
+                'name'        => $user->name,
+                'username'    => $user->username,
+                'email'       => $user->email,
+                'role'        => (int) $user->role,
+                'role_label'  => $roleLabel,
+                'division'    => $user->division,
+                'permissions' => $userPermissions,
             ],
             'active_modules' => $activeModules,
+        ]);
+    }
+
+    /**
+     * Update profil dan ganti kata sandi pengguna mobile.
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $validator = Validator::make($request->all(), [
+            'name'             => 'sometimes|string|max:255',
+            'email'            => 'sometimes|email|max:255|unique:users,email,' . $user->id,
+            'current_password' => 'nullable|string',
+            'password'         => 'nullable|string|min:6|confirmed',
+        ], [
+            'email.unique'       => 'Email ini sudah terdaftar oleh pengguna lain.',
+            'password.min'       => 'Kata sandi baru minimal harus 6 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi baru tidak cocok.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        if ($request->filled('name')) {
+            $user->name = $request->name;
+        }
+
+        if ($request->filled('email')) {
+            $user->email = $request->email;
+        }
+
+        if ($request->filled('password')) {
+            if ($request->filled('current_password') && !Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kata sandi saat ini yang Anda masukkan salah.',
+                ], 422);
+            }
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        $roleLabel = match ((int) $user->role) {
+            0 => 'Admin',
+            5 => 'Super Admin',
+            default => 'Pegawai',
+        };
+
+        $rawType = json_decode($user->type, true);
+        $userPermissions = is_array($rawType) ? $rawType : (empty($user->type) ? [] : [$user->type]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profil dan data akun berhasil diperbarui.',
+            'user'    => [
+                'id'          => $user->id,
+                'name'        => $user->name,
+                'username'    => $user->username,
+                'email'       => $user->email,
+                'role'        => (int) $user->role,
+                'role_label'  => $roleLabel,
+                'division'    => $user->division,
+                'permissions' => $userPermissions,
+            ],
+        ]);
+    }
+
+    /**
+     * Daftarkan / perbarui FCM Token perangkat mobile untuk push alert.
+     */
+    public function updateFcmToken(Request $request)
+    {
+        $request->validate([
+            'fcm_token' => 'required|string',
+        ]);
+
+        $user = $request->user();
+        $user->fcm_token = $request->input('fcm_token');
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FCM Token berhasil diperbarui.',
         ]);
     }
 

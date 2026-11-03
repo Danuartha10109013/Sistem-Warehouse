@@ -6,7 +6,7 @@
     <title>@yield('title', 'Sistem Informasi Digital WH') | PT Tata Metal Lestari</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="shortcut icon" type="image/png" href="{{ asset('bahan_logo_v2/logobg-ic.png') }}" />
+    <link rel="shortcut icon" type="image/png" href="{{ asset('template_v2/bahan_logo_v2/logobg-ic.png') }}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Compiled CSS -->

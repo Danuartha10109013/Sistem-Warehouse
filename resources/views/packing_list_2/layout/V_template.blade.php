@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', 'Packing List 2.0') | PT Tata Metal Lestari</title>
-  <link rel="shortcut icon" type="image/png" href="{{ asset('bahan_logo_v2/logobg-ic.png') }}" />
+  <link rel="shortcut icon" type="image/png" href="{{ asset('template_v2/bahan_logo_v2/logobg-ic.png') }}" />
   <link rel="stylesheet" href="{{ asset('template_v2/src/assets/css/styles.min.css') }}" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">

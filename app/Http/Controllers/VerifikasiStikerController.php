@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Exports\VerifikasiStikerHasilScanExport;
 use App\Imports\VerifikasiStikerImport;
 use App\Models\VerifikasiStiker;
+use App\Models\VerifikasiStikerNotifContact;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -172,14 +174,31 @@ class VerifikasiStikerController extends Controller
         $item->catatan = $request->catatan;
         $item->save();
 
+        // [TAG: NOTIFIKASI WA] Kirim notifikasi jika hasil verifikasi tidak sesuai
+        $waStatus = null;
+        if ($item->status_verifikasi === 'tidak_sesuai') {
+            $waStatus = WhatsAppNotificationService::sendMismatchAlert($item);
+        }
+
         if ($request->ajax()) {
+            $msg = $item->status_verifikasi === 'sesuai' 
+                ? 'Semua 3 atribut stiker valid (Sesuai OK)!' 
+                : 'Verifikasi disimpan sebagai TIDAK SESUAI (atribut belum lengkap).';
+
+            if ($waStatus) {
+                if ($waStatus['success']) {
+                    $msg .= ' 📲 Notifikasi WhatsApp berhasil dikirim ke nomor pengawas.';
+                } else {
+                    $msg .= ' ⚠️ Info WA: ' . $waStatus['message'];
+                }
+            }
+
             return response()->json([
-                'success' => true,
-                'status'  => $item->status_verifikasi,
-                'message' => $item->status_verifikasi === 'sesuai' 
-                    ? 'Semua 3 atribut stiker valid (Sesuai OK)!' 
-                    : 'Verifikasi disimpan sebagai TIDAK SESUAI (atribut belum lengkap).',
-                'data'    => $item,
+                'success'   => true,
+                'status'    => $item->status_verifikasi,
+                'message'   => $msg,
+                'wa_status' => $waStatus,
+                'data'      => $item,
             ]);
         }
 
@@ -293,5 +312,108 @@ class VerifikasiStikerController extends Controller
     {
         VerifikasiStiker::truncate();
         return redirect()->back()->with('success', 'Seluruh data berhasil di-reset!');
+    }
+
+    // [TAG: NOTIF WA - DAFTAR KONTAK] Menampilkan daftar nomor penerima WhatsApp & status Fonnte
+    public function notifWaIndex()
+    {
+        $contacts = VerifikasiStikerNotifContact::orderBy('is_active', 'desc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $tokenConfigured = !empty(env('FONNTE_TOKEN', config('services.fonnte.token')));
+        $fonnteDevice = WhatsAppNotificationService::getDeviceStatus();
+
+        return view('verifikasi_stiker.notif_wa.index', compact('contacts', 'tokenConfigured', 'fonnteDevice'));
+    }
+
+    // [TAG: NOTIF WA - SIMPAN KONTAK] Menambah nomor penerima WhatsApp baru
+    public function notifWaStore(Request $request)
+    {
+        $request->validate([
+            'nama'     => 'required|string|max:100',
+            'nomor_wa' => 'required|string|max:30',
+            'jabatan'  => 'nullable|string|max:100',
+        ]);
+
+        $cleanNomor = preg_replace('/[^0-9]/', '', $request->nomor_wa);
+
+        VerifikasiStikerNotifContact::create([
+            'nama'      => $request->nama,
+            'nomor_wa'  => $cleanNomor,
+            'jabatan'   => $request->jabatan,
+            'is_active' => true,
+        ]);
+
+        return redirect()->back()->with('success', 'Nomor kontak WhatsApp berhasil ditambahkan!');
+    }
+
+    // [TAG: NOTIF WA - UPDATE KONTAK] Edit nomor penerima WhatsApp
+    public function notifWaUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'nama'     => 'required|string|max:100',
+            'nomor_wa' => 'required|string|max:30',
+            'jabatan'  => 'nullable|string|max:100',
+        ]);
+
+        $contact = VerifikasiStikerNotifContact::findOrFail($id);
+        $cleanNomor = preg_replace('/[^0-9]/', '', $request->nomor_wa);
+
+        $contact->update([
+            'nama'     => $request->nama,
+            'nomor_wa' => $cleanNomor,
+            'jabatan'  => $request->jabatan,
+        ]);
+
+        return redirect()->back()->with('success', 'Kontak WhatsApp berhasil diperbarui!');
+    }
+
+    // [TAG: NOTIF WA - TOGGLE STATUS] Aktifkan / Nonaktifkan kontak
+    public function notifWaToggle($id)
+    {
+        $contact = VerifikasiStikerNotifContact::findOrFail($id);
+        $contact->is_active = !$contact->is_active;
+        $contact->save();
+
+        $statusText = $contact->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        return redirect()->back()->with('success', "Kontak {$contact->nama} berhasil {$statusText}!");
+    }
+
+    // [TAG: NOTIF WA - HAPUS KONTAK] Hapus nomor penerima WhatsApp
+    public function notifWaDestroy($id)
+    {
+        $contact = VerifikasiStikerNotifContact::findOrFail($id);
+        $contact->delete();
+
+        return redirect()->back()->with('success', 'Kontak WhatsApp berhasil dihapus!');
+    }
+
+    // [TAG: NOTIF WA - TEST KIRIM] Uji coba pengiriman pesan ke satu atau seluruh nomor aktif
+    public function notifWaTest(Request $request)
+    {
+        $request->validate([
+            'target' => 'nullable|string',
+        ]);
+
+        if ($request->filled('target')) {
+            $targets = preg_replace('/[^0-9]/', '', $request->target);
+        } else {
+            $contacts = VerifikasiStikerNotifContact::active()->get();
+            if ($contacts->isEmpty()) {
+                return redirect()->back()->with('error', 'Tidak ada kontak aktif untuk dikirimi tes.');
+            }
+            $targets = $contacts->pluck('nomor_wa')->map(function ($no) {
+                return preg_replace('/[^0-9]/', '', $no);
+            })->filter()->implode(',');
+        }
+
+        $result = WhatsAppNotificationService::sendTestMessage($targets);
+
+        if ($result['success']) {
+            return redirect()->back()->with('success', 'Pesan uji coba berhasil dikirim via Fonnte!');
+        }
+
+        return redirect()->back()->with('error', 'Gagal mengirim pesan uji coba: ' . $result['message']);
     }
 }

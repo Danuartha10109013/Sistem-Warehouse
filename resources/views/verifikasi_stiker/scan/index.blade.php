@@ -153,8 +153,8 @@
                                 <th class="ps-4">Waktu</th>
                                 <th>Attribute</th>
                                 <th>Status</th>
-                                <th>Produk (Kuning)</th>
-                                <th>Lot No (Kuning)</th>
+                                <th>Produk</th>
+                                <th>Lot No</th>
                                 <th class="text-end">Berat</th>
                                 <th class="text-center pe-4">3 Ceklis</th>
                             </tr>
@@ -837,12 +837,15 @@
                                 icon: isSesuai ? 'success' : 'warning',
                                 title: isSesuai ? 'Verifikasi Sesuai' : 'Verifikasi Tidak Sesuai',
                                 text: res.message,
-                                timer: 1400,
-                                showConfirmButton: false,
-                                width: '320px',
+                                timer: isSesuai ? 1400 : 3500,
+                                showConfirmButton: !isSesuai,
+                                confirmButtonText: 'OK, Lanjut Scan',
+                                width: '360px',
                                 customClass: {
-                                    popup: 'rounded-4 shadow border-0'
-                                }
+                                    popup: 'rounded-4 shadow border-0',
+                                    confirmButton: 'btn btn-primary px-3 py-1'
+                                },
+                                buttonsStyling: false
                             });
 
                             currentItem.check_produk = c1;

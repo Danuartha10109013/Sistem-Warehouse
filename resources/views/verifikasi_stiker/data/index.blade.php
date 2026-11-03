@@ -101,8 +101,8 @@
                             <th class="ps-4 text-center" style="width: 45px;">No</th>
                             <th>Tgl Input</th>
                             <th>Attribute</th>
-                            <th>Produk (Kuning)</th>
-                            <th>Supplier Lot No (Kuning)</th>
+                            <th>Produk</th>
+                            <th>Supplier Lot No</th>
                             <th>Tgl DN</th>
                             <th class="text-end">Berat</th>
                             <th class="text-center">3 Ceklis Fisik</th>

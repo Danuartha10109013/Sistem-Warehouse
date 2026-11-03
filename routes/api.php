@@ -19,6 +19,8 @@ Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 Route::middleware('auth:sanctum')->group(function () {
     // Sesi Profil & Modul Dinamis
     Route::get('/me', [AuthController::class, 'me'])->name('api.me');
+    Route::post('/profile', [AuthController::class, 'updateProfile'])->name('api.profile.update');
+    Route::post('/fcm-token', [AuthController::class, 'updateFcmToken'])->name('api.fcm-token');
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
 
     // ==========================================

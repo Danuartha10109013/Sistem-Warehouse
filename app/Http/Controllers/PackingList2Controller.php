@@ -6,6 +6,7 @@ use App\Exports\PackingList2BatchExport;
 use App\Exports\PackingList2LaporanHarianExport;
 use App\Models\PackingList2Batch;
 use App\Models\PackingList2Item;
+use App\Services\FirebaseNotificationService;
 use App\Services\PackingList2Parser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -341,7 +342,23 @@ class PackingList2Controller extends Controller
 
             DB::commit();
 
+            // [PUSH NOTIFIKASI FCM] Kirim alert otomatis ke seluruh operator lapangan di mobile app
             $batchCount = count($createdBatches);
+            try {
+                if ($batchCount === 1) {
+                    $first = $createdBatches[0];
+                    $ritText = $first['no_rit'] ? " (Rit {$first['no_rit']})" : "";
+                    FirebaseNotificationService::sendBatchReadyAlert($first['kode_batch'] . $ritText, (int) $first['total_item']);
+                } else {
+                    foreach ($createdBatches as $b) {
+                        $ritText = $b['no_rit'] ? " (Rit {$b['no_rit']})" : "";
+                        FirebaseNotificationService::sendBatchReadyAlert($b['kode_batch'] . $ritText, (int) $b['total_item']);
+                    }
+                }
+            } catch (\Throwable $fcmEx) {
+                \Illuminate\Support\Facades\Log::warning("[FCM Trigger Warning] Gagal mengirim push: " . $fcmEx->getMessage());
+            }
+
             if ($batchCount === 1) {
                 $first = $createdBatches[0];
                 $ritText = $first['no_rit'] ? " (Rit {$first['no_rit']})" : "";

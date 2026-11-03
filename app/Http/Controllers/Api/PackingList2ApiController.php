@@ -328,10 +328,11 @@ class PackingList2ApiController extends Controller
         $item->load(['validator:id,name', 'batch:id,kode_batch']);
 
         // Catat ke log aktivitas
+        $userName = Auth::user() ? (Auth::user()->name ?? Auth::user()->username) : 'Operator Mobile';
         \App\Services\LogActivity::record(
             action: 'VERIFIKASI_KOIL',
             module: 'Packing List 2.0 Mobile',
-            description: "User " . Auth::user()->name . " memeriksa koil {$item->no_coil} (Hasil: {$newStatus}, {$catatan})"
+            description: "User " . $userName . " memeriksa koil {$item->no_coil} (Hasil: {$newStatus}, {$catatan})"
         );
 
         $msg = $allChecked

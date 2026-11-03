@@ -193,6 +193,14 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::post('/truncate',        [VerifikasiStikerController::class, 'truncate'])->name('verifikasi-stiker.truncate');
         Route::get('/export-excel',     [VerifikasiStikerController::class, 'exportExcel'])->name('verifikasi-stiker.export-excel');
         Route::delete('/{id}',          [VerifikasiStikerController::class, 'destroy'])->name('verifikasi-stiker.destroy');
+
+        // Fitur Kontak Notifikasi WhatsApp
+        Route::get('/notif-wa',                 [VerifikasiStikerController::class, 'notifWaIndex'])->name('verifikasi-stiker.notif-wa');
+        Route::post('/notif-wa/store',          [VerifikasiStikerController::class, 'notifWaStore'])->name('verifikasi-stiker.notif-wa.store');
+        Route::put('/notif-wa/{id}',            [VerifikasiStikerController::class, 'notifWaUpdate'])->name('verifikasi-stiker.notif-wa.update');
+        Route::post('/notif-wa/{id}/toggle',    [VerifikasiStikerController::class, 'notifWaToggle'])->name('verifikasi-stiker.notif-wa.toggle');
+        Route::delete('/notif-wa/{id}',         [VerifikasiStikerController::class, 'notifWaDestroy'])->name('verifikasi-stiker.notif-wa.destroy');
+        Route::post('/notif-wa/test',           [VerifikasiStikerController::class, 'notifWaTest'])->name('verifikasi-stiker.notif-wa.test');
     });
 
     // ============================

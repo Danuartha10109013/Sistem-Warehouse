@@ -41,6 +41,18 @@
             <span class="hide-menu">Data & Import</span>
           </a>
         </li>
+        <li class="nav-small-cap">
+          <i class="fas fa-ellipsis-h nav-small-cap-icon fs-4"></i>
+          <span class="hide-menu">Pengaturan</span>
+        </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link {{ request()->routeIs('verifikasi-stiker.notif-wa*') ? 'active' : '' }}" href="{{ route('verifikasi-stiker.notif-wa') }}" aria-expanded="false">
+            <span>
+              <i class="fab fa-whatsapp" style="font-size: 1.2rem; color: #25D366;"></i>
+            </span>
+            <span class="hide-menu">Kontak Notif WA</span>
+          </a>
+        </li>
       </ul>
     </nav>
   </div>

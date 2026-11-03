@@ -133,7 +133,7 @@
                         <tr>
                             <th class="ps-4 text-muted text-uppercase" style="font-size: 11px; font-weight: 700;">Attribute</th>
                             <th class="text-center text-muted text-uppercase" style="font-size: 11px; font-weight: 700;">Status</th>
-                            <th class="text-muted text-uppercase" style="font-size: 11px; font-weight: 700;">Produk (Kuning)</th>
+                            <th class="text-muted text-uppercase" style="font-size: 11px; font-weight: 700;">Produk</th>
                             <th class="text-muted text-uppercase" style="font-size: 11px; font-weight: 700;">Supplier Lot No</th>
                             <th class="text-end text-muted text-uppercase" style="font-size: 11px; font-weight: 700;">Berat</th>
                             <th class="text-center text-muted text-uppercase" style="font-size: 11px; font-weight: 700;">3 Ceklis</th>

@@ -5,12 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login || Sistem Informasi Digital WH</title>
-    <link rel="shortcut icon" type="image/png" href="{{asset('bahan_logo_v2/logobg-ic.png')}}" />
+    <link rel="shortcut icon" type="image/png" href="{{asset('template_v2/bahan_logo_v2/logobg-ic.png')}}" />
     <link rel="stylesheet" href="{{asset('template_v2/src/assets/css/styles.min.css')}}" />
     <style>
         /* Mengganti latar belakang dengan gambar pabrik/perusahaan beserta overlay gelap yang elegan */
         .page-wrapper {
-            background: linear-gradient(rgba(30, 41, 59, 0.8), rgba(19, 91, 159, 0.9)), url('{{ asset("bahan_logo_v2/main_image-v2.jpg") }}') center center / cover no-repeat fixed !important;
+            background: linear-gradient(rgba(30, 41, 59, 0.8), rgba(19, 91, 159, 0.9)), url('{{ asset("template_v2/bahan_logo_v2/main_image-v2.jpg") }}') center center / cover no-repeat fixed !important;
         }
 
         /* Menambahkan bayangan pada card agar lebih menonjol di atas background terang */
@@ -91,7 +91,7 @@
                         <div class="card mb-0 shadow-sm">
                             <div class="card-body">
                                 <a href="#" class="text-nowrap logo-img text-center d-block py-3 w-100">
-                                    <img src="{{asset('bahan_logo_v2/logobg-ic.png')}}" width="180"
+                                    <img src="{{asset('template_v2/bahan_logo_v2/logobg-ic.png')}}" width="180"
                                         alt="Logo Tata Metal Lestari">
                                 </a>
                                 <p class="text-center">Sistem Informasi Manajemen Operasional</p>
