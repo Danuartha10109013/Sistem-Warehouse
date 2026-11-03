@@ -63,7 +63,7 @@
                     </div>
                     @if(!$isConnected)
                         <div class="alert alert-danger p-1 mt-2 mb-0 small text-center" style="font-size: 10px; border-radius: 6px;">
-                            <i class="fas fa-exclamation-triangle me-1"></i> Perlu scan QR di dashboard Fonnte
+                            <i class="fas fa-exclamation-triangle me-1"></i> {{ $fonnteDevice['message'] ?? 'Perlu scan QR di dashboard Fonnte' }}
                         </div>
                     @endif
                 </div>

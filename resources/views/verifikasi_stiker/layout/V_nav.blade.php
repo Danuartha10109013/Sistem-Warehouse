@@ -41,6 +41,12 @@
             <span class="hide-menu">Data & Import</span>
           </a>
         </li>
+        @php
+          $userTypes = json_decode(Auth::user()->type ?? '[]', true) ?? [];
+          $canAccessWaNotif = Auth::user()->role == 0 || in_array('all', $userTypes) || in_array('VS_WA', $userTypes);
+        @endphp
+
+        @if($canAccessWaNotif)
         <li class="nav-small-cap">
           <i class="fas fa-ellipsis-h nav-small-cap-icon fs-4"></i>
           <span class="hide-menu">Pengaturan</span>
@@ -53,6 +59,7 @@
             <span class="hide-menu">Kontak Notif WA</span>
           </a>
         </li>
+        @endif
       </ul>
     </nav>
   </div>

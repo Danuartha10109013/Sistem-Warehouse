@@ -91,21 +91,20 @@ class VerifikasiStikerController extends Controller
             $query->whereDate('tanggal_input', $tglInput);
         }
 
-        // Cari record yang belum diverifikasi terlebih dahulu
+        // 1. Cari record yang belum diverifikasi terlebih dahulu pada tanggal yang dipilih
         $item = (clone $query)
             ->orderByRaw("CASE WHEN status_verifikasi = 'belum' THEN 0 ELSE 1 END")
             ->orderBy('id', 'desc')
             ->first();
 
-        // Jika tidak ketemu di tanggal terpilih tapi ada di tanggal lain, beri info
-        if (!$item && $tglInput && $tglInput !== 'all') {
-            $existOtherDate = VerifikasiStiker::where('attribute', $search)->first();
-            if ($existOtherDate) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Attribute "' . $search . '" ditemukan pada input tanggal ' . $existOtherDate->tanggal_input->format('d/m/Y') . ', bukan pada tanggal yang dipilih.',
-                ], 404);
-            }
+        // 2. Jika tidak ditemukan di tanggal terpilih (misal diinput kemarin/beda tanggal),
+        // otomatis fallback cari di semua tanggal input agar operator tetap bisa scan tanpa perlu ubah filter
+        if (!$item) {
+            $item = VerifikasiStiker::where('attribute', $search)
+                ->orderByRaw("CASE WHEN status_verifikasi = 'belum' THEN 0 ELSE 1 END")
+                ->orderBy('tanggal_input', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
         }
 
         if (!$item) {
@@ -115,28 +114,32 @@ class VerifikasiStikerController extends Controller
             ], 404);
         }
 
-        $remainingCount = (clone $query)
+        $remainingCount = VerifikasiStiker::where('attribute', $search)
             ->where('status_verifikasi', 'belum')
             ->count();
+
+        $isDiffDate = ($tglInput && $tglInput !== 'all' && $item->tanggal_input && $item->tanggal_input->format('Y-m-d') !== $tglInput);
 
         return response()->json([
             'success' => true,
             'data' => [
-                'id'                => $item->id,
-                'tanggal_input'     => $item->tanggal_input ? $item->tanggal_input->format('d-m-Y') : null,
-                'attribute'         => $item->attribute,
-                'produk'            => $item->produk,
-                'supplier_lot_no'   => $item->supplier_lot_no,
-                'tgl_dn'            => $item->tgl_dn,
-                'berat'             => number_format($item->berat, 2, '.', ','),
-                'berat_raw'         => $item->berat,
-                'status_verifikasi' => $item->status_verifikasi,
-                'check_produk'      => (bool) $item->check_produk,
-                'check_lot_no'      => (bool) $item->check_lot_no,
-                'check_berat'       => (bool) $item->check_berat,
-                'verified_at'       => $item->verified_at ? $item->verified_at->format('d-m-Y H:i:s') : null,
-                'verified_by'       => $item->verified_by,
-                'remaining_belum'   => $remainingCount,
+                'id'                  => $item->id,
+                'tanggal_input'       => $item->tanggal_input ? $item->tanggal_input->format('d/m/Y') : null,
+                'is_different_date'   => $isDiffDate,
+                'different_date_note' => $isDiffDate ? 'Input Tanggal ' . $item->tanggal_input->format('d/m/Y') : null,
+                'attribute'           => $item->attribute,
+                'produk'              => $item->produk,
+                'supplier_lot_no'     => $item->supplier_lot_no,
+                'tgl_dn'              => $item->tgl_dn,
+                'berat'               => number_format($item->berat, 2, '.', ','),
+                'berat_raw'           => $item->berat,
+                'status_verifikasi'   => $item->status_verifikasi,
+                'check_produk'        => (bool) $item->check_produk,
+                'check_lot_no'        => (bool) $item->check_lot_no,
+                'check_berat'         => (bool) $item->check_berat,
+                'verified_at'         => $item->verified_at ? $item->verified_at->format('d-m-Y H:i:s') : null,
+                'verified_by'         => $item->verified_by,
+                'remaining_belum'     => $remainingCount,
             ],
         ]);
     }
@@ -314,14 +317,31 @@ class VerifikasiStikerController extends Controller
         return redirect()->back()->with('success', 'Seluruh data berhasil di-reset!');
     }
 
+    /**
+     * Cek apakah user saat ini memiliki hak akses untuk mengelola kontak notifikasi WhatsApp
+     */
+    private function checkWaNotifAccess(): void
+    {
+        $user = auth()->user();
+        if (!$user) {
+            abort(401);
+        }
+        $types = json_decode($user->type ?? '[]', true) ?? [];
+        if ($user->role != 0 && !in_array('all', $types) && !in_array('VS_WA', $types)) {
+            abort(403, 'Akses Ditolak: Anda tidak memiliki izin untuk mengelola Kontak Notifikasi WhatsApp.');
+        }
+    }
+
     // [TAG: NOTIF WA - DAFTAR KONTAK] Menampilkan daftar nomor penerima WhatsApp & status Fonnte
     public function notifWaIndex()
     {
+        $this->checkWaNotifAccess();
+
         $contacts = VerifikasiStikerNotifContact::orderBy('is_active', 'desc')
             ->orderBy('id', 'asc')
             ->get();
 
-        $tokenConfigured = !empty(env('FONNTE_TOKEN', config('services.fonnte.token')));
+        $tokenConfigured = !empty(config('services.fonnte.token') ?: env('FONNTE_TOKEN'));
         $fonnteDevice = WhatsAppNotificationService::getDeviceStatus();
 
         return view('verifikasi_stiker.notif_wa.index', compact('contacts', 'tokenConfigured', 'fonnteDevice'));
@@ -330,6 +350,8 @@ class VerifikasiStikerController extends Controller
     // [TAG: NOTIF WA - SIMPAN KONTAK] Menambah nomor penerima WhatsApp baru
     public function notifWaStore(Request $request)
     {
+        $this->checkWaNotifAccess();
+
         $request->validate([
             'nama'     => 'required|string|max:100',
             'nomor_wa' => 'required|string|max:30',
@@ -351,6 +373,8 @@ class VerifikasiStikerController extends Controller
     // [TAG: NOTIF WA - UPDATE KONTAK] Edit nomor penerima WhatsApp
     public function notifWaUpdate(Request $request, $id)
     {
+        $this->checkWaNotifAccess();
+
         $request->validate([
             'nama'     => 'required|string|max:100',
             'nomor_wa' => 'required|string|max:30',
@@ -372,6 +396,8 @@ class VerifikasiStikerController extends Controller
     // [TAG: NOTIF WA - TOGGLE STATUS] Aktifkan / Nonaktifkan kontak
     public function notifWaToggle($id)
     {
+        $this->checkWaNotifAccess();
+
         $contact = VerifikasiStikerNotifContact::findOrFail($id);
         $contact->is_active = !$contact->is_active;
         $contact->save();
@@ -383,6 +409,8 @@ class VerifikasiStikerController extends Controller
     // [TAG: NOTIF WA - HAPUS KONTAK] Hapus nomor penerima WhatsApp
     public function notifWaDestroy($id)
     {
+        $this->checkWaNotifAccess();
+
         $contact = VerifikasiStikerNotifContact::findOrFail($id);
         $contact->delete();
 
@@ -392,6 +420,7 @@ class VerifikasiStikerController extends Controller
     // [TAG: NOTIF WA - TEST KIRIM] Uji coba pengiriman pesan ke satu atau seluruh nomor aktif
     public function notifWaTest(Request $request)
     {
+        $this->checkWaNotifAccess();
         $request->validate([
             'target' => 'nullable|string',
         ]);

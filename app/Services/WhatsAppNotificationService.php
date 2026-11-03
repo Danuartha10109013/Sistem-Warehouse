@@ -34,7 +34,7 @@ class WhatsAppNotificationService
             ];
         }
 
-        $token = env('FONNTE_TOKEN', config('services.fonnte.token'));
+        $token = config('services.fonnte.token') ?: env('FONNTE_TOKEN');
 
         if (empty($token)) {
             Log::warning('[WA_NOTIF] FONNTE_TOKEN belum diset di .env');
@@ -84,7 +84,7 @@ class WhatsAppNotificationService
      */
     public static function sendTestMessage(string $targets, string $customMessage = null): array
     {
-        $token = env('FONNTE_TOKEN', config('services.fonnte.token'));
+        $token = config('services.fonnte.token') ?: env('FONNTE_TOKEN');
 
         if (empty($token)) {
             return [
@@ -106,7 +106,7 @@ class WhatsAppNotificationService
      */
     public static function getDeviceStatus(): array
     {
-        $token = env('FONNTE_TOKEN', config('services.fonnte.token'));
+        $token = config('services.fonnte.token') ?: env('FONNTE_TOKEN');
 
         if (empty($token)) {
             return [
@@ -117,7 +117,7 @@ class WhatsAppNotificationService
         }
 
         try {
-            $response = Http::withHeaders([
+            $response = Http::withoutVerifying()->withHeaders([
                 'Authorization' => $token,
             ])->timeout(8)->post('https://api.fonnte.com/device');
 
@@ -159,7 +159,7 @@ class WhatsAppNotificationService
     protected static function sendViaFonnte(string $targets, string $message, string $token): array
     {
         try {
-            $response = Http::withHeaders([
+            $response = Http::withoutVerifying()->withHeaders([
                 'Authorization' => $token,
             ])->timeout(15)->post('https://api.fonnte.com/send', [
                 'target'      => $targets,

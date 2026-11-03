@@ -264,6 +264,14 @@
                                                                                 <input class="form-check-input shadow-sm edit-type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="PL2" {{ in_array('PL2', json_decode($d->type, true) ?? []) ? 'checked' : '' }}>
                                                                                 <label class="form-check-label">Packing List 2.0</label>
                                                                             </div>
+                                                                            <div class="form-check mb-2">
+                                                                                <input class="form-check-input shadow-sm edit-type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="VS" {{ in_array('VS', json_decode($d->type, true) ?? []) ? 'checked' : '' }}>
+                                                                                <label class="form-check-label">Verifikasi Stiker</label>
+                                                                            </div>
+                                                                            <div class="form-check mb-2">
+                                                                                <input class="form-check-input shadow-sm edit-type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="VS_WA" {{ in_array('VS_WA', json_decode($d->type, true) ?? []) ? 'checked' : '' }}>
+                                                                                <label class="form-check-label text-success fw-semibold"><i class="fab fa-whatsapp me-1"></i> Kontak Notif WA</label>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -447,6 +455,14 @@
                                             <div class="form-check mb-2">
                                                 <input class="form-check-input shadow-sm type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="PL2" id="typePL2">
                                                 <label class="form-check-label" for="typePL2">Packing List 2.0</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input shadow-sm type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="VS" id="typeVS">
+                                                <label class="form-check-label" for="typeVS">Verifikasi Stiker</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input shadow-sm type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="VS_WA" id="typeVS_WA">
+                                                <label class="form-check-label text-success fw-semibold" for="typeVS_WA"><i class="fab fa-whatsapp me-1"></i> Kontak Notif WA</label>
                                             </div>
                                         </div>
                                     </div>

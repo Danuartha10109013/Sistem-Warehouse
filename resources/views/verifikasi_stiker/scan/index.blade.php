@@ -659,7 +659,11 @@
                 $('#displayProduk').text(item.produk || '-');
                 $('#displayLotNo').text(item.supplier_lot_no || '-');
                 $('#displayTglDn').text(item.tgl_dn || '-');
-                $('#displayTglInput').text(item.tanggal_input || '-');
+                if (item.is_different_date) {
+                    $('#displayTglInput').html(item.tanggal_input + ' <span class="badge bg-secondary text-white ms-1" style="font-size: 9px; font-weight: 600;">Beda Tgl Filter</span>');
+                } else {
+                    $('#displayTglInput').text(item.tanggal_input || '-');
+                }
                 $('#displayBerat').text(item.berat + ' kg');
 
                 // Set status checklist
