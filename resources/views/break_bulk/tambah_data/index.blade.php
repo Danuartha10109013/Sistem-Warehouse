@@ -86,6 +86,7 @@
                 <span class="badge bg-light text-primary border border-primary-subtle px-2 px-md-3 py-2 fw-semibold" style="border-radius: 8px;">
                     <i class="fas fa-database me-1"></i> {{ number_format($totalItems) }} Baris ({{ number_format($totalWeight / 1000, 2) }} Ton)
                 </span>
+                @if(Auth::check() && (Auth::user()->role == 0 || Auth::user()->role === 'admin'))
                 <form id="resetAllForm" action="{{ route('break-bulk.destroy-all') }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
@@ -93,6 +94,7 @@
                         <i class="fas fa-trash-alt"></i> <span class="d-none d-sm-inline">Reset Data</span>
                     </button>
                 </form>
+                @endif
             </div>
             @endif
         </div>

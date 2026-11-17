@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\BreakBulk;
+use App\Models\BreakBulkScan;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
@@ -22,6 +23,11 @@ class BreakBulkImport implements ToCollection, WithStartRow
     {
         // Cache data atribut yang sudah ada di database untuk efisiensi
         $existingRecords = BreakBulk::all()->keyBy(function ($item) {
+            return strtoupper(trim($item->atribut));
+        });
+
+        // Cache riwayat scan yang sudah dilakukan operator
+        $existingScans = BreakBulkScan::all()->keyBy(function ($item) {
             return strtoupper(trim($item->atribut));
         });
 
@@ -56,30 +62,59 @@ class BreakBulkImport implements ToCollection, WithStartRow
             }
 
             $key = strtoupper($atribut);
+            $scanRecord = $existingScans->get($key);
+
+            // Tentukan status: jika sudah pernah discan di lapangan, langsung 'scanned'
+            $status = $scanRecord ? 'scanned' : 'pending';
+            $scannedAt = $scanRecord ? $scanRecord->scanned_at : null;
+            $scannedBy = $scanRecord ? null : null; // id user jika ada
 
             if (isset($existingRecords[$key])) {
                 // Update data jika sudah ada
                 $record = $existingRecords[$key];
-                $record->update([
+                $updateData = [
                     'no_urut' => is_numeric($noUrut) ? (int)$noUrut : $record->no_urut,
                     'weight'  => $weight > 0 ? $weight : $record->weight,
                     'product' => $product ?: $record->product,
                     'no_so'   => !empty($noSo) ? strtoupper($noSo) : $record->no_so,
-                ]);
+                ];
+                if ($scanRecord && $record->status !== 'scanned') {
+                    $updateData['status'] = 'scanned';
+                    $updateData['scanned_at'] = $scannedAt;
+                }
+                $record->update($updateData);
                 $this->updatedCount++;
             } else {
                 // Simpan data baru
                 $newRecord = BreakBulk::create([
-                    'no_urut' => is_numeric($noUrut) ? (int)$noUrut : null,
-                    'atribut' => $atribut,
-                    'weight'  => $weight,
-                    'product' => $product ?: '-',
-                    'no_so'   => !empty($noSo) ? strtoupper($noSo) : null,
-                    'status'  => 'pending',
+                    'no_urut'    => is_numeric($noUrut) ? (int)$noUrut : null,
+                    'atribut'    => $atribut,
+                    'weight'     => $weight,
+                    'product'    => $product ?: '-',
+                    'no_so'      => !empty($noSo) ? strtoupper($noSo) : null,
+                    'status'     => $status,
+                    'scanned_at' => $scannedAt,
                 ]);
 
                 $existingRecords[$key] = $newRecord;
                 $this->insertedCount++;
+            }
+
+            // Sinkronkan ke record scan jika scan sebelumnya masih belum punya berat/produk lengkap
+            if ($scanRecord) {
+                $scanUpdate = [];
+                if ($weight > 0 && ($scanRecord->weight == 0 || empty($scanRecord->weight))) {
+                    $scanUpdate['weight'] = $weight;
+                }
+                if ($product && ($scanRecord->product == 'Menunggu Import' || empty($scanRecord->product) || $scanRecord->product == '-')) {
+                    $scanUpdate['product'] = $product;
+                }
+                if (!empty($noSo) && empty($scanRecord->no_so)) {
+                    $scanUpdate['no_so'] = strtoupper($noSo);
+                }
+                if (!empty($scanUpdate)) {
+                    $scanRecord->update($scanUpdate);
+                }
             }
         }
     }

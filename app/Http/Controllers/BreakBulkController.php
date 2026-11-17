@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BreakBulkScanExport;
 use App\Imports\BreakBulkImport;
 use App\Models\BreakBulk;
 use App\Models\BreakBulkMaster;
 use App\Models\BreakBulkScan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BreakBulkController extends Controller
@@ -17,7 +19,27 @@ class BreakBulkController extends Controller
     {
         $this->ensureInitialMasterData();
 
-        $scans = BreakBulkScan::orderBy('id', 'desc')->get();
+        // Query relasi JOIN atribut agar weight & product selalu tersinkron dinamis
+        $scans = BreakBulkScan::leftJoin('break_bulks', 'break_bulk_scans.atribut', '=', 'break_bulks.atribut')
+            ->select(
+                'break_bulk_scans.id',
+                'break_bulk_scans.atribut',
+                'break_bulk_scans.trailer',
+                DB::raw('COALESCE(NULLIF(break_bulks.weight, 0), break_bulk_scans.weight, 0) as weight'),
+                DB::raw('COALESCE(NULLIF(break_bulks.product, "-"), NULLIF(break_bulk_scans.product, "-"), "Menunggu Import") as product'),
+                DB::raw('COALESCE(break_bulk_scans.no_so, break_bulks.no_so) as no_so'),
+                'break_bulk_scans.grouping',
+                'break_bulk_scans.pod',
+                'break_bulk_scans.lokasi',
+                'break_bulk_scans.scanned_by',
+                'break_bulk_scans.scanned_at',
+                'break_bulk_scans.created_at',
+                'break_bulks.id as master_id',
+                'break_bulks.status as master_status'
+            )
+            ->orderBy('break_bulk_scans.id', 'desc')
+            ->get();
+
         $groupingOptions = BreakBulkMaster::where('kategori', 'grouping')->pluck('nama');
         $podOptions      = BreakBulkMaster::where('kategori', 'pod')->pluck('nama');
         $lokasiOptions   = BreakBulkMaster::where('kategori', 'lokasi')->pluck('nama');
@@ -46,14 +68,25 @@ class BreakBulkController extends Controller
     {
         $cleanAttr = trim($atribut);
         $item = BreakBulk::where('atribut', $cleanAttr)->first();
+        $existingScan = BreakBulkScan::where('atribut', $cleanAttr)->first();
 
-        $alreadyScanned = BreakBulkScan::where('atribut', $cleanAttr)->exists();
+        $scanData = null;
+        if ($existingScan) {
+            $scanData = [
+                'trailer'  => $existingScan->trailer,
+                'grouping' => $existingScan->grouping,
+                'pod'      => $existingScan->pod,
+                'lokasi'   => $existingScan->lokasi,
+                'no_so'    => $existingScan->no_so,
+            ];
+        }
 
         if ($item) {
             return response()->json([
                 'success'         => true,
                 'exists'          => true,
-                'already_scanned' => $alreadyScanned,
+                'already_scanned' => (bool)$existingScan,
+                'existing_scan'   => $scanData,
                 'data'            => [
                     'atribut' => $item->atribut,
                     'weight'  => (float)$item->weight,
@@ -66,19 +99,20 @@ class BreakBulkController extends Controller
         return response()->json([
             'success'         => true,
             'exists'          => false,
-            'already_scanned' => $alreadyScanned,
-            'message'         => 'Atribut belum terdaftar di tabel Tambah Data!',
+            'already_scanned' => (bool)$existingScan,
+            'existing_scan'   => $scanData,
+            'message'         => 'Atribut belum terdaftar di Tambah Data (tetap bisa discan & disimpan, akan sinkron otomatis saat Excel di-upload).',
         ]);
     }
 
-    // [TAG: SIMPAN SCAN] Simpan Hasil Scan Operator
+    // [TAG: SIMPAN SCAN] Simpan / Update Hasil Scan Operator (Upsert)
     public function storeScan(Request $request)
     {
         $request->validate([
             'atribut'  => 'required|string',
             'trailer'  => 'required|string',
-            'weight'   => 'required|numeric',
-            'product'  => 'required|string',
+            'weight'   => 'nullable|numeric',
+            'product'  => 'nullable|string',
             'grouping' => 'required|string',
             'pod'      => 'required|string',
             'lokasi'   => 'required|string',
@@ -87,40 +121,80 @@ class BreakBulkController extends Controller
 
         $cleanAttr = trim($request->atribut);
 
-        // Cegah duplikasi scan
-        if (BreakBulkScan::where('atribut', $cleanAttr)->exists()) {
-            return redirect()->route('break-bulk.index')->with('error', "Atribut {$cleanAttr} sudah pernah discan!");
+        // Cek data di Tambah Data Break Bulk jika sudah ada
+        $breakBulkItem = BreakBulk::where('atribut', $cleanAttr)->first();
+        $weight = $breakBulkItem && $breakBulkItem->weight > 0
+            ? (float)$breakBulkItem->weight
+            : ($request->filled('weight') ? (float)$request->weight : 0);
+        $product = $breakBulkItem && $breakBulkItem->product !== '-'
+            ? $breakBulkItem->product
+            : ($request->filled('product') ? trim($request->product) : 'Menunggu Import');
+        $noSo = !empty($request->no_so)
+            ? strtoupper(trim($request->no_so))
+            : ($breakBulkItem ? $breakBulkItem->no_so : null);
+
+        // Cek apakah atribut sudah pernah discan sebelumnya (Jika ya -> UPDATE)
+        $existingScan = BreakBulkScan::where('atribut', $cleanAttr)->first();
+
+        if ($existingScan) {
+            $existingScan->update([
+                'trailer'    => trim($request->trailer),
+                'weight'     => $weight > 0 ? $weight : $existingScan->weight,
+                'product'    => ($product && $product !== 'Menunggu Import') ? $product : $existingScan->product,
+                'grouping'   => trim($request->grouping),
+                'pod'        => strtoupper(trim($request->pod)),
+                'no_so'      => $noSo ?: $existingScan->no_so,
+                'lokasi'     => strtoupper(trim($request->lokasi)),
+                'scanned_by' => Auth::check() ? Auth::user()->name : ($existingScan->scanned_by ?? 'Operator'),
+                'scanned_at' => now(),
+            ]);
+
+            if ($breakBulkItem) {
+                $updateData = [
+                    'status'     => 'scanned',
+                    'scanned_at' => now(),
+                    'scanned_by' => Auth::id(),
+                ];
+                if (empty($breakBulkItem->no_so) && !empty($noSo)) {
+                    $updateData['no_so'] = $noSo;
+                }
+                $breakBulkItem->update($updateData);
+            }
+
+            return redirect()->route('break-bulk.index')->with('success', "Data scan atribut {$cleanAttr} berhasil diperbarui ke Trailer {$request->trailer}!");
         }
 
-        // Simpan transaksi scan
+        // Jika belum pernah discan, simpan sebagai data scan baru
         BreakBulkScan::create([
             'atribut'    => $cleanAttr,
-            'trailer'    => strtoupper(trim($request->trailer)),
-            'weight'     => $request->weight,
-            'product'    => trim($request->product),
+            'trailer'    => trim($request->trailer),
+            'weight'     => $weight,
+            'product'    => $product ?: 'Menunggu Import',
             'grouping'   => trim($request->grouping),
             'pod'        => strtoupper(trim($request->pod)),
-            'no_so'      => !empty($request->no_so) ? strtoupper(trim($request->no_so)) : null,
+            'no_so'      => $noSo,
             'lokasi'     => strtoupper(trim($request->lokasi)),
             'scanned_by' => Auth::check() ? Auth::user()->name : 'Operator',
             'scanned_at' => now(),
         ]);
 
-        // Perbarui status dan no_so di data master impor jika diisi
-        $breakBulkItem = BreakBulk::where('atribut', $cleanAttr)->first();
         if ($breakBulkItem) {
             $updateData = [
                 'status'     => 'scanned',
                 'scanned_at' => now(),
                 'scanned_by' => Auth::id(),
             ];
-            if (empty($breakBulkItem->no_so) && !empty($request->no_so)) {
-                $updateData['no_so'] = strtoupper(trim($request->no_so));
+            if (empty($breakBulkItem->no_so) && !empty($noSo)) {
+                $updateData['no_so'] = $noSo;
             }
             $breakBulkItem->update($updateData);
         }
 
-        return redirect()->route('break-bulk.index')->with('success', "Atribut {$cleanAttr} berhasil discan!");
+        $successMsg = $breakBulkItem
+            ? "Atribut {$cleanAttr} berhasil diverifikasi & disimpan ke Trailer {$request->trailer}!"
+            : "Atribut {$cleanAttr} berhasil disimpan ke Trailer {$request->trailer}! (Menunggu data spesifikasi di-import ke Tambah Data)";
+
+        return redirect()->route('break-bulk.index')->with('success', $successMsg);
     }
 
     // [TAG: HAPUS SCAN] Hapus/Batalkan 1 Baris Scan
@@ -144,6 +218,10 @@ class BreakBulkController extends Controller
     // [TAG: RESET SCAN] Reset Seluruh Scan Hari Ini
     public function destroyAllScan()
     {
+        if (!Auth::check() || (Auth::user()->role != 0 && Auth::user()->role !== 'admin')) {
+            return redirect()->route('break-bulk.index')->with('error', 'Akses ditolak: Hanya role Admin yang dapat mereset sesi scan.');
+        }
+
         BreakBulkScan::truncate();
         BreakBulk::query()->update([
             'status'     => 'pending',
@@ -154,10 +232,65 @@ class BreakBulkController extends Controller
         return redirect()->route('break-bulk.index')->with('success', 'Seluruh data scan berhasil direset.');
     }
 
+    // [TAG: EXPORT EXCEL SCAN] Export hasil scan break bulk terurut per trailer dengan merge tonase
+    public function exportExcel()
+    {
+        $scans = BreakBulkScan::leftJoin('break_bulks', 'break_bulk_scans.atribut', '=', 'break_bulks.atribut')
+            ->select(
+                'break_bulk_scans.id',
+                'break_bulk_scans.atribut',
+                'break_bulk_scans.trailer',
+                DB::raw('COALESCE(NULLIF(break_bulks.weight, 0), break_bulk_scans.weight, 0) as weight'),
+                DB::raw('COALESCE(NULLIF(break_bulks.product, "-"), NULLIF(break_bulk_scans.product, "-"), "Menunggu Import") as product'),
+                DB::raw('COALESCE(break_bulk_scans.no_so, break_bulks.no_so) as no_so'),
+                'break_bulk_scans.grouping',
+                'break_bulk_scans.pod',
+                'break_bulk_scans.lokasi',
+                'break_bulk_scans.scanned_by',
+                'break_bulk_scans.scanned_at',
+                'break_bulk_scans.created_at'
+            )
+            ->orderByRaw('CAST(break_bulk_scans.trailer AS UNSIGNED) ASC')
+            ->orderBy('break_bulk_scans.trailer', 'asc')
+            ->orderBy('break_bulk_scans.atribut', 'asc')
+            ->get();
+
+        if ($scans->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data hasil scan untuk diexport.');
+        }
+
+        $groupedScans = $scans->groupBy('trailer');
+        $totalItems   = $scans->count();
+        $totalWeight  = $scans->sum('weight');
+
+        $fileName = 'Hasil_Scan_Break_Bulk_' . date('Ymd_His') . '.xlsx';
+
+        return Excel::download(new BreakBulkScanExport($groupedScans, $totalItems, $totalWeight), $fileName);
+    }
+
     // [TAG: HALAMAN TONASE] Halaman Perhitungan / Monitoring Tonase per Trailer
     public function tonase(Request $request)
     {
-        $scans = BreakBulkScan::orderBy('created_at', 'desc')->get();
+        // Query relasi JOIN atribut agar tonase selalu tersinkron dinamis
+        $scans = BreakBulkScan::leftJoin('break_bulks', 'break_bulk_scans.atribut', '=', 'break_bulks.atribut')
+            ->select(
+                'break_bulk_scans.id',
+                'break_bulk_scans.atribut',
+                'break_bulk_scans.trailer',
+                DB::raw('COALESCE(NULLIF(break_bulks.weight, 0), break_bulk_scans.weight, 0) as weight'),
+                DB::raw('COALESCE(NULLIF(break_bulks.product, "-"), NULLIF(break_bulk_scans.product, "-"), "Menunggu Import") as product'),
+                DB::raw('COALESCE(break_bulk_scans.no_so, break_bulks.no_so) as no_so'),
+                'break_bulk_scans.grouping',
+                'break_bulk_scans.pod',
+                'break_bulk_scans.lokasi',
+                'break_bulk_scans.scanned_by',
+                'break_bulk_scans.scanned_at',
+                'break_bulk_scans.created_at',
+                'break_bulks.id as master_id'
+            )
+            ->orderBy('break_bulk_scans.created_at', 'desc')
+            ->get();
+
         $grouped = $scans->groupBy('trailer');
 
         $trailers = $grouped->map(function ($items, $trailerNo) {
@@ -228,6 +361,10 @@ class BreakBulkController extends Controller
     // [TAG: HAPUS SEMUA DATA TAMBAH] Reset / Hapus Seluruh Data Tambah
     public function destroyAll()
     {
+        if (!Auth::check() || (Auth::user()->role != 0 && Auth::user()->role !== 'admin')) {
+            return redirect()->route('break-bulk.tambah-data')->with('error', 'Akses ditolak: Hanya role Admin yang dapat mereset data break bulk.');
+        }
+
         BreakBulk::truncate();
         return redirect()->route('break-bulk.tambah-data')->with('success', 'Seluruh data Break Bulk berhasil direset.');
     }

@@ -315,10 +315,20 @@
                                         <span class="font-monospace fw-bold text-primary">{{ $item->atribut }}</span>
                                     </td>
                                     <td>
-                                        <span class="text-dark fw-medium">{{ $item->product }}</span>
+                                        @if($item->product == 'Menunggu Import' || empty($item->product) || $item->product == '-')
+                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                                <i class="fas fa-clock me-1"></i>Menunggu Import
+                                            </span>
+                                        @else
+                                            <span class="text-dark fw-medium">{{ $item->product }}</span>
+                                        @endif
                                     </td>
                                     <td class="text-end font-monospace fw-bold">
-                                        {{ number_format($item->weight, 2, ',', '.') }}
+                                        @if($item->weight > 0)
+                                            {{ number_format($item->weight, 2, ',', '.') }}
+                                        @else
+                                            <span class="badge bg-warning-subtle text-warning-emphasis">Pending</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <span class="badge bg-light text-primary border">{{ $item->grouping }}</span>

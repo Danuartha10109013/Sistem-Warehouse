@@ -11,6 +11,7 @@
    <!-- Bootstrap CSS -->
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
+   <link rel="stylesheet" href="{{ asset('vendorfc/dist/assets/vendors/mdi/css/materialdesignicons.min.css') }}">
    <style>
       /* Subtle enterprise top accent bar */
       .top-accent-bar {
@@ -493,7 +494,7 @@
             @if (in_array('all', $akses) || in_array('VS', $akses) || Auth::user()->role == 0)
                <a href="{{ route('verifikasi-stiker.dashboard') }}" class="menu-item">
                   <div>
-                     <i class="mdi mdi-label-check-outline"></i>
+                     <i class="mdi mdi-sticker-check-outline"></i>
                      <div class="menu-title">Verifikasi Stiker</div>
                   </div>
                </a>

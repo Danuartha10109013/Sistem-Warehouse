@@ -92,6 +92,10 @@
                 <span class="badge bg-light text-primary border border-primary-subtle px-2 px-md-3 py-2 fw-semibold" style="border-radius: 8px;">
                     <i class="fas fa-check-double me-1"></i> {{ number_format($totalScans) }} Discan ({{ number_format($totalWeightScanned / 1000, 2) }} Ton)
                 </span>
+                <a href="{{ route('break-bulk.scan.export-excel') }}" class="btn btn-outline-success btn-sm d-flex align-items-center gap-1 shadow-sm" style="border-radius: 8px; font-weight: 600; padding: 6px 12px;" title="Export Rekap Scan per Trailer ke Excel">
+                    <i class="fas fa-file-excel"></i> <span class="d-none d-sm-inline">Export Excel</span>
+                </a>
+                @if(Auth::check() && (Auth::user()->role == 0 || Auth::user()->role === 'admin'))
                 <form id="resetAllScanForm" action="{{ route('break-bulk.scan.destroy-all') }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
@@ -99,6 +103,7 @@
                         <i class="fas fa-trash-alt"></i> <span class="d-none d-sm-inline">Reset Sesi</span>
                     </button>
                 </form>
+                @endif
             </div>
             @endif
         </div>
@@ -144,11 +149,21 @@
                                     <span class="fw-bold font-monospace text-dark">{{ $row->trailer }}</span>
                                 </td>
                                 <td class="text-end">
-                                    <span class="fw-bold text-dark font-monospace">{{ number_format($row->weight, 2, ',', '.') }}</span>
-                                    <small class="text-muted">kg</small>
+                                    @if($row->weight > 0)
+                                        <span class="fw-bold text-dark font-monospace">{{ number_format($row->weight, 2, ',', '.') }}</span>
+                                        <small class="text-muted">kg</small>
+                                    @else
+                                        <span class="badge bg-warning-subtle text-warning-emphasis font-monospace px-2 py-1">0,00 (Pending)</span>
+                                    @endif
                                 </td>
                                 <td>
-                                    <span class="fw-semibold text-dark">{{ $row->product }}</span>
+                                    @if($row->product == 'Menunggu Import' || empty($row->product) || $row->product == '-')
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1">
+                                            <i class="fas fa-clock me-1"></i>Menunggu Import
+                                        </span>
+                                    @else
+                                        <span class="fw-semibold text-dark">{{ $row->product }}</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <span class="badge bg-light text-primary border border-primary-subtle px-2 py-1 fw-semibold">{{ $row->grouping }}</span>
@@ -276,7 +291,7 @@
                             <label class="form-label fw-bold text-dark mb-1">
                                 WEIGHT (KG) <span class="badge bg-light text-primary border px-1">Otomatis</span>
                             </label>
-                            <input type="number" step="0.01" name="weight" id="inputWeight" class="form-control bg-light fw-bold text-end" placeholder="0.00" readonly required style="border-radius: 8px; height: 44px;">
+                            <input type="number" step="0.01" name="weight" id="inputWeight" class="form-control bg-light fw-bold text-end" placeholder="0.00" readonly style="border-radius: 8px; height: 44px;">
                         </div>
 
                         <!-- 4. PRODUK (Otomatis) -->
@@ -284,7 +299,7 @@
                             <label class="form-label fw-bold text-dark mb-1">
                                 PRODUK <span class="badge bg-light text-primary border px-1">Otomatis</span>
                             </label>
-                            <input type="text" name="product" id="inputProduct" class="form-control bg-light fw-semibold" placeholder="Nama Produk" readonly required style="border-radius: 8px; height: 44px;">
+                            <input type="text" name="product" id="inputProduct" class="form-control bg-light fw-semibold" placeholder="Nama Produk" readonly style="border-radius: 8px; height: 44px;">
                         </div>
 
                         <!-- 5. GROUPING -->
@@ -360,11 +375,13 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const inputAtribut = document.getElementById('inputAtribut');
+        const inputTrailer = document.getElementById('inputTrailer');
         const inputWeight = document.getElementById('inputWeight');
         const inputProduct = document.getElementById('inputProduct');
         const inputNoSo = document.getElementById('inputNoSo');
         const statusBadge = document.getElementById('lookupStatusBadge');
         const statusText = document.getElementById('lookupStatusText');
+        const btnSubmitScan = document.getElementById('btnSubmitScan');
         const modalEl = document.getElementById('modalScanBreakBulk');
 
         let html5QrCode = null;
@@ -409,14 +426,47 @@
                             inputNoSo.classList.remove('bg-light');
                         }
 
-                        if (res.already_scanned) {
-                            setStatus('warning', '<i class="fas fa-exclamation-triangle text-warning"></i>', 'Peringatan: Atribut ini sudah pernah discan sebelumnya!');
+                        if (res.already_scanned && res.existing_scan) {
+                            const prevTrailer = res.existing_scan.trailer || '-';
+                            setStatus('info', '<i class="fas fa-sync-alt text-info"></i>', `Mode Pembaruan: Atribut sudah terdaftar di Trailer ${prevTrailer}. Menyimpan akan memperbarui data.`);
+                            if (!inputTrailer.value && res.existing_scan.trailer) {
+                                inputTrailer.value = res.existing_scan.trailer;
+                            }
+                            if (btnSubmitScan) {
+                                btnSubmitScan.innerHTML = '<i class="fas fa-sync-alt"></i> <span>Perbarui Scan</span>';
+                                btnSubmitScan.className = 'btn btn-warning text-dark d-flex align-items-center gap-2';
+                            }
                         } else {
                             setStatus('success', '<i class="fas fa-check-circle text-success"></i>', `Data Cocok: ${res.data.product} (${res.data.weight} kg)`);
+                            if (btnSubmitScan) {
+                                btnSubmitScan.innerHTML = '<i class="fas fa-check"></i> <span>Simpan Scan</span>';
+                                btnSubmitScan.className = 'btn btn-primary d-flex align-items-center gap-2';
+                            }
                         }
                     } else {
-                        resetAutoFields();
-                        setStatus('danger', '<i class="fas fa-times-circle text-danger"></i>', 'Atribut tidak ditemukan di tabel Tambah Data!');
+                        inputWeight.value = '0.00';
+                        inputProduct.value = 'Menunggu Import';
+                        inputNoSo.value = '';
+                        inputNoSo.readOnly = false;
+                        inputNoSo.classList.remove('bg-light');
+
+                        if (res.already_scanned && res.existing_scan) {
+                            const prevTrailer = res.existing_scan.trailer || '-';
+                            setStatus('info', '<i class="fas fa-sync-alt text-info"></i>', `Mode Pembaruan: Atribut sudah terdaftar di Trailer ${prevTrailer}. Menyimpan akan memperbarui data.`);
+                            if (!inputTrailer.value && res.existing_scan.trailer) {
+                                inputTrailer.value = res.existing_scan.trailer;
+                            }
+                            if (btnSubmitScan) {
+                                btnSubmitScan.innerHTML = '<i class="fas fa-sync-alt"></i> <span>Perbarui Scan</span>';
+                                btnSubmitScan.className = 'btn btn-warning text-dark d-flex align-items-center gap-2';
+                            }
+                        } else {
+                            setStatus('info', '<i class="fas fa-info-circle text-info"></i>', 'Atribut belum ada di Tambah Data (tetap bisa disimpan, otomatis tersinkron saat Excel di-upload).');
+                            if (btnSubmitScan) {
+                                btnSubmitScan.innerHTML = '<i class="fas fa-check"></i> <span>Simpan Scan</span>';
+                                btnSubmitScan.className = 'btn btn-primary d-flex align-items-center gap-2';
+                            }
+                        }
                     }
                 })
                 .catch(() => {
@@ -432,6 +482,8 @@
                 statusBadge.classList.add('alert-warning', 'border-warning');
             } else if (type === 'danger') {
                 statusBadge.classList.add('alert-danger', 'border-danger');
+            } else if (type === 'info') {
+                statusBadge.classList.add('alert-info', 'border-info');
             } else {
                 statusBadge.classList.add('alert-light', 'border');
             }
@@ -444,6 +496,10 @@
             inputNoSo.value = '';
             inputNoSo.readOnly = false;
             inputNoSo.classList.remove('bg-light');
+            if (btnSubmitScan) {
+                btnSubmitScan.innerHTML = '<i class="fas fa-check"></i> <span>Simpan Scan</span>';
+                btnSubmitScan.className = 'btn btn-primary d-flex align-items-center gap-2';
+            }
         }
 
         inputAtribut.addEventListener('input', function() {

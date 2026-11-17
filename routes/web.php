@@ -1159,6 +1159,7 @@ Route::group(['prefix' => 'break-bulk', 'middleware' => ['Setting-Break-Bulk'], 
     
     // Menu Scan
     Route::get('/scan', [BreakBulkController::class, 'scan'])->name('scan');
+    Route::get('/export-excel', [BreakBulkController::class, 'exportExcel'])->name('scan.export-excel');
     Route::post('/scan/store', [BreakBulkController::class, 'storeScan'])->name('scan.store');
     Route::delete('/scan/destroy/{id}', [BreakBulkController::class, 'destroyScan'])->name('scan.destroy');
     Route::delete('/scan/destroy-all', [BreakBulkController::class, 'destroyAllScan'])->name('scan.destroy-all');
