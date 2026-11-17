@@ -17,9 +17,9 @@ class IngotExportExcel implements FromView, ShouldAutoSize
 
     private $data;
 
-    public function __construct()
+    public function __construct($data = null)
     {
-        $this->data = IngotM::all();
+        $this->data = $data ?? IngotM::all();
     }
 
     public function view() : View

@@ -12,6 +12,7 @@ use App\Models\IngotM;
 use App\Models\Resin_imageM;
 use App\Models\ResinM;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,11 +71,10 @@ class FomController extends Controller
         ));
     }
 
-    private function paginateMaterial(string $modelClass, Request $request)
+    // [TAG: QUERY FILTER MATERIAL] Query dasar dengan pencarian dan filter tanggal inklusif
+    private function buildMaterialQuery(string $modelClass, Request $request)
     {
         $searchTerm = $request->input('search');
-        $sort = $request->get('sort', 'id');
-        $direction = $request->get('direction', 'desc');
         $start = $request->get('start');
         $end = $request->get('end');
 
@@ -89,17 +89,57 @@ class FomController extends Controller
             });
         }
 
-        if ($start && $end) {
-            $query->whereBetween('created_at', [$start, $end]);
-        } elseif ($start) {
-            $query->whereDate('created_at', '>=', $start);
-        } elseif ($end) {
-            $query->whereDate('created_at', '<=', $end);
+        // [TAG: FILTER TANGGAL] Filter tanggal dokumen (date) atau created_at hari penuh
+        if (!empty($start) && !empty($end)) {
+            $startDate = Carbon::parse($start)->startOfDay();
+            $endDate = Carbon::parse($end)->endOfDay();
+            if ($startDate->gt($endDate)) {
+                $temp = $startDate;
+                $startDate = $endDate->copy()->startOfDay();
+                $endDate = $temp->copy()->endOfDay();
+            }
+            $startStr = $startDate->format('Y-m-d H:i:s');
+            $endStr = $endDate->format('Y-m-d H:i:s');
+            $dateStart = $startDate->format('Y-m-d');
+            $dateEnd = $endDate->format('Y-m-d');
+
+            $query->where(function ($q) use ($startStr, $endStr, $dateStart, $dateEnd) {
+                $q->whereBetween('created_at', [$startStr, $endStr])
+                  ->orWhereBetween('date', [$dateStart, $dateEnd]);
+            });
+        } elseif (!empty($start)) {
+            $startDate = Carbon::parse($start)->startOfDay();
+            $startStr = $startDate->format('Y-m-d H:i:s');
+            $dateStart = $startDate->format('Y-m-d');
+
+            $query->where(function ($q) use ($startStr, $dateStart) {
+                $q->where('created_at', '>=', $startStr)
+                  ->orWhere('date', '>=', $dateStart);
+            });
+        } elseif (!empty($end)) {
+            $endDate = Carbon::parse($end)->endOfDay();
+            $endStr = $endDate->format('Y-m-d H:i:s');
+            $dateEnd = $endDate->format('Y-m-d');
+
+            $query->where(function ($q) use ($endStr, $dateEnd) {
+                $q->where('created_at', '<=', $endStr)
+                  ->orWhere('date', '<=', $dateEnd);
+            });
         }
 
         if (Auth::user()->role != 0) {
             $query->where('user_id', Auth::id());
         }
+
+        return $query;
+    }
+
+    private function paginateMaterial(string $modelClass, Request $request)
+    {
+        $sort = $request->get('sort', 'id');
+        $direction = $request->get('direction', 'desc');
+
+        $query = $this->buildMaterialQuery($modelClass, $request);
 
         return $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
     }
@@ -647,22 +687,28 @@ class FomController extends Controller
         return redirect()->route('fomcheck', ['type' => 'resin'])->with('success', 'Data berhasil dihapus');
     }
 
-    public function crc_export()
+    // [TAG: EXPORT CRC] Export Excel material CRC sesuai filter
+    public function crc_export(Request $request)
     {
+        $data = $this->buildMaterialQuery(CrcM::class, $request)->orderBy('id', 'desc')->get();
         $date = now()->format('d-m-Y');
-        return Excel::download(new CrcExportExcel, $date . '_CrC.xlsx');
+        return Excel::download(new CrcExportExcel($data), $date . '_CrC.xlsx');
     }
 
-    public function ingot_export()
+    // [TAG: EXPORT INGOT] Export Excel material Ingot sesuai filter
+    public function ingot_export(Request $request)
     {
+        $data = $this->buildMaterialQuery(IngotM::class, $request)->orderBy('id', 'desc')->get();
         $date = now()->format('d-m-Y');
-        return Excel::download(new IngotExportExcel, $date . '_Ingot.xlsx');
+        return Excel::download(new IngotExportExcel($data), $date . '_Ingot.xlsx');
     }
 
-    public function resin_export()
+    // [TAG: EXPORT RESIN] Export Excel material Resin sesuai filter
+    public function resin_export(Request $request)
     {
+        $data = $this->buildMaterialQuery(ResinM::class, $request)->orderBy('id', 'desc')->get();
         $date = now()->format('d-m-Y');
-        return Excel::download(new ResinExportExcel, $date . '_Resin.xlsx');
+        return Excel::download(new ResinExportExcel($data), $date . '_Resin.xlsx');
     }
 
     private function storeMaterialImages(

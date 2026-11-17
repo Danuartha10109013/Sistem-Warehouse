@@ -272,6 +272,10 @@
                                                                                 <input class="form-check-input shadow-sm edit-type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="VS_WA" {{ in_array('VS_WA', json_decode($d->type, true) ?? []) ? 'checked' : '' }}>
                                                                                 <label class="form-check-label text-success fw-semibold"><i class="fab fa-whatsapp me-1"></i> Kontak Notif WA</label>
                                                                             </div>
+                                                                            <div class="form-check mb-2">
+                                                                                <input class="form-check-input shadow-sm edit-type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="BB" {{ in_array('BB', json_decode($d->type, true) ?? []) ? 'checked' : '' }}>
+                                                                                <label class="form-check-label">Setting Break Bulk</label>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -463,6 +467,10 @@
                                             <div class="form-check mb-2">
                                                 <input class="form-check-input shadow-sm type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="VS_WA" id="typeVS_WA">
                                                 <label class="form-check-label text-success fw-semibold" for="typeVS_WA"><i class="fab fa-whatsapp me-1"></i> Kontak Notif WA</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input shadow-sm type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="BB" id="typeBB">
+                                                <label class="form-check-label" for="typeBB">Setting Break Bulk</label>
                                             </div>
                                         </div>
                                     </div>

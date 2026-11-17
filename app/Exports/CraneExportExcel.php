@@ -14,9 +14,9 @@ class CraneExportExcel implements FromView, ShouldAutoSize
 
     private $data;
 
-    public function __construct()
+    public function __construct($data = null)
     {
-        $this->data = CraneM::all();
+        $this->data = $data ?? CraneM::all();
     }
 
     public function view() : View

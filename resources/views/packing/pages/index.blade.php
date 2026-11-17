@@ -131,9 +131,29 @@
 <script>
 document.getElementById("exportExcelBtn").addEventListener("click", function () {
 
-    let table = document.getElementById("dataTable");
+    let originalTable = document.getElementById("dataTable");
+    if (!originalTable) return;
 
-    let ws = XLSX.utils.table_to_sheet(table);
+    // Buat tabel tiruan hanya berisi baris yang tampil (lolos filter)
+    let clonedTable = document.createElement("table");
+    let clonedThead = originalTable.querySelector("thead").cloneNode(true);
+    clonedTable.appendChild(clonedThead);
+
+    let clonedTbody = document.createElement("tbody");
+    let visibleRows = originalTable.querySelectorAll("tbody tr");
+    let counter = 1;
+    visibleRows.forEach(tr => {
+        if (tr.style.display !== "none" && window.getComputedStyle(tr).display !== "none") {
+            let clonedTr = tr.cloneNode(true);
+            if (clonedTr.cells.length > 0) {
+                clonedTr.cells[0].innerText = counter++;
+            }
+            clonedTbody.appendChild(clonedTr);
+        }
+    });
+    clonedTable.appendChild(clonedTbody);
+
+    let ws = XLSX.utils.table_to_sheet(clonedTable);
 
     // Hapus kolom ACTION
     let range = XLSX.utils.decode_range(ws["!ref"]);
@@ -179,7 +199,7 @@ document.getElementById("exportExcelBtn").addEventListener("click", function () 
     let totalCols = lastCol + 1;
 
     for (let c = 0; c < totalCols; c++) {
-        let th = table.querySelectorAll("thead th")[c];
+        let th = originalTable.querySelectorAll("thead th")[c];
         let px = th ? th.offsetWidth : 100;
         ws["!cols"].push({ wch: Math.floor(px / 7) });
     }
@@ -247,27 +267,32 @@ document.getElementById("exportPdfBtn").addEventListener("click", function () {
     doc.setFontSize(10);
     doc.text("FM.WH.21.00", 280, 15, { align: "right" });
 
-    // Tabel
+    // Tabel: hanya ambil baris yang terlihat (lolos filter)
     let table = document.getElementById("dataTable");
-    let headers = [...table.querySelectorAll("thead th")].map(th => th.innerText);
+    if (!table) return;
+
+    let headers = [...table.querySelectorAll("thead th")].map(th => th.innerText.trim());
     headers.pop(); // hapus kolom action
 
     let body = [];
+    let counter = 1;
     table.querySelectorAll("tbody tr").forEach(tr => {
-        let row = [...tr.querySelectorAll("td")].map(td => td.innerText);
-        row.pop();
-        body.push(row);
+        if (tr.style.display !== "none" && window.getComputedStyle(tr).display !== "none") {
+            let row = [...tr.querySelectorAll("td")].map(td => td.innerText.trim());
+            row.pop(); // hapus kolom action
+            if (row.length > 0) {
+                row[0] = counter++; // sesuaikan nomor urut
+            }
+            body.push(row);
+        }
     });
-
-    // ★ BATASI MAKSIMAL 15 DATA
-    body = body.slice(0, 15);
 
     doc.autoTable({
         head: [headers],
         body: body,
         startY: 25,
         styles: {
-            fontSize: 8,
+            fontSize: 7,
             cellPadding: 2
         },
         headStyles: {

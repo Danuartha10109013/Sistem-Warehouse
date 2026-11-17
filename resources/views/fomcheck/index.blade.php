@@ -125,7 +125,7 @@
                 <i class="bi bi-plus-circle me-1"></i> Tambah {{ $typeLabels[$type] }}
             </button>
             @if($isAdmin)
-                <a href="{{ route($exportRoute) }}" class="btn btn-success">
+                <a href="{{ route($exportRoute, request()->query()) }}" class="btn btn-success">
                     <i class="bi bi-download me-1"></i> Export Excel
                 </a>
             @endif

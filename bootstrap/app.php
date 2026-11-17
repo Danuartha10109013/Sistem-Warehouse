@@ -23,6 +23,7 @@ use App\Http\Middleware\CheckTypeST;
 use App\Http\Middleware\CheckTypeMK;
 use App\Http\Middleware\CheckTypeVT;
 use App\Http\Middleware\CheckTypePL2;
+use App\Http\Middleware\CheckTypeBB;
 use App\Http\Middleware\PegawaiMiddleware;
 use App\Http\Middleware\RunScheduler;
 use App\Http\Middleware\ScanLayout;
@@ -226,6 +227,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Packing List 2.0
         $middleware->appendToGroup('Packing-List-2', [CheckTypePL2::class]);
+        $middleware->appendToGroup('admin', [AdminMiddleware::class]);
+        $middleware->appendToGroup('pegawai', [PegawaiMiddleware::class]);
+
+        // Setting Break Bulk
+        $middleware->appendToGroup('Setting-Break-Bulk', [CheckTypeBB::class]);
         $middleware->appendToGroup('admin', [AdminMiddleware::class]);
         $middleware->appendToGroup('pegawai', [PegawaiMiddleware::class]);
 

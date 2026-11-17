@@ -498,6 +498,15 @@
                   </div>
                </a>
             @endif
+
+            @if (in_array('all', $akses) || in_array('BB', $akses))
+               <a href="{{ route('break-bulk.index') }}" class="menu-item">
+                  <div>
+                     <i class="mdi mdi-dolly"></i>
+                     <div class="menu-title">Setting Break Bulk</div>
+                  </div>
+               </a>
+            @endif
             {{-- Menu khusus Superadmin --}}
             @if (Auth::user()->role == 5)
                <a href="{{ route('superadmin.Administrator.kelola-user') }}" class="menu-item">

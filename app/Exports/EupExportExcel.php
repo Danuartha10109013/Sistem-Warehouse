@@ -15,9 +15,9 @@ class EupExportExcel implements FromView, ShouldAutoSize
 
     private $data;
 
-    public function __construct()
+    public function __construct($data = null)
     {
-        $this->data = EupM::all();
+        $this->data = $data ?? EupM::all();
     }
 
     public function view() : View

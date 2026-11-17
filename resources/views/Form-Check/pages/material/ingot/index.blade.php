@@ -30,12 +30,14 @@
         <div class="d-flex">
             <a href="{{ Auth::user()->role == 0 ? route('Form-Check.admin.ingot.add') : route('Form-Check.pegawai.ingot.add') }}"
                class="btn btn-primary mr-2" style="text-decoration: none; font-size: 15px">Tambahkan response</a>
-            <a href="{{ route('Form-Check.admin.ingot.export') }}"
+            <a href="{{ route('Form-Check.admin.ingot.export', request()->query()) }}"
                class="btn btn-success" style="text-decoration: none; font-size: 15px">Export Excel</a>
         </div>
 
         <form action="{{ route('Form-Check.admin.ingot') }}" method="GET" class="ml-2" style="display: inline;">
             <input type="text" name="search" placeholder="Search By Responden / No Document" class="form-control d-inline" style="width: auto; display: inline;" value="{{ $searchTerm }}">
+            <input type="hidden" name="start" value="{{ $start }}">
+            <input type="hidden" name="end" value="{{ $end }}">
             <input type="hidden" name="sort" value="{{ $sort }}">
             <input type="hidden" name="direction" value="{{ $direction }}">
             <button style="border: none; padding: 0; cursor: pointer;" type="submit">
@@ -43,7 +45,10 @@
             </button>
         </form>
     </div>
-    <form action="{{ Auth::user()->role == 0 ? route('Form-Check.admin.ingot') : route('Form-Check.pegawai.ingot') }}">
+    <form action="{{ Auth::user()->role == 0 ? route('Form-Check.admin.ingot') : route('Form-Check.pegawai.ingot') }}" method="GET">
+        <input type="hidden" name="search" value="{{ $searchTerm }}">
+        <input type="hidden" name="sort" value="{{ $sort }}">
+        <input type="hidden" name="direction" value="{{ $direction }}">
       <div class="row mb-3">
           <div class="col-md-5">
               <input class="form-control" value="{{$start}}" type="date" name="start">

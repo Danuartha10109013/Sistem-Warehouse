@@ -17,9 +17,9 @@ class CrcExportExcel implements FromView, ShouldAutoSize
 
     private $data;
 
-    public function __construct()
+    public function __construct($data = null)
     {
-        $this->data = CrcM::all();
+        $this->data = $data ?? CrcM::all();
     }
 
     public function view() : View

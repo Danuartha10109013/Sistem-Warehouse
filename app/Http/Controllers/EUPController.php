@@ -8,6 +8,7 @@ use App\Models\ForkliftM;
 use App\Models\Resin_imageM;
 use App\Models\ResinM;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,39 +16,75 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class EUPController extends Controller
 {
-    public function index(Request $request) {
+    // [TAG: QUERY FILTER EUP] Query dasar dengan pencarian dan filter tanggal inklusif
+    private function buildEupQuery(Request $request)
+    {
         $searchTerm = $request->input('search');
-        $sort = $request->get('sort', 'id'); // Default sort by 'id'
-        $direction = $request->get('direction', 'asc'); // Default direction 'asc'
         $start = $request->get('start', null);
         $end = $request->get('end', null);
-    
-        // Fetch data with search and sorting applied
+
         $query = EupM::query();
-    
-        // Apply search if it exists
+
         if ($searchTerm) {
             $results = User::where('name', 'LIKE', '%' . $searchTerm . '%')->pluck('id');
             $query->whereIn('user_id', $results);
         }
 
-        // Apply date filtering if start and end dates are provided
-        if ($start && $end) {
-            $query->whereBetween('created_at', [$start, $end]);
-        } elseif ($start) {
-            $query->whereDate('created_at', '>=', $start);
-        } elseif ($end) {
-            $query->whereDate('created_at', '<=', $end);
+        // [TAG: FILTER TANGGAL] Filter rentang tanggal inklusif hari penuh (created_at dan date)
+        if (!empty($start) && !empty($end)) {
+            $startDate = Carbon::parse($start)->startOfDay();
+            $endDate = Carbon::parse($end)->endOfDay();
+            if ($startDate->gt($endDate)) {
+                $temp = $startDate;
+                $startDate = $endDate->copy()->startOfDay();
+                $endDate = $temp->copy()->endOfDay();
+            }
+            $startStr = $startDate->format('Y-m-d H:i:s');
+            $endStr = $endDate->format('Y-m-d H:i:s');
+            $dateStart = $startDate->format('Y-m-d');
+            $dateEnd = $endDate->format('Y-m-d');
+
+            $query->where(function ($q) use ($startStr, $endStr, $dateStart, $dateEnd) {
+                $q->whereBetween('created_at', [$startStr, $endStr])
+                  ->orWhereBetween('date', [$dateStart, $dateEnd]);
+            });
+        } elseif (!empty($start)) {
+            $startDate = Carbon::parse($start)->startOfDay();
+            $startStr = $startDate->format('Y-m-d H:i:s');
+            $dateStart = $startDate->format('Y-m-d');
+
+            $query->where(function ($q) use ($startStr, $dateStart) {
+                $q->where('created_at', '>=', $startStr)
+                  ->orWhere('date', '>=', $dateStart);
+            });
+        } elseif (!empty($end)) {
+            $endDate = Carbon::parse($end)->endOfDay();
+            $endStr = $endDate->format('Y-m-d H:i:s');
+            $dateEnd = $endDate->format('Y-m-d');
+
+            $query->where(function ($q) use ($endStr, $dateEnd) {
+                $q->where('created_at', '<=', $endStr)
+                  ->orWhere('date', '<=', $dateEnd);
+            });
         }
-    
-        // Apply sorting
-        if(Auth::user()->role == 0){
-            // $data = ForkliftM::paginate(10); // 10 items per page
-            $data = $query->orderBy($sort, $direction)->paginate(10);
-        }else{
-            $data = $query->where('user_id', Auth::user()->id)->orderBy($sort, $direction)->paginate(10);
-            // $data = ForkliftM::where('user_id', Auth::user()->id)->paginate(10);
+
+        if (Auth::user()->role != 0) {
+            $query->where('user_id', Auth::user()->id);
         }
+
+        return $query;
+    }
+
+    // [TAG: HALAMAN UTAMA] Menampilkan data respon EUP
+    public function index(Request $request) {
+        $searchTerm = $request->input('search');
+        $sort = $request->get('sort', 'id');
+        $direction = $request->get('direction', 'desc');
+        $start = $request->get('start', null);
+        $end = $request->get('end', null);
+
+        $query = $this->buildEupQuery($request);
+        $data = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
         $suppliers = ['a','b'];
         return view('Form-Check.pages.eup.index', compact('data','suppliers', 'searchTerm', 'sort', 'direction','start','end'));
     }
@@ -128,9 +165,13 @@ public function destroy($id){
         return view('Form-Check.pages.eup.print',compact('submission'));
     }
 
-    public function export(){
+    // [TAG: EXPORT EUP] Export data EUP ke Excel sesuai filter
+    public function export(Request $request){
+        $sort = $request->get('sort', 'id');
+        $direction = $request->get('direction', 'desc');
+        $data = $this->buildEupQuery($request)->orderBy($sort, $direction)->get();
         $date = now()->format('d-m-Y'); 
-        return Excel::download(new EupExportExcel, $date . '_Eup.xlsx');
+        return Excel::download(new EupExportExcel($data), $date . '_Eup.xlsx');
     }
 
 }

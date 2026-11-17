@@ -16,17 +16,22 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class PackingController extends Controller
 {
+    // [TAG: HALAMAN UTAMA] Menampilkan data laporan packing dengan filter tanggal
     public function index(Request $request)
     {
         $query = PackingReport::query();
 
-        // Filter berdasarkan rentang tanggal
+        // [TAG: FILTER TANGGAL] Filter berdasarkan rentang tanggal inklusif hari penuh
         if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+            $query->whereBetween('date', [$startDate, $endDate]);
         } elseif ($request->filled('start_date')) {
-            $query->where('date', '>=', $request->start_date);
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $query->where('date', '>=', $startDate);
         } elseif ($request->filled('end_date')) {
-            $query->where('date', '<=', $request->end_date);
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+            $query->where('date', '<=', $endDate);
         }
 
         $data = $query->orderBy('date', 'desc')->get();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\CraneExportExcel;
 use App\Models\CraneM;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -12,53 +13,94 @@ use PDF;
 
 class CraneController extends Controller
 {
-   public function index(Request $request)
-{
-    $searchTerm = $request->input('search');
-    $sort = $request->get('sort', 'id');
-    $direction = $request->get('direction', 'desc');
-    $start = $request->get('start', null);
-    $end = $request->get('end', null);
+    // [TAG: QUERY FILTER CRANE] Query dasar dengan filter divisi, pencarian, dan rentang tanggal
+    private function buildCraneQuery(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $start = $request->get('start', null);
+        $end = $request->get('end', null);
 
-    $div = Auth::user()->division;
+        $div = Auth::user()->division;
 
-    // Base query
-    $query = CraneM::query();
+        // Base query
+        $query = CraneM::query();
 
-    // Filter by division and jenis_crane
-    if ($div === 'Produksi') {
-        $query->where('jenis_crane', 'LIKE', '%PRD%');
-    } else { // Assume Warehouse or others
-        $query->where('jenis_crane', 'NOT LIKE', '%PRD%');
+        // Filter by division and jenis_crane
+        if ($div === 'Produksi') {
+            $query->where('jenis_crane', 'LIKE', '%PRD%');
+        } else {
+            $query->where('jenis_crane', 'NOT LIKE', '%PRD%');
+        }
+
+        // Apply search if it exists
+        if ($searchTerm) {
+            $results = User::where('name', 'LIKE', '%' . $searchTerm . '%')->pluck('id');
+            $query->where(function ($q) use ($results, $searchTerm) {
+                $q->whereIn('user_id', $results)
+                  ->orWhere('jenis_crane', 'LIKE', '%' . $searchTerm . '%');
+            });
+        }
+
+        // [TAG: FILTER TANGGAL] Filter rentang tanggal inklusif hari penuh (created_at dan date)
+        if (!empty($start) && !empty($end)) {
+            $startDate = Carbon::parse($start)->startOfDay();
+            $endDate = Carbon::parse($end)->endOfDay();
+            if ($startDate->gt($endDate)) {
+                $temp = $startDate;
+                $startDate = $endDate->copy()->startOfDay();
+                $endDate = $temp->copy()->endOfDay();
+            }
+            $startStr = $startDate->format('Y-m-d H:i:s');
+            $endStr = $endDate->format('Y-m-d H:i:s');
+            $dateStart = $startDate->format('Y-m-d');
+            $dateEnd = $endDate->format('Y-m-d');
+
+            $query->where(function ($q) use ($startStr, $endStr, $dateStart, $dateEnd) {
+                $q->whereBetween('created_at', [$startStr, $endStr])
+                  ->orWhereBetween('date', [$dateStart, $dateEnd]);
+            });
+        } elseif (!empty($start)) {
+            $startDate = Carbon::parse($start)->startOfDay();
+            $startStr = $startDate->format('Y-m-d H:i:s');
+            $dateStart = $startDate->format('Y-m-d');
+
+            $query->where(function ($q) use ($startStr, $dateStart) {
+                $q->where('created_at', '>=', $startStr)
+                  ->orWhere('date', '>=', $dateStart);
+            });
+        } elseif (!empty($end)) {
+            $endDate = Carbon::parse($end)->endOfDay();
+            $endStr = $endDate->format('Y-m-d H:i:s');
+            $dateEnd = $endDate->format('Y-m-d');
+
+            $query->where(function ($q) use ($endStr, $dateEnd) {
+                $q->where('created_at', '<=', $endStr)
+                  ->orWhere('date', '<=', $dateEnd);
+            });
+        }
+
+        // Role-based filtering
+        if (Auth::user()->role != 0) {
+            $query->where('user_id', Auth::user()->id);
+        }
+
+        return $query;
     }
 
-    // Apply search if it exists
-    if ($searchTerm) {
-        $results = User::where('name', 'LIKE', '%' . $searchTerm . '%')->pluck('id');
-        $query->where(function ($q) use ($results, $searchTerm) {
-            $q->whereIn('user_id', $results)
-              ->orWhere('jenis_crane', 'LIKE', '%' . $searchTerm . '%');
-        });
-    }
+    // [TAG: HALAMAN UTAMA] Menampilkan data respon crane
+    public function index(Request $request)
+    {
+        $searchTerm = $request->input('search');
+        $sort = $request->get('sort', 'id');
+        $direction = $request->get('direction', 'desc');
+        $start = $request->get('start', null);
+        $end = $request->get('end', null);
 
-    // Apply date filtering if start and/or end is provided
-    if ($start && $end) {
-        $query->whereBetween('created_at', [$start, $end]);
-    } elseif ($start) {
-        $query->whereDate('created_at', '>=', $start);
-    } elseif ($end) {
-        $query->whereDate('created_at', '<=', $end);
-    }
+        $query = $this->buildCraneQuery($request);
+        $data = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
 
-    // Role-based filtering
-    if (Auth::user()->role == 0) {
-        $data = $query->orderBy($sort, $direction)->paginate(10);
-    } else {
-        $data = $query->where('user_id', Auth::user()->id)->orderBy($sort, $direction)->paginate(10);
+        return view('Form-Check.pages.crane.index', compact('data', 'searchTerm', 'sort', 'direction', 'start', 'end'));
     }
-
-    return view('Form-Check.pages.crane.index', compact('data', 'searchTerm', 'sort', 'direction', 'start', 'end'));
-}
 
     
     
@@ -166,8 +208,14 @@ public function destroy($id){
     return redirect()->back()->with('success', 'Data berhasil Dihapus');
 }
 
-public function exportexcel(){
-    return Excel::download(new CraneExportExcel,'Crane.xlsx');
-}
+    // [TAG: EXPORT CRANE] Export data Crane ke Excel sesuai filter
+    public function exportexcel(Request $request)
+    {
+        $sort = $request->get('sort', 'id');
+        $direction = $request->get('direction', 'desc');
+        $data = $this->buildCraneQuery($request)->orderBy($sort, $direction)->get();
+        $date = now()->format('d-m-Y');
+        return Excel::download(new CraneExportExcel($data), $date . '_Crane.xlsx');
+    }
 
 }

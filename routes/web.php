@@ -1149,3 +1149,33 @@ Route::group(['prefix' => 'verifikasi-timbangan', 'middleware' => ['Verifikasi-T
     Route::delete('/destroy/{id}', [VerifikasiTimbanganController::class, 'destroy'])->name('destroy');
     Route::get('/export', [VerifikasiTimbanganController::class, 'export'])->name('export');
 });
+
+// Modul Setting Break Bulk
+use App\Http\Controllers\BreakBulkController;
+
+Route::group(['prefix' => 'break-bulk', 'middleware' => ['Setting-Break-Bulk'], 'as' => 'break-bulk.'], function () {
+    Route::get('/', [BreakBulkController::class, 'index'])->name('index');
+    Route::get('/dashboard', [BreakBulkController::class, 'index'])->name('dashboard');
+    
+    // Menu Scan
+    Route::get('/scan', [BreakBulkController::class, 'scan'])->name('scan');
+    Route::post('/scan/store', [BreakBulkController::class, 'storeScan'])->name('scan.store');
+    Route::delete('/scan/destroy/{id}', [BreakBulkController::class, 'destroyScan'])->name('scan.destroy');
+    Route::delete('/scan/destroy-all', [BreakBulkController::class, 'destroyAllScan'])->name('scan.destroy-all');
+    Route::get('/cek-atribut/{atribut}', [BreakBulkController::class, 'cekAtribut'])->name('cek-atribut');
+
+    // Menu Tambah Data (Excel)
+    Route::get('/tambah-data', [BreakBulkController::class, 'tambahData'])->name('tambah-data');
+    Route::post('/import', [BreakBulkController::class, 'importExcel'])->name('import');
+    Route::delete('/destroy/{id}', [BreakBulkController::class, 'destroy'])->name('destroy');
+    Route::delete('/destroy-all', [BreakBulkController::class, 'destroyAll'])->name('destroy-all');
+    Route::get('/template-excel', [BreakBulkController::class, 'downloadTemplate'])->name('template-excel');
+    
+    // Menu Tonase
+    Route::get('/tonase', [BreakBulkController::class, 'tonase'])->name('tonase');
+
+    // Menu Master Data (Admin/Superadmin)
+    Route::get('/master-data', [BreakBulkController::class, 'masterData'])->name('master-data');
+    Route::post('/master-data/store', [BreakBulkController::class, 'storeMaster'])->name('master-data.store');
+    Route::delete('/master-data/destroy/{id}', [BreakBulkController::class, 'destroyMaster'])->name('master-data.destroy');
+});

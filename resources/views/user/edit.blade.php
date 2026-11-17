@@ -153,6 +153,11 @@
             {{ in_array('SO', json_decode($data->type, true) ?? []) ? 'checked' : '' }}>
           <label class="form-check-label" for="typeSO">Stock Opname</label>
         </div>
+        <div class="form-check">
+          <input class="form-check-input type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="BB" id="typeBB"
+            {{ in_array('BB', json_decode($data->type, true) ?? []) ? 'checked' : '' }}>
+          <label class="form-check-label" for="typeBB">Setting Break Bulk</label>
+        </div>
 
         
       </div>

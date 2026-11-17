@@ -16,9 +16,9 @@ class ResinExportExcel implements FromView, ShouldAutoSize
 
     private $data;
 
-    public function __construct()
+    public function __construct($data = null)
     {
-        $this->data = ResinM::all();
+        $this->data = $data ?? ResinM::all();
     }
 
     public function view() : View

@@ -15,9 +15,9 @@ class ForkliftExportExcel implements FromView, ShouldAutoSize
 
     private $data;
 
-    public function __construct()
+    public function __construct($data = null)
     {
-        $this->data = ForkliftM::all();
+        $this->data = $data ?? ForkliftM::all();
     }
 
     public function view() : View
