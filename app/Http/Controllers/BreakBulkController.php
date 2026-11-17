@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\BreakBulkScanExport;
+use App\Exports\BreakBulkTemplateExport;
 use App\Imports\BreakBulkImport;
 use App\Models\BreakBulk;
 use App\Models\BreakBulkMaster;
@@ -326,12 +327,17 @@ class BreakBulkController extends Controller
     public function importExcel(Request $request)
     {
         $request->validate([
-            'file_excel' => 'required|mimes:xlsx,xls,csv|max:20480',
+            'file_excel' => 'required|file|max:20480',
         ], [
             'file_excel.required' => 'Pilih file Excel terlebih dahulu.',
-            'file_excel.mimes'    => 'Format file harus berupa .xlsx, .xls, atau .csv.',
             'file_excel.max'      => 'Ukuran file maksimal 20 MB.',
         ]);
+
+        $file = $request->file('file_excel');
+        $extension = strtolower($file->getClientOriginalExtension());
+        if (!in_array($extension, ['xlsx', 'xls', 'csv'])) {
+            return redirect()->route('break-bulk.tambah-data')->with('error', 'Format file harus berupa .xlsx, .xls, atau .csv.');
+        }
 
         try {
             $import = new BreakBulkImport();
@@ -369,23 +375,11 @@ class BreakBulkController extends Controller
         return redirect()->route('break-bulk.tambah-data')->with('success', 'Seluruh data Break Bulk berhasil direset.');
     }
 
-    // [TAG: DOWNLOAD TEMPLATE] Unduh Contoh Format Excel
+    // [TAG: DOWNLOAD TEMPLATE] Unduh Contoh Format Excel (.xlsx)
     public function downloadTemplate()
     {
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="template_break_bulk.csv"',
-        ];
-
-        $callback = function () {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['NO', 'Atribut', 'Weight', 'Product', 'NO SO']);
-            fputcsv($handle, ['1', 'TML-BB-001', '12500.50', 'CRC PRIME COIL', 'SO-2026-001']);
-            fputcsv($handle, ['2', 'TML-BB-002', '11800.00', 'CRC SECONDARY COIL', '']);
-            fclose($handle);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        $fileName = 'Template_Import_Break_Bulk.xlsx';
+        return Excel::download(new BreakBulkTemplateExport(), $fileName);
     }
 
     // [TAG: HALAMAN MASTER DATA] Master Data (Grouping, POD, Lokasi)

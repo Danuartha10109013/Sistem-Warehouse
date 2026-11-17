@@ -198,9 +198,9 @@
                             <i class="fas fa-cloud-upload-alt fs-5"></i>
                             <span>Import Data Sekarang</span>
                         </button>
-                        <a href="{{ route('break-bulk.template-excel') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2" style="border-radius: 10px; font-weight: 600; padding: 10px 20px;">
-                            <i class="fas fa-file-download"></i>
-                            <span>Unduh Template</span>
+                        <a href="{{ route('break-bulk.template-excel') }}" class="btn btn-outline-success d-flex align-items-center gap-2" style="border-radius: 10px; font-weight: 600; padding: 10px 20px;">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Unduh Template (.xlsx)</span>
                         </a>
                     </div>
                 </div>
@@ -225,11 +225,11 @@
                     <!-- Template Download Box -->
                     <div class="d-flex align-items-center justify-content-between p-3 mb-4 rounded-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
                         <div>
-                            <div class="fw-semibold text-dark" style="font-size: 14px;">Template Excel Standar</div>
+                            <div class="fw-semibold text-dark" style="font-size: 14px;">Template Excel Standar (.xlsx)</div>
                             <small class="text-muted">Unduh format kolom resmi sebelum upload</small>
                         </div>
                         <a href="{{ route('break-bulk.template-excel') }}" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1 shadow-sm" style="font-weight: 600; border-radius: 8px; padding: 6px 14px;">
-                            <i class="fas fa-download"></i> Unduh
+                            <i class="fas fa-file-excel"></i> Unduh
                         </a>
                     </div>
 
