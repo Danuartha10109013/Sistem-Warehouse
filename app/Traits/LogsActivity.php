@@ -64,6 +64,7 @@ trait LogsActivity
             'ShipC' => 'Ship Mark (C)',
             'ShipD' => 'Ship Mark (D)',
             'ShipE' => 'Ship Mark (E)',
+            'ShipF' => 'Ship Mark (F)',
             'Shipment' => 'Ship Mark / Shipment',
             'MapCoil' => 'Mapping',
             'MapCoilTruck' => 'Mapping Truk',

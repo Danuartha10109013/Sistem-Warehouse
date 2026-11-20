@@ -153,30 +153,50 @@
              </a>    
         </div>
     </div>
+    @php
+        $shipmentERoute = Auth::user()->role == 0 ? 'Ship-Mark.admin.shipment-e' : 'Ship-Mark.pegawai.shipment-e';
+        $shipmentEAvailable = \Illuminate\Support\Facades\Route::has($shipmentERoute);
+    @endphp
     <div class="row">
         <div class="col-md-12">
-            @if (Auth::user()->role == 0)
-            <a href="{{route('Ship-Mark.admin.shipment-e')}}">
-            @else
-               <a href="{{route('Ship-Mark.pegawai.shipment-e')}}">
+            @if ($shipmentEAvailable)
+            <a href="{{ route($shipmentERoute) }}">
             @endif
             <div class="iq-card iq-card-block iq-card-stretch ">
                 <div class="iq-card-body">
                    <div class="d-flex d-flex align-items-center justify-content-between">
                       <div>
-                        <img width="50%" src="{{asset('E.png')}}" alt="">
+                         <img width="50%" src="{{asset('E.png')}}" alt="Contoh shipping mark Shipment E">
 
                           <h2>Shippment E</h2>
-                          <p class="fontsize-sm m-0">Generate Shippping Mark Type E</p>
+                           <p class="fontsize-sm m-0">Generate Shippping Mark Type E</p>
+                           @unless ($shipmentEAvailable)
+                           <p class="fontsize-sm m-0">Akses Shipment E belum tersedia untuk akun ini.</p>
+                           @endunless
                       </div>
                       <div class="rounded-circle iq-card-icon iq-bg-dark "><i class="ri-refund-line"></i></div>
                    </div>
                </div>
              </div>
-             </a>    
+              @if ($shipmentEAvailable)</a>@endif
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <a href="{{ route(Auth::user()->role == 0 ? 'Ship-Mark.admin.shipment-f' : 'Ship-Mark.pegawai.shipment-f') }}">
+                <div class="iq-card iq-card-block iq-card-stretch">
+                    <div class="iq-card-body d-flex align-items-center justify-content-between">
+                        <div>
+                            <img class="img-fluid" style="width: 50%; max-height: 240px; object-fit: contain; object-position: left;" src="{{ asset('F.svg') }}" alt="Contoh template Shipping Mark Shipment F">
+                            <h2>Shipment F</h2>
+                            <p class="fontsize-sm m-0">Generate Shipping Mark Type F</p>
+                        </div>
+                        <div class="rounded-circle iq-card-icon iq-bg-dark"><i class="ri-refund-line"></i></div>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
    
 </div>
 @endsection
- 

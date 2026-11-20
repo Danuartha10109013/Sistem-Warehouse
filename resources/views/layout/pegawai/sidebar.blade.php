@@ -51,12 +51,16 @@
           <li><a href="{{route('Ship-Mark.admin.shipment-c')}}" class="iq-waves-effect iq-bg-warning" aria-expanded="false"><i>C</i><span>SHIPPMENT C</span></a></li>
           <li><a href="{{route('Ship-Mark.admin.shipment-d')}}" class="iq-waves-effect iq-bg-info" aria-expanded="false"><i>D</i><span>SHIPPMENT D</span></a></li>
           <li><a href="{{route('Ship-Mark.admin.shipment-e')}}" class="iq-waves-effect iq-bg-dark" aria-expanded="false"><i>E</i><span>SHIPPMENT E</span></a></li>
+          <li><a href="{{route('Ship-Mark.admin.shipment-f')}}" class="iq-waves-effect iq-bg-dark" aria-expanded="false"><i>F</i><span>SHIPMENT F</span></a></li>
           @else
           <li><a href="{{route('Ship-Mark.pegawai.shipment-a')}}" class="iq-waves-effect iq-bg-primary" aria-expanded="false"><i>A</i><span>SHIPPMENT A</span></a></li>
           <li><a href="{{route('Ship-Mark.pegawai.shipment-b')}}" class="iq-waves-effect iq-bg-danger" aria-expanded="false"><i>B</i><span>SHIPPMENT B</span></a></li>
           <li><a href="{{route('Ship-Mark.pegawai.shipment-c')}}" class="iq-waves-effect iq-bg-warning" aria-expanded="false"><i>C</i><span>SHIPPMENT C</span></a></li>
           <li><a href="{{route('Ship-Mark.pegawai.shipment-d')}}" class="iq-waves-effect iq-bg-info" aria-expanded="false"><i>D</i><span>SHIPPMENT D</span></a></li>
+          @if (\Illuminate\Support\Facades\Route::has('Ship-Mark.pegawai.shipment-e'))
           <li><a href="{{route('Ship-Mark.pegawai.shipment-e')}}" class="iq-waves-effect iq-bg-dark" aria-expanded="false"><i>E</i><span>SHIPPMENT E</span></a></li>
+          @endif
+          <li><a href="{{route('Ship-Mark.pegawai.shipment-f')}}" class="iq-waves-effect iq-bg-dark" aria-expanded="false"><i>F</i><span>SHIPMENT F</span></a></li>
           @endif
 
           

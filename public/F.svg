@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-labelledby="title desc">
+  <title id="title">Contoh Shipping Mark Shipment F</title>
+  <desc id="desc">Template portrait dengan judul vertikal Shipping Mark, Unicode, POD, Made in Indonesia, serta SO dan Attribute di sisi kanan.</desc>
+  <g transform="translate(900 0) rotate(90)">
+  <rect width="360" height="900" fill="#fff"/>
+  <g fill="none" stroke="#111" stroke-width="3">
+    <rect x="66" y="24" width="244" height="826"/>
+    <path d="M66 24H23V850H66"/>
+  </g>
+  <g fill="#111" font-family="Arial, Helvetica, sans-serif">
+    <text x="45" y="800" font-size="25" font-weight="700" transform="rotate(-90 45 800)">SHIPPING MARK</text>
+    <text x="91" y="820" font-size="22" transform="rotate(-90 91 820)">23353 / V26-2407</text>
+    <text x="181" y="820" font-size="22" transform="rotate(-90 181 820)">VANCOUVER BC, CANADA</text>
+    <text x="270" y="820" font-size="22" transform="rotate(-90 270 820)">MADE IN INDONESIA</text>
+    <text x="340" y="39" font-size="15" transform="rotate(90 340 39)">SOX26-26038 / ATTRIBUTE</text>
+  </g>
+  </g>
+</svg>

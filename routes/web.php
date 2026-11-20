@@ -31,6 +31,7 @@ use App\Http\Controllers\ShippmentB;
 use App\Http\Controllers\ShippmentC;
 use App\Http\Controllers\ShippmentD;
 use App\Http\Controllers\ShippmentE;
+use App\Http\Controllers\ShippmentF;
 use App\Http\Controllers\SIKController;
 use App\Http\Controllers\SupplyController;
 use App\Http\Controllers\TraillerController;
@@ -518,6 +519,19 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/printone/{id}',[ShippmentE::class,'printone'])->name('shipment-e-printone');
                 Route::post('/add-excel-a',[ShippmentE::class,'store'])->name('add-shippmente-excel');
             });
+            Route::prefix('ShipmentF')->group(function () {
+                Route::get('/', [ShippmentF::class, 'index'])->name('shipment-f');
+                Route::get('/add', [ShippmentF::class, 'create'])->name('shipment-f-add');
+                Route::post('/store', [ShippmentF::class, 'store'])->name('shipment-f-store');
+                Route::get('/template', [ShippmentF::class, 'template'])->name('shipment-f-template');
+                Route::post('/import', [ShippmentF::class, 'import'])->name('shipment-f-import');
+                Route::get('/show/{shipment}', [ShippmentF::class, 'show'])->name('shipment-f-show');
+                Route::get('/edit/{shipment}', [ShippmentF::class, 'edit'])->name('shipment-f-edit');
+                Route::put('/update/{shipment}', [ShippmentF::class, 'update'])->name('shipment-f-update');
+                Route::delete('/delete/{shipment}', [ShippmentF::class, 'destroy'])->name('shipment-f-delete');
+                Route::get('/print/{shipment}', [ShippmentF::class, 'print'])->name('shipment-f-print');
+                Route::get('/printone/{shipment}', [ShippmentF::class, 'printOne'])->name('shipment-f-printone');
+            });
         });
 
         // Pegawai routes group with middleware and prefix
@@ -580,6 +594,20 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/print/{id}',[ShippmentD::class,'print'])->name('shipment-d-print');
                 Route::get('/printone/{id}',[ShippmentD::class,'printone'])->name('shipment-d-printone');
                 Route::post('/add-excel-a',[ShippmentD::class,'store'])->name('add-shippmentd-excel');
+            });
+
+            Route::prefix('ShipmentF')->group(function () {
+                Route::get('/', [ShippmentF::class, 'index'])->name('shipment-f');
+                Route::get('/add', [ShippmentF::class, 'create'])->name('shipment-f-add');
+                Route::post('/store', [ShippmentF::class, 'store'])->name('shipment-f-store');
+                Route::get('/template', [ShippmentF::class, 'template'])->name('shipment-f-template');
+                Route::post('/import', [ShippmentF::class, 'import'])->name('shipment-f-import');
+                Route::get('/show/{shipment}', [ShippmentF::class, 'show'])->name('shipment-f-show');
+                Route::get('/edit/{shipment}', [ShippmentF::class, 'edit'])->name('shipment-f-edit');
+                Route::put('/update/{shipment}', [ShippmentF::class, 'update'])->name('shipment-f-update');
+                Route::delete('/delete/{shipment}', [ShippmentF::class, 'destroy'])->name('shipment-f-delete');
+                Route::get('/print/{shipment}', [ShippmentF::class, 'print'])->name('shipment-f-print');
+                Route::get('/printone/{shipment}', [ShippmentF::class, 'printOne'])->name('shipment-f-printone');
             });
 
 
