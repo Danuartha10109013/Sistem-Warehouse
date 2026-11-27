@@ -217,18 +217,6 @@ class IdOdController extends Controller
         $validated['jumlah_od'] = (int) $validated['jumlah_od'];
         $validated['jumlah_od_ng'] = (int) ($validated['jumlah_od_ng'] ?? 0);
 
-        if ($validated['jumlah_id_ng'] > $validated['jumlah_id']) {
-            throw ValidationException::withMessages([
-                'jumlah_id_ng' => ['Jumlah ID NG tidak boleh melebihi Jumlah ID OK.'],
-            ]);
-        }
-
-        if ($validated['jumlah_od_ng'] > $validated['jumlah_od']) {
-            throw ValidationException::withMessages([
-                'jumlah_od_ng' => ['Jumlah OD NG tidak boleh melebihi Jumlah OD OK.'],
-            ]);
-        }
-
         return $validated;
     }
 

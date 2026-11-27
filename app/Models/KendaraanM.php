@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\LogsActivity;
 
 class KendaraanM extends Model
@@ -22,5 +23,10 @@ class KendaraanM extends Model
         'ket_kir', 'ket_masa_berlaku_kir', 'ket_surat_pengantar_ekspedisi', 
         'ket_segel', 'user_id','no_kontainer_foto','no_mobil_foto','jam','tanggal'
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
     
 }

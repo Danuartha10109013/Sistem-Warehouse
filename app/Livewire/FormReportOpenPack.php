@@ -69,7 +69,7 @@ class FormReportOpenPack extends Component
 
         // We search through checklist_data which is a JSON array
         $query = CrcM::whereNotNull('checklist_data')
-            ->where('checklist_data', 'like', '%' . $this->searchQuery . '%')
+            ->whereRaw('LOWER(checklist_data) LIKE ?', ['%' . mb_strtolower($this->searchQuery) . '%'])
             ->orderBy('id', 'desc')
             ->take(10)
             ->get();

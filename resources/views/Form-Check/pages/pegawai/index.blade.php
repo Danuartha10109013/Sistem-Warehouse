@@ -33,7 +33,7 @@
               <img src="{{asset('vendorfc/src/assets/images/dashboard/circle.svg')}}" class="card-img-absolute" alt="circle-image" />
               <h4 class="font-weight-normal mb-3">Total Form <i class="mdi mdi-chart-line mdi-24px float-end"></i>
               </h4>
-              <h2 class="mb-5">5</h2>
+              <h2 class="mb-5">7</h2>
               <h6 class="card-text">Crane, Forklift, Trailer, Eup, Material</h6>
             </div>
           </div>

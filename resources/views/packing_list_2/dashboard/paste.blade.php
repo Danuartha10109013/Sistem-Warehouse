@@ -31,6 +31,9 @@
                 Salin baris data langsung dari Microsoft Excel atau Spreadsheet lalu tempelkan ke area teks di bawah. Pastikan urutan 13 kolom:
                 <br>
                 <code class="fw-semibold text-primary" style="font-size: 12px;">Code Product &bull; Product Name &bull; <span class="badge bg-success-subtle text-success">Quantity</span> &bull; Unit &bull; <span class="badge bg-success-subtle text-success">Attribute</span> &bull; Storagen Bin &bull; Production &bull; No. SO &bull; <span class="badge bg-success-subtle text-success">Length</span> &bull; Time Scan &bull; Condition &bull; Loc &bull; Ket</code>
+                <div class="mt-2 text-muted" style="font-size: 11.5px;">
+                    <i class="ti ti-info-circle text-info me-1"></i> Kolom <strong>No. SO / Pengirim</strong>, <strong>Storagen Bin</strong>, dan <strong>Ket</strong> bersifat opsional (boleh kosong saat copas dari Excel).
+                </div>
             </p>
 
             <div class="mb-3">
@@ -108,7 +111,7 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
                                 </th>
                                 <th style="min-width: 130px;">Storagen Bin</th>
                                 <th style="min-width: 100px;">Production</th>
-                                <th style="min-width: 110px;">No. SO</th>
+                                <th style="min-width: 110px;">No. SO <span class="badge bg-secondary-subtle text-secondary fw-normal" style="font-size: 10px;">Opsional</span></th>
                                 <th style="min-width: 100px; background-color: #dcfce7; color: #166534;" class="border-success-subtle text-center">
                                     <i class="ti ti-check-circle me-1"></i>Length
                                 </th>
@@ -282,10 +285,18 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
             const ket = (r.keterangan || '').trim();
             let rit = null;
             if (/^\d+$/.test(ket)) {
-                rit = parseInt(ket, 10);
+                rit = String(parseInt(ket, 10));
             } else {
-                const m = ket.match(/rit\s*[-#:]?\s*(\d+)/i) || ket.match(/\b(\d+)\b/) || ket.match(/(\d+)/);
-                if (m) rit = parseInt(m[1], 10);
+                const mRit = ket.match(/rit\s*[-#:]?\s*([a-zA-Z0-9]+)/i);
+                if (mRit) {
+                    const val = mRit[1];
+                    rit = /^\d+$/.test(val) ? String(parseInt(val, 10)) : val.toUpperCase();
+                } else if (/^[a-zA-Z0-9]+$/.test(ket)) {
+                    rit = ket.toUpperCase();
+                } else {
+                    const mNum = ket.match(/\b(\d+)\b/) || ket.match(/(\d+)/);
+                    if (mNum) rit = String(parseInt(mNum[1], 10));
+                }
             }
             const ritPart = rit !== null ? `Rit ${rit}` : 'Tanpa Rit';
             const loc = (r.tujuan || r.loc || '').trim().toUpperCase() || 'Tanpa LOC';
@@ -400,9 +411,13 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
                 errors.push("NO COIL kosong.");
             }
 
-            const p = parseJsNumber(r.panjang);
-            if (isNaN(p) || p <= 0) errors.push("PANJANG harus > 0.");
-            else r.panjang = p;
+            if (r.panjang !== '' && r.panjang !== null && r.panjang !== undefined) {
+                const p = parseJsNumber(r.panjang);
+                if (isNaN(p) || p <= 0) errors.push("PANJANG harus > 0.");
+                else r.panjang = p;
+            } else {
+                r.panjang = null;
+            }
 
             if (!r.kondisi) errors.push("KONDISI kosong.");
             if (!r.tujuan) errors.push("TUJUAN kosong.");
@@ -411,8 +426,7 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
             const tgl = r.tanggal_display || r.tanggal;
             if (!tgl) errors.push("TANGGAL kosong.");
 
-            const tm = r.time_display || r.time;
-            if (!tm) errors.push("TIME kosong.");
+            // TIME opsional (boleh kosong)
 
             r.errors = errors;
             r.is_valid = errors.length === 0;
@@ -443,10 +457,18 @@ CPXC0431056165G35CL2-1008	0.43 x 1056mm AZ165 G350 CL2 NEXALUME® Clear Resin-10
             const ket = (r.keterangan || '').trim();
             let rit = null;
             if (/^\d+$/.test(ket)) {
-                rit = parseInt(ket, 10);
+                rit = String(parseInt(ket, 10));
             } else {
-                const m = ket.match(/rit\s*[-#:]?\s*(\d+)/i) || ket.match(/\b(\d+)\b/) || ket.match(/(\d+)/);
-                if (m) rit = parseInt(m[1], 10);
+                const mRit = ket.match(/rit\s*[-#:]?\s*([a-zA-Z0-9]+)/i);
+                if (mRit) {
+                    const val = mRit[1];
+                    rit = /^\d+$/.test(val) ? String(parseInt(val, 10)) : val.toUpperCase();
+                } else if (/^[a-zA-Z0-9]+$/.test(ket)) {
+                    rit = ket.toUpperCase();
+                } else {
+                    const mNum = ket.match(/\b(\d+)\b/) || ket.match(/(\d+)/);
+                    if (mNum) rit = String(parseInt(mNum[1], 10));
+                }
             }
             const key = rit !== null ? `Rit ${rit}` : 'Tanpa Rit';
             ritGroups[key] = (ritGroups[key] || 0) + 1;

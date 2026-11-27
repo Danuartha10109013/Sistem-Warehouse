@@ -192,12 +192,15 @@ class PackingList2Controller extends Controller
                 $rowErrors[] = "TANGGAL baris {$rowNum} tidak valid.";
             }
 
-            $cleanPanjang = $this->parser->parseNumber((string) $rawPanjang);
-            if ($cleanPanjang === null || $cleanPanjang <= 0) {
-                $rowErrors[] = "PANJANG baris {$rowNum} tidak valid (harus > 0).";
+            $cleanPanjang = null;
+            if ($rawPanjang !== null && trim((string) $rawPanjang) !== '' && (float) $rawPanjang !== 0.0) {
+                $cleanPanjang = $this->parser->parseNumber((string) $rawPanjang);
+                if ($cleanPanjang === null || $cleanPanjang <= 0) {
+                    $rowErrors[] = "PANJANG baris {$rowNum} tidak valid (harus > 0).";
+                }
             }
 
-            // Time bisa format Y-m-d H:i:s atau mm/dd/yyyy hh:mm:ss
+            // Time bisa format Y-m-d H:i:s atau mm/dd/yyyy hh:mm:ss (boleh kosong)
             $dtTime = null;
             if (!empty($rawTime)) {
                 if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $rawTime)) {
@@ -206,9 +209,9 @@ class PackingList2Controller extends Controller
                     $parsedTime = $this->parser->parseTime($rawTime);
                     $dtTime = $parsedTime ? $parsedTime->format('Y-m-d H:i:s') : null;
                 }
-            }
-            if (!$dtTime) {
-                $rowErrors[] = "TIME baris {$rowNum} tidak valid.";
+                if (!$dtTime) {
+                    $rowErrors[] = "TIME baris {$rowNum} tidak valid.";
+                }
             }
 
             if (empty($kondisi)) $rowErrors[] = "KONDISI baris {$rowNum} kosong.";
@@ -223,9 +226,9 @@ class PackingList2Controller extends Controller
                     'qty'         => $cleanQty,
                     'uom'         => $uom,
                     'no_coil'     => $noCoil,
-                    'storage_bin' => $storageBin,
+                    'storage_bin' => $storageBin !== '' ? $storageBin : null,
                     'tanggal'     => $dtTanggal,
-                    'pengirim'    => $pengirim,
+                    'pengirim'    => !empty($pengirim) ? $pengirim : null,
                     'panjang'     => $cleanPanjang,
                     'time'        => $dtTime,
                     'kondisi'     => $kondisi,
@@ -281,7 +284,9 @@ class PackingList2Controller extends Controller
                 // Buat kode batch berbasis tanggal, rit, dan tujuan
                 $parts = ["BATCH", $dateStr];
                 if ($rit !== null) {
-                    $padRit = str_pad($rit, 2, '0', STR_PAD_LEFT);
+                    $padRit = is_numeric($rit)
+                        ? str_pad((string) $rit, 2, '0', STR_PAD_LEFT)
+                        : strtoupper((string) $rit);
                     $parts[] = "RIT{$padRit}";
                 }
                 if ($tujuan !== null) {

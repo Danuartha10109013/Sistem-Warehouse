@@ -70,13 +70,22 @@ class AuthController extends Controller
         $rawType = json_decode($user->type, true);
         $userPermissions = is_array($rawType) ? $rawType : (empty($user->type) ? [] : [$user->type]);
 
-        // Cek apakah punya akses PL2 (atau 'all' atau admin)
+        // Cek apakah punya akses modul mobile (PL2 atau Coil Damage)
         $hasPL2 = in_array('all', $userPermissions) || in_array('PL2', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasCoilDamage = in_array('all', $userPermissions) || in_array('CD', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasRepacking = in_array('all', $userPermissions) || in_array('LR', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasIdOd = in_array('all', $userPermissions) || in_array('ID', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasSidewall = in_array('all', $userPermissions) || in_array('SW', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasLaporanPacking = in_array('all', $userPermissions) || in_array('LP', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasStockOpname = in_array('all', $userPermissions) || in_array('SO', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasReportOpenPack = in_array('all', $userPermissions) || in_array('OP', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasFormCheck = in_array('all', $userPermissions) || in_array('FC', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasKendaraan = in_array('all', $userPermissions) || in_array('CK', $userPermissions) || $user->role == 0 || $user->role == 5;
 
-        if (!$hasPL2) {
+        if (!$hasPL2 && !$hasCoilDamage && !$hasRepacking && !$hasIdOd && !$hasSidewall && !$hasFormCheck && !$hasLaporanPacking && !$hasStockOpname && !$hasReportOpenPack && !$hasKendaraan) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda tidak memiliki hak akses untuk modul Packing List 2.0.',
+                'message' => 'Anda tidak memiliki hak akses ke modul mobile.',
             ], 403);
         }
 
@@ -107,6 +116,87 @@ class AuthController extends Controller
                 'description' => 'Validasi & Scanner Koil Lapangan',
                 'icon'        => 'format_list_bulleted',
                 'is_active'   => true,
+            ];
+        }
+        if ($hasCoilDamage) {
+            $activeModules[] = [
+                'code' => 'CD',
+                'name' => 'Coil Damage',
+                'description' => 'Pelaporan kerusakan koil dengan foto',
+                'icon' => 'inventory_2',
+                'is_active' => true,
+            ];
+        }
+        if ($hasRepacking) {
+            $activeModules[] = [
+                'code' => 'LR',
+                'name' => 'Laporan Repacking',
+                'description' => 'Pelaporan repacking CRC',
+                'icon' => 'recycling',
+                'is_active' => true,
+            ];
+        }
+        foreach ([
+            ['code' => 'ID', 'name' => 'Laporan ID OD', 'description' => 'Pelaporan pemeriksaan ID dan OD', 'icon' => 'track_changes'],
+            ['code' => 'SW', 'name' => 'Laporan Sidewall', 'description' => 'Pelaporan pengiriman Sidewall', 'icon' => 'circle'],
+        ] as $module) {
+            $hasModule = $module['code'] === 'ID' ? $hasIdOd : $hasSidewall;
+            if ($hasModule) {
+                $activeModules[] = [...$module, 'is_active' => true];
+            }
+            if ($hasFormCheck) {
+                $activeModules[] = [
+                    'code' => 'FC',
+                    'name' => 'Form Check',
+                    'description' => 'Checklist Crane, Forklift, Trailler, EUP, dan Material',
+                    'icon' => 'check_box',
+                    'is_active' => true,
+                ];
+            }
+            if ($hasFormCheck) {
+                $activeModules[] = [
+                    'code' => 'FC',
+                    'name' => 'Form Check',
+                    'description' => 'Checklist Crane, Forklift, Trailer, EUP, dan Material',
+                    'icon' => 'check_box',
+                    'is_active' => true,
+                ];
+            }
+        }
+        if ($hasLaporanPacking) {
+            $activeModules[] = [
+                'code' => 'LP',
+                'name' => 'Laporan Packing',
+                'description' => 'Input laporan packing coil',
+                'icon' => 'inventory_2',
+                'is_active' => true,
+            ];
+        }
+        if ($hasStockOpname) {
+            $activeModules[] = [
+                'code' => 'SO',
+                'name' => 'Stock Opname',
+                'description' => 'Stock Opname Bahan Baku & Sparepart',
+                'icon' => 'inventory',
+                'is_active' => true,
+            ];
+        }
+        if ($hasReportOpenPack) {
+            $activeModules[] = [
+                'code' => 'OP',
+                'name' => 'Report Open Pack',
+                'description' => 'Inspeksi CRC sebelum dan setelah Open Pack',
+                'icon' => 'inventory_2',
+                'is_active' => true,
+            ];
+        }
+        if ($hasKendaraan) {
+            $activeModules[] = [
+                'code' => 'CK',
+                'name' => 'Checklist Kendaraan',
+                'description' => 'Pemeriksaan kendaraan, sopir, dokumen, dan segel',
+                'icon' => 'directions_car',
+                'is_active' => true,
             ];
         }
 
@@ -152,6 +242,14 @@ class AuthController extends Controller
         $rawType = json_decode($user->type, true);
         $userPermissions = is_array($rawType) ? $rawType : (empty($user->type) ? [] : [$user->type]);
         $hasPL2 = in_array('all', $userPermissions) || in_array('PL2', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasCoilDamage = in_array('all', $userPermissions) || in_array('CD', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasRepacking = in_array('all', $userPermissions) || in_array('LR', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasIdOd = in_array('all', $userPermissions) || in_array('ID', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasSidewall = in_array('all', $userPermissions) || in_array('SW', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasLaporanPacking = in_array('all', $userPermissions) || in_array('LP', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasStockOpname = in_array('all', $userPermissions) || in_array('SO', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasReportOpenPack = in_array('all', $userPermissions) || in_array('OP', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasKendaraan = in_array('all', $userPermissions) || in_array('CK', $userPermissions) || $user->role == 0 || $user->role == 5;
 
         $activeModules = [];
         if ($hasPL2) {
@@ -161,6 +259,69 @@ class AuthController extends Controller
                 'description' => 'Validasi & Scanner Koil Lapangan',
                 'icon'        => 'format_list_bulleted',
                 'is_active'   => true,
+            ];
+        }
+        if ($hasCoilDamage) {
+            $activeModules[] = [
+                'code' => 'CD',
+                'name' => 'Coil Damage',
+                'description' => 'Pelaporan kerusakan koil dengan foto',
+                'icon' => 'inventory_2',
+                'is_active' => true,
+            ];
+        }
+        if ($hasRepacking) {
+            $activeModules[] = [
+                'code' => 'LR',
+                'name' => 'Laporan Repacking',
+                'description' => 'Pelaporan repacking CRC',
+                'icon' => 'recycling',
+                'is_active' => true,
+            ];
+        }
+        foreach ([
+            ['code' => 'ID', 'name' => 'Laporan ID OD', 'description' => 'Pelaporan pemeriksaan ID dan OD', 'icon' => 'track_changes'],
+            ['code' => 'SW', 'name' => 'Laporan Sidewall', 'description' => 'Pelaporan pengiriman Sidewall', 'icon' => 'circle'],
+        ] as $module) {
+            $hasModule = $module['code'] === 'ID' ? $hasIdOd : $hasSidewall;
+            if ($hasModule) {
+                $activeModules[] = [...$module, 'is_active' => true];
+            }
+        }
+        if ($hasLaporanPacking) {
+            $activeModules[] = [
+                'code' => 'LP',
+                'name' => 'Laporan Packing',
+                'description' => 'Input laporan packing coil',
+                'icon' => 'inventory_2',
+                'is_active' => true,
+            ];
+        }
+        if ($hasStockOpname) {
+            $activeModules[] = [
+                'code' => 'SO',
+                'name' => 'Stock Opname',
+                'description' => 'Stock Opname Bahan Baku & Sparepart',
+                'icon' => 'inventory',
+                'is_active' => true,
+            ];
+        }
+        if ($hasReportOpenPack) {
+            $activeModules[] = [
+                'code' => 'OP',
+                'name' => 'Report Open Pack',
+                'description' => 'Inspeksi CRC sebelum dan setelah Open Pack',
+                'icon' => 'inventory_2',
+                'is_active' => true,
+            ];
+        }
+        if ($hasKendaraan) {
+            $activeModules[] = [
+                'code' => 'CK',
+                'name' => 'Checklist Kendaraan',
+                'description' => 'Pemeriksaan kendaraan, sopir, dokumen, dan segel',
+                'icon' => 'directions_car',
+                'is_active' => true,
             ];
         }
 

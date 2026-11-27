@@ -130,17 +130,18 @@ class PackingList2Parser
                 }
             }
 
-            // 7. Validasi PANJANG (angka > 0, hapus pemisah ribuan)
-            $cleanPanjang = $this->parseNumber($rawPanjang);
-            if ($cleanPanjang === null || $cleanPanjang <= 0) {
-                $errors[] = "PANJANG harus berupa angka lebih besar dari 0 (nilai: '{$rawPanjang}').";
+            // 7. Validasi PANJANG (angka > 0 jika diisi, boleh kosong)
+            $cleanPanjang = null;
+            if (trim((string) $rawPanjang) !== '') {
+                $cleanPanjang = $this->parseNumber($rawPanjang);
+                if ($cleanPanjang === null || $cleanPanjang <= 0) {
+                    $errors[] = "PANJANG harus berupa angka lebih besar dari 0 (nilai: '{$rawPanjang}').";
+                }
             }
 
-            // 8. Validasi TIME format mm/dd/yyyy hh:mm:ss
+            // 8. Validasi TIME format mm/dd/yyyy hh:mm:ss (boleh kosong)
             $formattedTime = null;
-            if (empty($rawTime)) {
-                $errors[] = "TIME wajib diisi.";
-            } else {
+            if (!empty($rawTime)) {
                 $formattedTime = $this->parseTime($rawTime);
                 if (!$formattedTime) {
                     $errors[] = "Format TIME harus mm/dd/yyyy hh:mm:ss (contoh: 10/15/2026 10:54:23, nilai: '{$rawTime}').";
@@ -182,8 +183,8 @@ class PackingList2Parser
                 'tanggal'           => $formattedTanggal ? $formattedTanggal->format('Y-m-d') : null,
                 'tanggal_display'   => $formattedTanggal ? $formattedTanggal->format('d/m/Y') : $rawTanggal,
                 'production'        => $formattedTanggal ? $formattedTanggal->format('d/m/Y') : $rawTanggal,
-                'pengirim'          => $pengirim,
-                'no_so'             => $pengirim,
+                'pengirim'          => !empty($pengirim) ? $pengirim : null,
+                'no_so'             => !empty($pengirim) ? $pengirim : null,
                 'panjang'           => $cleanPanjang ?? 0,
                 'length'            => $cleanPanjang ?? 0,
                 'panjang_raw'       => $rawPanjang,
@@ -239,8 +240,13 @@ class PackingList2Parser
             return (string) ((int) $keterangan);
         }
 
-        if (preg_match('/rit\s*[-#:]?\s*(\d+)/i', $keterangan, $matches)) {
-            return (string) ((int) $matches[1]);
+        if (preg_match('/rit\s*[-#:]?\s*([a-zA-Z0-9]+)/i', $keterangan, $matches)) {
+            $val = $matches[1];
+            return ctype_digit($val) ? (string) ((int) $val) : strtoupper($val);
+        }
+
+        if (preg_match('/^[a-zA-Z0-9]+$/', $keterangan)) {
+            return strtoupper($keterangan);
         }
 
         if (preg_match('/\b(\d+)\b/', $keterangan, $matches)) {

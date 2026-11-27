@@ -561,7 +561,6 @@
                             <p class="small text-muted mb-0">
                                 <i class="fas fa-info-circle me-1"></i>
                                 Minimal salah satu jumlah <strong>ID OK</strong> atau <strong>OD OK</strong> harus lebih dari 0.
-                                Jumlah NG tidak boleh melebihi jumlah OK pada bagian yang sama.
                             </p>
                         </div>
                     </div>
@@ -822,12 +821,8 @@
     }
 
     function syncNgMaxLimits() {
-        const idOk = parseInt(el('idodJumlahId').value, 10) || 0;
-        const odOk = parseInt(el('idodJumlahOd').value, 10) || 0;
-        el('idodJumlahIdNg').max = idOk;
-        el('idodJumlahOdNg').max = odOk;
-        if (parseInt(el('idodJumlahIdNg').value, 10) > idOk) el('idodJumlahIdNg').value = idOk;
-        if (parseInt(el('idodJumlahOdNg').value, 10) > odOk) el('idodJumlahOdNg').value = odOk;
+        el('idodJumlahIdNg').removeAttribute('max');
+        el('idodJumlahOdNg').removeAttribute('max');
     }
 
     function resetIdodForm() {
@@ -851,8 +846,6 @@
         const jumlahIdNg = parseInt(el('idodJumlahIdNg').value, 10) || 0;
         const jumlahOdNg = parseInt(el('idodJumlahOdNg').value, 10) || 0;
 
-        el('idodJumlahIdNg').classList.toggle('is-invalid', jumlahIdNg > jumlahId);
-        el('idodJumlahOdNg').classList.toggle('is-invalid', jumlahOdNg > jumlahOd);
 
         if (!el('idodDate').value) errors.push('Tanggal wajib diisi.');
         if (!el('idodShift').value) errors.push('Shift wajib dipilih.');
@@ -860,8 +853,6 @@
         if (!el('idodSizeId').value.trim()) errors.push('Size ID wajib diisi.');
         if (!el('idodSizeOd').value.trim()) errors.push('Size OD wajib diisi.');
         if (jumlahId + jumlahOd < 1) errors.push('Minimal salah satu jumlah ID OK atau OD OK harus lebih dari 0.');
-        if (jumlahIdNg > jumlahId) errors.push('Jumlah ID NG tidak boleh melebihi Jumlah ID OK.');
-        if (jumlahOdNg > jumlahOd) errors.push('Jumlah OD NG tidak boleh melebihi Jumlah OD OK.');
 
         if (errors.length) {
             showFormErrors(errors.map((m) => `<div>${escapeHtml(m)}</div>`).join(''));

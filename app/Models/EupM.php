@@ -26,6 +26,7 @@ class EupM extends Model
         'action',
         'foto7',
         'kaba_asimetris',
+        'kaba_simetris',
         'kaba_simteris',
         'papan_patah',
         'papan_pecah',
