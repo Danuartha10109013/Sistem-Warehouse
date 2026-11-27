@@ -185,6 +185,10 @@
                                                                                 <label class="form-check-label">Open Packing</label>
                                                                             </div>
                                                                             <div class="form-check mb-2">
+                                                                                <input class="form-check-input shadow-sm edit-type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="ROP" {{ in_array('ROP', json_decode($d->type, true) ?? []) ? 'checked' : '' }}>
+                                                                                <label class="form-check-label">Report Open Pack</label>
+                                                                            </div>
+                                                                            <div class="form-check mb-2">
                                                                                 <input class="form-check-input shadow-sm edit-type-checkbox all-role" type="checkbox" name="type[]" value="SB" {{ in_array('SB', json_decode($d->type, true) ?? []) ? 'checked' : '' }}>
                                                                                 <label class="form-check-label">Supply Bahan</label>
                                                                             </div>
@@ -379,6 +383,10 @@
                                             <div class="form-check mb-2">
                                                 <input class="form-check-input shadow-sm type-checkbox all-role" type="checkbox" name="type[]" value="OP" id="typeOP">
                                                 <label class="form-check-label" for="typeOP">Open Packing</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input shadow-sm type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="ROP" id="typeROP">
+                                                <label class="form-check-label" for="typeROP">Report Open Pack</label>
                                             </div>
                                             <div class="form-check mb-2">
                                                 <input class="form-check-input shadow-sm type-checkbox all-role" type="checkbox" name="type[]" value="SB" id="typeSB">

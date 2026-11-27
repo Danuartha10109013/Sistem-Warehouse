@@ -410,7 +410,7 @@
                   </div>
                </a>
             @endif
-            @if (in_array('all', $akses) || in_array('OP', $akses))
+            @if (in_array('all', $akses) || in_array('ROP', $akses))
                <a href="{{ route('report-open-pack') }}" class="menu-item">
                   <div>
                      <i class="mdi mdi-note"></i>

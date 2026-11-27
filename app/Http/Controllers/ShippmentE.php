@@ -194,4 +194,10 @@ class ShippmentE extends Controller
         }
 
     }
+
+    public function destroyBySo(string $type)
+    {
+        ShipE::where('no_so', $type)->delete();
+        return redirect()->back()->with('success', "Semua data NO SO {$type} berhasil dihapus.");
+    }
 }

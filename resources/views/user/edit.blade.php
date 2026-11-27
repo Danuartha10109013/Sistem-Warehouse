@@ -117,6 +117,11 @@
           <label class="form-check-label" for="typeOP">Open Packing</label>
         </div>
         <div class="form-check">
+          <input class="form-check-input type-checkbox all-role pegawai-only" type="checkbox" name="type[]" value="ROP" id="typeROP"
+            {{ in_array('ROP', json_decode($data->type, true) ?? []) ? 'checked' : '' }}>
+          <label class="form-check-label" for="typeROP">Report Open Pack</label>
+        </div>
+        <div class="form-check">
           <input class="form-check-input type-checkbox all-role" type="checkbox" name="type[]" value="SB" id="typeSB"
             {{ in_array('SB', json_decode($data->type, true) ?? []) ? 'checked' : '' }}>
           <label class="form-check-label" for="typeSB">Supply Bahan</label>

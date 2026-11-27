@@ -56,6 +56,7 @@
                                         "MP" => "Mapping",
                                         "FC" => "Form Check",
                                         "OP" => "Open Packing",
+                                        "ROP" => "Report Open Pack",
                                         "PL" => "Packing List",
                                         // "CK" => "Checklist Kendaraan",
                                         "SL" => "Scan Layout",

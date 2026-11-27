@@ -78,7 +78,7 @@ class AuthController extends Controller
         $hasSidewall = in_array('all', $userPermissions) || in_array('SW', $userPermissions) || $user->role == 0 || $user->role == 5;
         $hasLaporanPacking = in_array('all', $userPermissions) || in_array('LP', $userPermissions) || $user->role == 0 || $user->role == 5;
         $hasStockOpname = in_array('all', $userPermissions) || in_array('SO', $userPermissions) || $user->role == 0 || $user->role == 5;
-        $hasReportOpenPack = in_array('all', $userPermissions) || in_array('OP', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasReportOpenPack = in_array('all', $userPermissions) || in_array('ROP', $userPermissions) || $user->role == 0 || $user->role == 5;
         $hasFormCheck = in_array('all', $userPermissions) || in_array('FC', $userPermissions) || $user->role == 0 || $user->role == 5;
         $hasKendaraan = in_array('all', $userPermissions) || in_array('CK', $userPermissions) || $user->role == 0 || $user->role == 5;
 
@@ -248,7 +248,7 @@ class AuthController extends Controller
         $hasSidewall = in_array('all', $userPermissions) || in_array('SW', $userPermissions) || $user->role == 0 || $user->role == 5;
         $hasLaporanPacking = in_array('all', $userPermissions) || in_array('LP', $userPermissions) || $user->role == 0 || $user->role == 5;
         $hasStockOpname = in_array('all', $userPermissions) || in_array('SO', $userPermissions) || $user->role == 0 || $user->role == 5;
-        $hasReportOpenPack = in_array('all', $userPermissions) || in_array('OP', $userPermissions) || $user->role == 0 || $user->role == 5;
+        $hasReportOpenPack = in_array('all', $userPermissions) || in_array('ROP', $userPermissions) || $user->role == 0 || $user->role == 5;
         $hasKendaraan = in_array('all', $userPermissions) || in_array('CK', $userPermissions) || $user->role == 0 || $user->role == 5;
 
         $activeModules = [];

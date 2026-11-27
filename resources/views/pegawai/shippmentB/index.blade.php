@@ -93,10 +93,20 @@ Shippment B || Pegawai
                                             <a class="btn btn-primary" href="{{route('Ship-Mark.admin.shipment-b-show',$d->type)}}">
                                                 <i class="ri-eye-line"></i>Show
                                             </a>
+                                            <form action="{{ route('Ship-Mark.admin.shipment-b-delete-so', $d->type) }}" method="POST" class="d-inline" onsubmit="return confirmDeleteSo(event, this, '{{ $d->type }}')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger"><i class="ri-delete-bin-line"></i>Delete</button>
+                                            </form>
                                         @else
                                             <a class="btn btn-primary" href="{{route('Ship-Mark.pegawai.shipment-b-show',$d->type)}}">
                                                 <i class="ri-eye-line"></i>Show
                                             </a>
+                                            <form action="{{ route('Ship-Mark.pegawai.shipment-b-delete-so', $d->type) }}" method="POST" class="d-inline" onsubmit="return confirmDeleteSo(event, this, '{{ $d->type }}')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger"><i class="ri-delete-bin-line"></i>Delete</button>
+                                            </form>
                                         @endif
                                         </td> 
                                     </tr>
@@ -113,4 +123,25 @@ Shippment B || Pegawai
            </div>
         </div>
      </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmDeleteSo(e, form, noSo) {
+    e.preventDefault();
+    Swal.fire({
+        title: 'Hapus NO SO?',
+        text: 'Semua data pada NO SO ' + noSo + ' akan dihapus permanen.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+    return false;
+}
+</script>
 @endsection

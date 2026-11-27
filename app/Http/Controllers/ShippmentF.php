@@ -112,4 +112,10 @@ class ShippmentF extends Controller
 
         return view('pegawai.shippmentf.print', compact('data'));
     }
+
+    public function destroyBySo(string $type)
+    {
+        ShipF::where('no_so', $type)->delete();
+        return redirect()->back()->with('success', "Semua data NO SO {$type} berhasil dihapus.");
+    }
 }

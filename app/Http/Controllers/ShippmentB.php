@@ -185,4 +185,10 @@ class ShippmentB extends Controller
             return redirect()->route('Ship-Mark.pegawai.shipment-b')->with('success', 'Shippmenta deleted successfully');
         }
     }
+
+    public function destroyBySo(string $type)
+    {
+        ShipB::where('type', $type)->delete();
+        return redirect()->back()->with('success', "Semua data NO SO {$type} berhasil dihapus.");
+    }
 }

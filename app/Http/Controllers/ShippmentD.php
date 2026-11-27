@@ -184,4 +184,10 @@ class ShippmentD extends Controller
         }
 
     }
+
+    public function destroyBySo(string $type)
+    {
+        ShipD::where('type', $type)->delete();
+        return redirect()->back()->with('success', "Semua data NO SO {$type} berhasil dihapus.");
+    }
 }

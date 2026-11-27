@@ -458,6 +458,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[ShippmentA::class,'update'])->name('shipment-a-update');
                 Route::get('/delete/{id}',[ShippmentA::class,'destroy'])->name('shipment-a-delete');
                 Route::delete('/deleteA/{type}',[ShippmentA::class,'destroyA'])->name('shipment-a-deleteA');
+                Route::delete('/delete-so/{type}',[ShippmentA::class,'destroyBySo'])->name('shipment-a-delete-so');
                 Route::get('/show/{id}',[ShippmentA::class,'show'])->name('shipment-a-show');
                 Route::get('/print/{id}',[ShippmentA::class,'print'])->name('shipment-a-print');
                 Route::get('/printone/{id}',[ShippmentA::class,'printone'])->name('shipment-a-printone');
@@ -472,6 +473,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[ShippmentB::class,'update'])->name('shipment-b-update');
                 Route::get('/delete/{id}',[ShippmentB::class,'destroy'])->name('shipment-b-delete');
                 Route::delete('/deleteA/{type}',[ShippmentB::class,'destroyA'])->name('shipment-b-deleteA');
+                Route::delete('/delete-so/{type}',[ShippmentB::class,'destroyBySo'])->name('shipment-b-delete-so');
                 Route::get('/show/{id}',[ShippmentB::class,'show'])->name('shipment-b-show');
                 Route::get('/print/{id}',[ShippmentB::class,'print'])->name('shipment-b-print');
                 Route::get('/printone/{id}',[ShippmentB::class,'printone'])->name('shipment-b-printone');
@@ -486,6 +488,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[ShippmentC::class,'update'])->name('shipment-c-update');
                 Route::get('/delete/{id}',[ShippmentC::class,'destroy'])->name('shipment-c-delete');
                 Route::delete('/deleteA/{type}',[ShippmentC::class,'destroyA'])->name('shipment-c-deleteA');
+                Route::delete('/delete-so/{type}',[ShippmentC::class,'destroyBySo'])->name('shipment-c-delete-so');
                 Route::get('/show/{id}',[ShippmentC::class,'show'])->name('shipment-c-show');
                 Route::get('/print/{id}',[ShippmentC::class,'print'])->name('shipment-c-print');
                 Route::get('/printone/{id}',[ShippmentC::class,'printone'])->name('shipment-c-printone');
@@ -500,6 +503,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[ShippmentD::class,'update'])->name('shipment-d-update');
                 Route::get('/delete/{id}',[ShippmentD::class,'destroy'])->name('shipment-d-delete');
                 Route::delete('/deleteA/{type}',[ShippmentD::class,'destroyA'])->name('shipment-d-deleteA');
+                Route::delete('/delete-so/{type}',[ShippmentD::class,'destroyBySo'])->name('shipment-d-delete-so');
                 Route::get('/show/{id}',[ShippmentD::class,'show'])->name('shipment-d-show');
                 Route::get('/print/{id}',[ShippmentD::class,'print'])->name('shipment-d-print');
                 Route::get('/printone/{id}',[ShippmentD::class,'printone'])->name('shipment-d-printone');
@@ -514,6 +518,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[ShippmentE::class,'update'])->name('shipment-e-update');
                 Route::get('/delete/{id}',[ShippmentE::class,'destroy'])->name('shipment-e-delete');
                 Route::delete('/deleteA/{type}',[ShippmentE::class,'destroyA'])->name('shipment-e-deleteA');
+                Route::delete('/delete-so/{type}',[ShippmentE::class,'destroyBySo'])->name('shipment-e-delete-so');
                 Route::get('/show/{id}',[ShippmentE::class,'show'])->name('shipment-e-show');
                 Route::get('/print/{id}',[ShippmentE::class,'print'])->name('shipment-e-print');
                 Route::get('/printone/{id}',[ShippmentE::class,'printone'])->name('shipment-e-printone');
@@ -529,6 +534,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/edit/{shipment}', [ShippmentF::class, 'edit'])->name('shipment-f-edit');
                 Route::put('/update/{shipment}', [ShippmentF::class, 'update'])->name('shipment-f-update');
                 Route::delete('/delete/{shipment}', [ShippmentF::class, 'destroy'])->name('shipment-f-delete');
+                Route::delete('/delete-so/{type}', [ShippmentF::class, 'destroyBySo'])->name('shipment-f-delete-so');
                 Route::get('/print/{shipment}', [ShippmentF::class, 'print'])->name('shipment-f-print');
                 Route::get('/printone/{shipment}', [ShippmentF::class, 'printOne'])->name('shipment-f-printone');
             });
@@ -548,6 +554,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[ShippmentA::class,'update'])->name('shipment-a-update');
                 Route::get('/delete/{id}',[ShippmentA::class,'destroy'])->name('shipment-a-delete');
                 Route::delete('/deleteA/{type}',[ShippmentA::class,'destroyA'])->name('shipment-a-deleteA');
+                Route::delete('/delete-so/{type}',[ShippmentA::class,'destroyBySo'])->name('shipment-a-delete-so');
                 Route::get('/show/{id}',[ShippmentA::class,'show'])->name('shipment-a-show');
                 Route::get('/print/{id}',[ShippmentA::class,'print'])->name('shipment-a-print');
                 Route::get('/printone/{id}',[ShippmentA::class,'printone'])->name('shipment-a-printone');
@@ -562,6 +569,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[ShippmentB::class,'update'])->name('shipment-b-update');
                 Route::get('/delete/{id}',[ShippmentB::class,'destroy'])->name('shipment-b-delete');
                 Route::delete('/deleteA/{type}',[ShippmentB::class,'destroyA'])->name('shipment-b-deleteA');
+                Route::delete('/delete-so/{type}',[ShippmentB::class,'destroyBySo'])->name('shipment-b-delete-so');
                 Route::get('/show/{id}',[ShippmentB::class,'show'])->name('shipment-b-show');
                 Route::get('/print/{id}',[ShippmentB::class,'print'])->name('shipment-b-print');
                 Route::get('/printone/{id}',[ShippmentB::class,'printone'])->name('shipment-b-printone');
@@ -576,6 +584,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[ShippmentC::class,'update'])->name('shipment-c-update');
                 Route::get('/delete/{id}',[ShippmentC::class,'destroy'])->name('shipment-c-delete');
                 Route::delete('/deleteA/{type}',[ShippmentC::class,'destroyA'])->name('shipment-c-deleteA');
+                Route::delete('/delete-so/{type}',[ShippmentC::class,'destroyBySo'])->name('shipment-c-delete-so');
                 Route::get('/show/{id}',[ShippmentC::class,'show'])->name('shipment-c-show');
                 Route::get('/print/{id}',[ShippmentC::class,'print'])->name('shipment-c-print');
                 Route::get('/printone/{id}',[ShippmentC::class,'printone'])->name('shipment-c-printone');
@@ -590,6 +599,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::put('/update/{id}',[ShippmentD::class,'update'])->name('shipment-d-update');
                 Route::get('/delete/{id}',[ShippmentD::class,'destroy'])->name('shipment-d-delete');
                 Route::delete('/deleteA/{type}',[ShippmentD::class,'destroyA'])->name('shipment-d-deleteA');
+                Route::delete('/delete-so/{type}',[ShippmentD::class,'destroyBySo'])->name('shipment-d-delete-so');
                 Route::get('/show/{id}',[ShippmentD::class,'show'])->name('shipment-d-show');
                 Route::get('/print/{id}',[ShippmentD::class,'print'])->name('shipment-d-print');
                 Route::get('/printone/{id}',[ShippmentD::class,'printone'])->name('shipment-d-printone');
@@ -606,6 +616,7 @@ Route::middleware([AutoLogout::class])->group(function () {
                 Route::get('/edit/{shipment}', [ShippmentF::class, 'edit'])->name('shipment-f-edit');
                 Route::put('/update/{shipment}', [ShippmentF::class, 'update'])->name('shipment-f-update');
                 Route::delete('/delete/{shipment}', [ShippmentF::class, 'destroy'])->name('shipment-f-delete');
+                Route::delete('/delete-so/{type}', [ShippmentF::class, 'destroyBySo'])->name('shipment-f-delete-so');
                 Route::get('/print/{shipment}', [ShippmentF::class, 'print'])->name('shipment-f-print');
                 Route::get('/printone/{shipment}', [ShippmentF::class, 'printOne'])->name('shipment-f-printone');
             });

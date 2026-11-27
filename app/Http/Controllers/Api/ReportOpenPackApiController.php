@@ -297,7 +297,7 @@ class ReportOpenPackApiController extends Controller
         $permissions = json_decode((string) $user->type, true);
         $permissions = is_array($permissions) ? $permissions : [$user->type];
 
-        if (in_array((int) $user->role, [0, 5], true) || in_array('all', $permissions, true) || in_array('OP', $permissions, true)) {
+        if (in_array((int) $user->role, [0, 5], true) || in_array('all', $permissions, true) || in_array('ROP', $permissions, true)) {
             return null;
         }
 
