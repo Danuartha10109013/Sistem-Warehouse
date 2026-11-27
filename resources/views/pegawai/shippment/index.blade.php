@@ -59,7 +59,6 @@ Shippment A || Pegawai
                         <button type="submit" class="btn btn-success">Save</button>
                     </form>
 
-
                     
                 </div>
                 
@@ -70,62 +69,61 @@ Shippment A || Pegawai
                           <h4 class="card-title">Shippment A</h4>
                        </div>
                     </div>
+
+                    {{-- Search Bar --}}
                     <div class="iq-card-body d-flex justify-content-between align-items-center">
-                        <p>All data of Shipment type A 
-                            <a href="{{ route('download.file', ['file' => 'ShippmentA.xlsx']) }}">
-                                Download Template
-                            </a>
+                        <p class="mb-0">All data of Shipment type A
+                            <a href="{{ route('download.file', ['file' => 'ShippmentA.xlsx']) }}">Download Template</a>
                         </p>
                         @if (Auth::user()->role == 0)
-                        <form class="form-inline" method="GET" action="{{ route('Ship-Mark.admin.shipment-a') }}">
+                        <form class="d-flex align-items-center" method="GET" action="{{ route('Ship-Mark.admin.shipment-a') }}">
                         @else
-                        <form class="form-inline" method="GET" action="{{ route('Ship-Mark.pegawai.shipment-a') }}">
-                        @endif    <div class="input-group">
-                                <input type="text" name="search" class="form-control" value="{{$search}}" placeholder="Search by no SO">
+                        <form class="d-flex align-items-center" method="GET" action="{{ route('Ship-Mark.pegawai.shipment-a') }}">
+                        @endif
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" value="{{ $search ?? '' }}"
+                                    placeholder="Search by no SO">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="submit">Search</button>
                                 </div>
                             </div>
                         </form>
                     </div>
-                    
-                    </p>
-                       <table class="table">
-                          <thead>
-                             <tr>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">No SO</th>
                                 <th scope="col">Action</th>
-                             </tr>
-                          </thead>
-                          <tbody>
-                            @if (empty($data) || $data->isEmpty())
-                                <tr>
-                                    <td colspan="8" class="text-center">Data Tidak Ada</td>
-                                </tr>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if ($data->isEmpty())
+                                <tr><td colspan="3" class="text-center">Data Tidak Ada</td></tr>
                             @else
                                 @foreach ($data as $d)
                                     <tr>
-                                        <th>{{$loop->iteration}}</th>
-                                        <td>{{$d->type}}</td>
-                                        <td >
+                                        <th>{{ $loop->iteration }}</th>
+                                        <td>{{ $d->type }}</td>
+                                        <td>
                                             @if (Auth::user()->role == 0)
-                                            <a class="btn btn-primary" href="{{route('Ship-Mark.admin.shipment-a-show',$d->type)}}">
-                                                <i class="ri-eye-line"></i>Show
+                                            <a class="btn btn-primary" href="{{ route('Ship-Mark.admin.shipment-a-show', $d->type) }}">
+                                                <i class="ri-eye-line"></i> Show
                                             </a>
                                             <form action="{{ route('Ship-Mark.admin.shipment-a-delete-so', $d->type) }}" method="POST" class="d-inline" onsubmit="return confirmDeleteSo(event, this, '{{ $d->type }}')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger"><i class="ri-delete-bin-line"></i>Delete</button>
+                                                <button type="submit" class="btn btn-danger"><i class="ri-delete-bin-line"></i> Delete</button>
                                             </form>
                                             @else
-                                            <a class="btn btn-primary" href="{{route('Ship-Mark.pegawai.shipment-a-show',$d->type)}}">
-                                                <i class="ri-eye-line"></i>Show
+                                            <a class="btn btn-primary" href="{{ route('Ship-Mark.pegawai.shipment-a-show', $d->type) }}">
+                                                <i class="ri-eye-line"></i> Show
                                             </a>
                                             <form action="{{ route('Ship-Mark.pegawai.shipment-a-delete-so', $d->type) }}" method="POST" class="d-inline" onsubmit="return confirmDeleteSo(event, this, '{{ $d->type }}')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger"><i class="ri-delete-bin-line"></i>Delete</button>
+                                                <button type="submit" class="btn btn-danger"><i class="ri-delete-bin-line"></i> Delete</button>
                                             </form>
                                             @endif
                                         </td>
@@ -133,8 +131,8 @@ Shippment A || Pegawai
                                 @endforeach
                             @endif
                         </tbody>
-                        
-                        </table>
+                    </table>
+
                     </div>
                  </div>
                  

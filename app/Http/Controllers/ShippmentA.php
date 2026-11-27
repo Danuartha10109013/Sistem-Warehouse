@@ -14,19 +14,15 @@ class ShippmentA extends Controller
 {
     public function index(Request $request)
     {
-        // Get the search query from the request
+        // [TAG: FILTER AWAL]
         $search = $request->input('search');
 
-        // Check if there's a search query, if so filter based on the 'type' field
-        if ($search) {
-            $data = ShipA::where('type', 'LIKE', '%' . $search . '%')->select('type')->distinct()->get();
-        } else {
-            // If no search query, retrieve distinct 'type' values
-            $data = ShipA::select('type')->distinct()->get();
-        }
+        // [TAG: SEARCH BY NO SO] Query distinct type (No SO)
+        $data = $search
+            ? ShipA::where('type', 'LIKE', '%' . $search . '%')->select('type')->distinct()->get()
+            : ShipA::select('type')->distinct()->get();
 
-        // Return the view with the filtered or default data
-        return view('pegawai.shippment.index', compact('data','search'));
+        return view('pegawai.shippment.index', compact('data', 'search'));
     }
 
 

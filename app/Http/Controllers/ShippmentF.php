@@ -32,7 +32,7 @@ class ShippmentF extends Controller
     {
         $search = $request->input('search', '');
         $groups = ShipF::query()
-            ->when($search !== '', fn ($query) => $query->where('no_so', 'like', "%{$search}%"))
+            ->when($search !== '', fn($query) => $query->where('no_so', 'like', "%{$search}%"))
             ->selectRaw('MIN(id) as id, no_so')
             ->groupBy('no_so')
             ->orderBy('no_so')
@@ -70,7 +70,7 @@ class ShippmentF extends Controller
     {
         $search = $request->input('search', '');
         $data = ShipF::where('no_so', $shipment->no_so)
-            ->when($search !== '', fn ($query) => $query->where('reference', 'like', "%{$search}%"))
+            ->when($search !== '', fn($query) => $query->where('reference', 'like', "%{$search}%"))
             ->orderBy('id')->get();
 
         return view('pegawai.shippmentf.show', compact('shipment', 'data', 'search'));

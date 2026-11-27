@@ -53,26 +53,27 @@
                             <h4 class="card-title">Shippment C</h4>
                         </div>
                     </div>
-                    <div class="iq-card-body d-flex justify-content-between align-items-center">
-                        <p>All data of Shipment type C
-                            <a href="{{ route('download.file', ['file' => 'ShippmentC.xlsx']) }}">
-                                Download Template
-                            </a>
-                        </p>
-                        @if (Auth::user()->role == 0)
-                            <form class="form-inline" method="GET" action="{{ route('Ship-Mark.admin.shipment-c') }}">
-                        @else
+                    <div class="iq-card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <p class="mb-0">All data of Shipment type C
+                                <a href="{{ route('download.file', ['file' => 'ShippmentC.xlsx']) }}">
+                                    Download Template
+                                </a>
+                            </p>
+                            @if (Auth::user()->role == 0)
+                                <form class="form-inline" method="GET" action="{{ route('Ship-Mark.admin.shipment-c') }}">
+                            @else
                                 <form class="form-inline" method="GET" action="{{ route('Ship-Mark.pegawai.shipment-c') }}">
                             @endif
                                 <div class="input-group">
-                                    <input type="text" name="search" class="form-control" value="{{$search}}"
+                                    <input type="text" name="search" class="form-control" value="{{ $search ?? '' }}"
                                         placeholder="Search by no SO">
                                     <div class="input-group-append">
                                         <button class="btn btn-primary" type="submit">Search</button>
                                     </div>
                                 </div>
                             </form>
-                    </div>
+                        </div>
                     <table class="table">
                         <thead>
                             <tr>
@@ -84,7 +85,7 @@
                         <tbody>
                             @if (empty($data) || $data->isEmpty())
                                 <tr>
-                                    <td colspan="8" class="text-center">Data Tidak Ada</td>
+                                    <td colspan="3" class="text-center">Data Tidak Ada</td>
                                 </tr>
                             @else
                                 @foreach ($data as $d)
@@ -93,7 +94,8 @@
                                         <td>{{$d->type}}</td>
                                         <td>
                                             @if (Auth::user()->role == 0)
-                                                <a class="btn btn-primary" href="{{route('Ship-Mark.admin.shipment-c-show', $d->type)}}">
+                                                <a class="btn btn-primary"
+                                                    href="{{route('Ship-Mark.admin.shipment-c-show', $d->type)}}">
                                                     <i class="ri-eye-line"></i>Show
                                                 </a>
                                                 <form action="{{ route('Ship-Mark.admin.shipment-c-delete-so', $d->type) }}"

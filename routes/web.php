@@ -32,6 +32,7 @@ use App\Http\Controllers\ShippmentC;
 use App\Http\Controllers\ShippmentD;
 use App\Http\Controllers\ShippmentE;
 use App\Http\Controllers\ShippmentF;
+use App\Http\Controllers\ShipmarkSearchController;
 use App\Http\Controllers\SIKController;
 use App\Http\Controllers\SupplyController;
 use App\Http\Controllers\TraillerController;
@@ -448,6 +449,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::group(['prefix' => 'admin', 'middleware' => ['admin'], 'as' => 'admin.'], function () {
 
             Route::get('/',[DashboardControlller::class, 'index'])->name('dashboard');
+            Route::get('/search-atribute', [ShipmarkSearchController::class, 'index'])->name('search-atribute');
 
             //A
             Route::prefix('ShipmentA')->group(function () {
@@ -544,6 +546,7 @@ Route::middleware([AutoLogout::class])->group(function () {
         Route::group(['prefix' => 'pegawai', 'middleware' => ['pegawai'], 'as' => 'pegawai.'], function () {
 
             Route::get('/',[DashboardControlller::class, 'index'])->name('dashboard');
+            Route::get('/search-atribute', [ShipmarkSearchController::class, 'index'])->name('search-atribute');
 
             //A
             Route::prefix('ShipmentA')->group(function () {

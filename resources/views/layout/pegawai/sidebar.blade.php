@@ -46,6 +46,11 @@
           </li>
           <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Shippment</span></li>
           @if (Auth::user()->role == 0)
+          <li class="{{ request()->routeIs('Ship-Mark.admin.search-atribute') ? 'active' : '' }}">
+              <a href="{{ route('Ship-Mark.admin.search-atribute') }}" class="iq-waves-effect" aria-expanded="false">
+                  <i class="ri-search-line"></i><span>Cari Atribute</span>
+              </a>
+          </li>
           <li><a href="{{route('Ship-Mark.admin.shipment-a')}}" class="iq-waves-effect iq-bg-primary" aria-expanded="false"><i>A</i><span>SHIPPMENT A</span></a></li>
           <li><a href="{{route('Ship-Mark.admin.shipment-b')}}" class="iq-waves-effect iq-bg-danger" aria-expanded="false"><i>B</i><span>SHIPPMENT B</span></a></li>
           <li><a href="{{route('Ship-Mark.admin.shipment-c')}}" class="iq-waves-effect iq-bg-warning" aria-expanded="false"><i>C</i><span>SHIPPMENT C</span></a></li>
@@ -53,6 +58,11 @@
           <li><a href="{{route('Ship-Mark.admin.shipment-e')}}" class="iq-waves-effect iq-bg-dark" aria-expanded="false"><i>E</i><span>SHIPPMENT E</span></a></li>
           <li><a href="{{route('Ship-Mark.admin.shipment-f')}}" class="iq-waves-effect iq-bg-dark" aria-expanded="false"><i>F</i><span>SHIPMENT F</span></a></li>
           @else
+          <li class="{{ request()->routeIs('Ship-Mark.pegawai.search-atribute') ? 'active' : '' }}">
+              <a href="{{ route('Ship-Mark.pegawai.search-atribute') }}" class="iq-waves-effect" aria-expanded="false">
+                  <i class="ri-search-line"></i><span>Cari Atribute</span>
+              </a>
+          </li>
           <li><a href="{{route('Ship-Mark.pegawai.shipment-a')}}" class="iq-waves-effect iq-bg-primary" aria-expanded="false"><i>A</i><span>SHIPPMENT A</span></a></li>
           <li><a href="{{route('Ship-Mark.pegawai.shipment-b')}}" class="iq-waves-effect iq-bg-danger" aria-expanded="false"><i>B</i><span>SHIPPMENT B</span></a></li>
           <li><a href="{{route('Ship-Mark.pegawai.shipment-c')}}" class="iq-waves-effect iq-bg-warning" aria-expanded="false"><i>C</i><span>SHIPPMENT C</span></a></li>
